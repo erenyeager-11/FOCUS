@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Focus Lab</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+--bg1:#1c1208;
+--bg2:#2e1b0f;
+--gold:#c6a15b;
+--glass:rgba(255,255,255,0.05);
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins,sans-serif;}
+body{
+background:linear-gradient(135deg,var(--bg1),var(--bg2));
+color:white;
+overflow-x:hidden;
+}
+
+/* INTRO */
+#intro{
+position:fixed;inset:0;
+display:flex;flex-direction:column;
+justify-content:center;align-items:center;
+background:linear-gradient(135deg,var(--bg1),var(--bg2));
+z-index:2000;transition:opacity 1s ease;
+}
+#intro h1{
+font-size:70px;color:var(--gold);
+opacity:0;transform:scale(0.9);
+animation:fadeIn 1.5s forwards;
+}
+#intro p{margin-top:10px;opacity:0;animation:fadeIn 1.5s 0.8s forwards;}
+@keyframes fadeIn{to{opacity:1;transform:scale(1);}}
+
+/* NAV */
+nav{
+position:fixed;top:0;width:100%;
+display:flex;justify-content:center;gap:30px;
+padding:15px;background:rgba(0,0,0,0.3);
+backdrop-filter:blur(10px);z-index:1000;
+}
+nav button{
+background:none;border:none;
+color:var(--gold);font-weight:500;cursor:pointer;
+}
+
+/* SECTIONS */
+section{
+min-height:100vh;
+padding:100px 20px 80px;
+display:none;
+}
+section.active{display:block;}
+
+.glass{
+background:var(--glass);
+border:1px solid rgba(255,255,255,0.1);
+border-radius:20px;
+padding:25px;
+backdrop-filter:blur(15px);
+}
+
+.dashboard-panel{max-width:900px;margin:auto;}
+
+#mainTimer{font-size:45px;margin:15px 0;}
+button{
+background:var(--gold);border:none;
+padding:8px 15px;border-radius:10px;
+margin:5px;cursor:pointer;font-weight:500;
+}
+
+/* CALENDAR */
+.calendar{
+display:grid;
+grid-template-columns:repeat(7,1fr);
+gap:6px;margin-top:15px;
+}
+.day{
+padding:10px;border-radius:8px;
+background:rgba(255,255,255,0.05);
+text-align:center;font-size:12px;
+}
+.day.activeDay{background:var(--gold);color:black;}
+
+/* FLOATING NOTES */
+#notesBtn{
+position:fixed;right:20px;bottom:20px;
+width:60px;height:60px;border-radius:50%;
+background:var(--gold);color:black;
+display:flex;align-items:center;justify-content:center;
+cursor:pointer;z-index:1000;font-weight:bold;
+}
+#notesPanel{
+position:fixed;right:20px;bottom:100px;
+width:300px;display:none;
+}
+
+/* ABOUT EREN */
+#aboutBtn{
+position:fixed;left:20px;bottom:20px;
+background:transparent;border:1px solid var(--gold);
+color:var(--gold);padding:10px 18px;
+border-radius:30px;text-decoration:none;
+font-weight:500;transition:0.3s;
+}
+#aboutBtn:hover{
+background:var(--gold);color:black;
+}
+
+/* TODO */
+.todo-item{display:flex;justify-content:space-between;margin:8px 0;}
+.done{text-decoration:line-through;opacity:0.6;}
+
+@media(max-width:768px){
+nav{bottom:0;top:auto;}
+section{padding-bottom:120px;}
+}
+</style>
+</head>
+<body>
+
+<div id="intro">
+<h1>FOCUS</h1>
+<p id="motivation"></p>
+</div>
+
+<nav>
+<button onclick="show('dashboard')">Dashboard</button>
+<button onclick="show('todo')">To-Do</button>
+<button onclick="show('focus')">Focus</button>
+</nav>
+
+<!-- DASHBOARD -->
+<section id="dashboard" class="active">
+<div class="glass dashboard-panel">
+<h2>Study Timer</h2>
+<div id="mainTimer">00:00:00</div>
+<button onclick="startStudy()">Start</button>
+<button onclick="pauseStudy()">Pause</button>
+<button onclick="resetAll()">Reset</button>
+
+<hr style="margin:25px 0;opacity:0.2">
+
+<h3>Calendar</h3>
+<div id="calendar" class="calendar"></div>
+
+<hr style="margin:25px 0;opacity:0.2">
+
+<h3>Analytics</h3>
+<p>Today: <span id="todayTotal">0</span> hrs</p>
+<p>All Time: <span id="allTotal">0</span> hrs</p>
+</div>
+</section>
+
+<!-- TODO -->
+<section id="todo">
+<div class="glass dashboard-panel">
+<h2>To-Do</h2>
+<input id="taskInput" placeholder="Add task">
+<button onclick="addTask()">Add</button>
+<div id="taskList"></div>
+</div>
+</section>
+
+<!-- FOCUS -->
+<section id="focus">
+<div class="glass dashboard-panel">
+
+<h2>Stopwatch</h2>
+<div id="stopwatch">00:00:00</div>
+<button onclick="startSW()">Start</button>
+<button onclick="pauseSW()">Pause</button>
+<button onclick="resetSW()">Reset</button>
+
+<hr style="margin:25px 0;opacity:0.2">
+
+<h2>Pomodoro (25:00)</h2>
+<div id="pomo">25:00</div>
+<button onclick="startPomo()">Start</button>
+<button onclick="resetPomo()">Reset</button>
+
+</div>
+</section>
+
+<!-- FLOATING -->
+<div id="notesBtn" onclick="toggleNotes()">📝</div>
+<div id="notesPanel" class="glass">
+<textarea id="noteArea" rows="8" style="width:100%"></textarea>
+</div>
+
+<a id="aboutBtn" href="https://erenyeager-11.github.io/ABOUT-EREN/" target="_blank">
+About Eren
+</a>
+
+<script>
+
+/* INTRO */
+const quotes=[
+"Discipline creates freedom.",
+"Focus beats motivation.",
+"Outwork yesterday.",
+"Small progress daily.",
+"Stay sharp."
+];
+document.getElementById("motivation").innerText=
+quotes[Math.floor(Math.random()*quotes.length)];
+
+setTimeout(()=>{
+document.getElementById("intro").style.opacity="0";
+setTimeout(()=>{document.getElementById("intro").style.display="none"},1000);
+},2500);
+
+/* NAV */
+function show(id){
+document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
+document.getElementById(id).classList.add("active");
+}
+
+/* STUDY ENGINE */
+let studyStart=localStorage.getItem("studyStart");
+let sessions=JSON.parse(localStorage.getItem("sessions"))||[];
+let interval;
+
+function getAllSeconds(){
+return sessions.reduce((a,b)=>a+b.duration,0);
+}
+
+function updateTimer(){
+if(studyStart){
+let elapsed=Math.floor((Date.now()-studyStart)/1000);
+displayTime(elapsed+getAllSeconds());
+}
+}
+
+function displayTime(sec){
+let h=Math.floor(sec/3600);
+let m=Math.floor((sec%3600)/60);
+let s=sec%60;
+document.getElementById("mainTimer").innerText=
+`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function startStudy(){
+if(!studyStart){
+studyStart=Date.now();
+localStorage.setItem("studyStart",studyStart);
+interval=setInterval(updateTimer,1000);
+}
+}
+
+function pauseStudy(){
+if(studyStart){
+let duration=Math.floor((Date.now()-studyStart)/1000);
+sessions.push({date:new Date().toISOString().slice(0,10),duration});
+localStorage.setItem("sessions",JSON.stringify(sessions));
+localStorage.removeItem("studyStart");
+studyStart=null;
+clearInterval(interval);
+updateStats();
+buildCalendar();
+}
+}
+
+function resetAll(){
+localStorage.clear();
+location.reload();
+}
+
+if(studyStart){interval=setInterval(updateTimer,1000);}
+
+/* REAL CALENDAR */
+function buildCalendar(){
+let cal=document.getElementById("calendar");
+cal.innerHTML="";
+
+const now=new Date();
+const year=now.getFullYear();
+const month=now.getMonth();
+const todayDate=now.getDate();
+
+const firstDay=new Date(year,month,1).getDay();
+const daysInMonth=new Date(year,month+1,0).getDate();
+
+const weekdays=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+weekdays.forEach(d=>{
+let head=document.createElement("div");
+head.className="day";
+head.style.fontWeight="600";
+head.innerText=d;
+cal.appendChild(head);
+});
+
+for(let i=0;i<firstDay;i++){
+let empty=document.createElement("div");
+empty.className="day";
+empty.style.opacity="0";
+cal.appendChild(empty);
+}
+
+for(let day=1;day<=daysInMonth;day++){
+let cell=document.createElement("div");
+cell.className="day";
+cell.innerText=day;
+
+if(day===todayDate){
+cell.style.border="1px solid var(--gold)";
+}
+
+let dateStr=new Date(year,month,day)
+.toISOString().slice(0,10);
+
+let studied=sessions.some(s=>s.date===dateStr);
+if(studied){
+cell.classList.add("activeDay");
+}
+
+cal.appendChild(cell);
+}
+}
+buildCalendar();
+
+/* ANALYTICS */
+function updateStats(){
+let today=new Date().toISOString().slice(0,10);
+let todaySec=sessions.filter(s=>s.date===today)
+.reduce((a,b)=>a+b.duration,0);
+document.getElementById("todayTotal").innerText=
+(todaySec/3600).toFixed(2);
+document.getElementById("allTotal").innerText=
+(getAllSeconds()/3600).toFixed(2);
+}
+updateStats();
+
+/* NOTES */
+document.getElementById("noteArea").value=
+localStorage.getItem("notes")||"";
+document.getElementById("noteArea").addEventListener("input",e=>{
+localStorage.setItem("notes",e.target.value);
+});
+function toggleNotes(){
+let p=document.getElementById("notesPanel");
+p.style.display=p.style.display==="block"?"none":"block";
+}
+
+/* TODO */
+function addTask(){
+let val=document.getElementById("taskInput").value;
+if(!val)return;
+let tasks=JSON.parse(localStorage.getItem("tasks"))||[];
+tasks.push({text:val,done:false});
+localStorage.setItem("tasks",JSON.stringify(tasks));
+document.getElementById("taskInput").value="";
+loadTasks();
+}
+function loadTasks(){
+let tasks=JSON.parse(localStorage.getItem("tasks"))||[];
+let list=document.getElementById("taskList");
+list.innerHTML="";
+tasks.forEach((t,i)=>{
+let div=document.createElement("div");
+div.className="todo-item"+(t.done?" done":"");
+div.innerHTML=`${t.text}
+<span>
+<button onclick="toggle(${i})">✓</button>
+<button onclick="del(${i})">X</button>
+</span>`;
+list.appendChild(div);
+});
+}
+function toggle(i){
+let tasks=JSON.parse(localStorage.getItem("tasks"));
+tasks[i].done=!tasks[i].done;
+localStorage.setItem("tasks",JSON.stringify(tasks));
+loadTasks();
+}
+function del(i){
+let tasks=JSON.parse(localStorage.getItem("tasks"));
+tasks.splice(i,1);
+localStorage.setItem("tasks",JSON.stringify(tasks));
+loadTasks();
+}
+loadTasks();
+
+/* STOPWATCH */
+let swInt,swTime=0;
+function startSW(){swInt=setInterval(()=>{swTime++;displaySW();},1000);}
+function pauseSW(){clearInterval(swInt);}
+function resetSW(){swTime=0;displaySW();}
+function displaySW(){
+let h=Math.floor(swTime/3600);
+let m=Math.floor((swTime%3600)/60);
+let s=swTime%60;
+document.getElementById("stopwatch").innerText=
+`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+/* POMODORO */
+let pomoTime=1500;
+let pomoInt;
+function startPomo(){
+clearInterval(pomoInt);
+pomoInt=setInterval(()=>{
+if(pomoTime>0){pomoTime--;displayPomo();}
+},1000);
+}
+function resetPomo(){
+clearInterval(pomoInt);
+pomoTime=1500;
+displayPomo();
+}
+function displayPomo(){
+let m=Math.floor(pomoTime/60);
+let s=pomoTime%60;
+document.getElementById("pomo").innerText=
+`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+displayPomo();
+
+</script>
+
+</body>
+</html>

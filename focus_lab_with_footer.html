@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Focus Lab</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080c12;
+  --bg2: #0d1117;
+  --bg3: #111820;
+  --surface: #141b24;
+  --surface2: #1a2333;
+  --border: rgba(100,180,255,0.08);
+  --border2: rgba(100,180,255,0.15);
+  --accent: #3b9eff;
+  --accent2: #00d4aa;
+  --accent3: #ff6b6b;
+  --accent4: #ffd166;
+  --text: #e8f0fe;
+  --text2: #8ba3c7;
+  --text3: #4a6080;
+  --mono: 'Space Mono', monospace;
+  --sans: 'Sora', sans-serif;
+  --radius: 14px;
+  --glow: 0 0 30px rgba(59,158,255,0.12);
+  --glow2: 0 0 20px rgba(0,212,170,0.1);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(59,158,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59,158,255,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none; z-index: 0;
+}
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(59,158,255,0.06) 0%, transparent 70%);
+  pointer-events: none; z-index: 0;
+}
+#intro {
+  position: fixed; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  background: var(--bg);
+  z-index: 9999;
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+#intro.hidden { opacity: 0; transform: scale(1.05); pointer-events: none; }
+.intro-logo {
+  font-family: var(--mono);
+  font-size: clamp(48px, 8vw, 90px);
+  color: var(--accent);
+  letter-spacing: 12px;
+  text-transform: uppercase;
+  animation: introGlow 2s ease-in-out infinite alternate;
+}
+@keyframes introGlow {
+  from { text-shadow: 0 0 20px rgba(59,158,255,0.3); }
+  to { text-shadow: 0 0 60px rgba(59,158,255,0.7), 0 0 100px rgba(59,158,255,0.3); }
+}
+.intro-sub {
+  margin-top: 16px;
+  color: var(--text2);
+  font-size: 14px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  animation: fadeUp 1s 0.5s both;
+}
+.intro-bar {
+  margin-top: 40px;
+  width: 200px; height: 2px;
+  background: var(--surface2);
+  border-radius: 2px;
+  overflow: hidden;
+  animation: fadeUp 1s 0.8s both;
+}
+.intro-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  width: 0;
+  animation: barFill 2s 0.3s ease forwards;
+}
+@keyframes barFill { to { width: 100%; } }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+#app { position: relative; z-index: 1; display: flex; min-height: 100vh; }
+#sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background: rgba(13,17,23,0.85);
+  border-right: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+  padding: 24px 0;
+  position: fixed; top: 0; left: 0; bottom: 0;
+  display: flex; flex-direction: column;
+  z-index: 100;
+  transition: transform 0.3s ease;
+}
+.sidebar-logo {
+  font-family: var(--mono);
+  font-size: 18px;
+  color: var(--accent);
+  letter-spacing: 4px;
+  padding: 0 24px 24px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+.nav-group { padding: 8px 12px; margin-bottom: 4px; }
+.nav-label {
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text3);
+  padding: 0 12px;
+  margin: 12px 0 4px;
+}
+.nav-btn {
+  width: 100%;
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  border: none;
+  background: transparent;
+  color: var(--text2);
+  font-family: var(--sans);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+.nav-btn:hover { background: var(--surface); color: var(--text); }
+.nav-btn.active { background: rgba(59,158,255,0.12); color: var(--accent); }
+.nav-btn .icon { font-size: 16px; width: 20px; }
+.sidebar-footer {
+  margin-top: auto;
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--text3);
+}
+.sidebar-footer a { color: var(--accent); text-decoration: none; }
+#main {
+  margin-left: 220px;
+  flex: 1;
+  min-height: 100vh;
+  padding: 32px;
+  padding-bottom: 80px;
+}
+.page { display: none; animation: pageIn 0.3s ease; }
+.page.active { display: block; }
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.page-header { margin-bottom: 28px; }
+.page-header h1 { font-size: 26px; font-weight: 700; color: var(--text); }
+.page-header p { font-size: 13px; color: var(--text2); margin-top: 4px; }
+
+/* PAGE FOOTER */
+.page-footer {
+  margin-top: 36px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.pf-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: var(--text3);
+  text-decoration: none;
+  transition: color 0.2s;
+  letter-spacing: 0.3px;
+}
+.pf-link:hover { color: var(--accent); }
+.pf-link svg { flex-shrink: 0; opacity: 0.7; transition: opacity 0.2s; }
+.pf-link:hover svg { opacity: 1; }
+.pf-dot { color: var(--border2); font-size: 10px; }
+.pf-built { font-size: 11px; color: var(--text3); margin-left: auto; }
+.pf-built a { color: var(--text3); text-decoration: none; }
+.pf-built a:hover { color: var(--accent); }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--glow);
+}
+.card-title {
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 16px;
+}
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.timer-display {
+  font-family: var(--mono);
+  font-size: clamp(40px, 6vw, 70px);
+  color: var(--accent);
+  text-align: center;
+  letter-spacing: 4px;
+  padding: 20px 0;
+  text-shadow: 0 0 30px rgba(59,158,255,0.4);
+}
+.timer-display.green { color: var(--accent2); text-shadow: 0 0 30px rgba(0,212,170,0.4); }
+.timer-display.red { color: var(--accent3); text-shadow: 0 0 30px rgba(255,107,107,0.4); }
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 9px 18px;
+  border-radius: 8px;
+  border: none;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-primary { background: var(--accent); color: white; }
+.btn-primary:hover { background: #5aadff; box-shadow: 0 0 20px rgba(59,158,255,0.3); }
+.btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border2); }
+.btn-secondary:hover { background: var(--bg3); }
+.btn-danger { background: rgba(255,107,107,0.15); color: var(--accent3); border: 1px solid rgba(255,107,107,0.2); }
+.btn-danger:hover { background: rgba(255,107,107,0.25); }
+.btn-success { background: rgba(0,212,170,0.15); color: var(--accent2); border: 1px solid rgba(0,212,170,0.2); }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+.btn-group { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 16px; }
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  text-align: center;
+}
+.stat-value { font-family: var(--mono); font-size: 28px; color: var(--accent); font-weight: 700; }
+.stat-label { font-size: 11px; color: var(--text3); margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
+.cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.cal-nav h3 { font-size: 15px; font-weight: 600; }
+.cal-nav button { background: var(--surface2); border: 1px solid var(--border2); color: var(--text); border-radius: 8px; padding: 6px 12px; cursor: pointer; font-size: 13px; }
+.cal-nav button:hover { background: var(--surface); }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.cal-dow { text-align: center; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--text3); padding: 6px 0; }
+.cal-day {
+  aspect-ratio: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+  gap: 2px;
+}
+.cal-day:hover { background: var(--surface2); }
+.cal-day.today { border: 1px solid var(--accent); color: var(--accent); }
+.cal-day.studied { background: rgba(59,158,255,0.15); }
+.cal-day.studied::after { content: ''; width: 4px; height: 4px; border-radius: 50%; background: var(--accent); }
+.cal-day.empty { opacity: 0; pointer-events: none; }
+.pomo-ring { position: relative; width: 220px; height: 220px; margin: 0 auto; }
+.pomo-ring svg { transform: rotate(-90deg); }
+.pomo-time { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.pomo-time .big { font-family: var(--mono); font-size: 42px; color: var(--text); }
+.pomo-time .label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 2px; margin-top: 4px; }
+.pomo-phases { display: flex; gap: 8px; justify-content: center; margin: 16px 0; }
+.phase-btn { padding: 6px 14px; border-radius: 20px; font-size: 12px; border: 1px solid var(--border2); background: transparent; color: var(--text2); cursor: pointer; transition: all 0.2s; }
+.phase-btn.active { background: rgba(59,158,255,0.12); color: var(--accent); border-color: rgba(59,158,255,0.3); }
+.pomo-settings { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 20px; }
+.pomo-set-item { text-align: center; }
+.pomo-set-item label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 6px; }
+.pomo-set-item input[type=number] {
+  width: 100%;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text);
+  font-family: var(--mono); font-size: 18px;
+  text-align: center; padding: 8px; outline: none;
+}
+.pomo-count { display: flex; gap: 6px; justify-content: center; margin: 12px 0; }
+.pomo-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border2); transition: all 0.3s; }
+.pomo-dot.done { background: var(--accent); border-color: var(--accent); }
+.note-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+.note-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; cursor: pointer; transition: all 0.2s; }
+.note-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+.note-card textarea { width: 100%; background: transparent; border: none; color: var(--text); font-family: var(--sans); font-size: 13px; resize: none; outline: none; line-height: 1.6; }
+.note-colors { display: flex; gap: 6px; margin-bottom: 8px; }
+.note-color { width: 14px; height: 14px; border-radius: 50%; cursor: pointer; transition: transform 0.15s; border: 2px solid transparent; }
+.note-color:hover, .note-color.sel { transform: scale(1.3); border-color: white; }
+.habit-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.habit-name { flex: 1; font-size: 13px; }
+.habit-dots { display: flex; gap: 4px; }
+.habit-dot {
+  width: 24px; height: 24px; border-radius: 6px;
+  background: var(--surface2); border: 1px solid var(--border2);
+  cursor: pointer; transition: all 0.15s; font-size: 10px;
+  display: flex; align-items: center; justify-content: center;
+}
+.habit-dot.done { background: var(--accent2); border-color: var(--accent2); color: #000; }
+.habit-streak { font-family: var(--mono); font-size: 12px; color: var(--accent4); width: 36px; text-align: right; }
+.lap-list { max-height: 180px; overflow-y: auto; margin-top: 12px; }
+.lap-item { display: flex; justify-content: space-between; padding: 6px 10px; border-radius: 6px; font-family: var(--mono); font-size: 12px; border-bottom: 1px solid var(--border); color: var(--text2); }
+.lap-item:last-child { border-bottom: none; }
+.lap-item.best { color: var(--accent2); }
+.lap-item.worst { color: var(--accent3); }
+.bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 120px; margin-top: 12px; }
+.bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; }
+.bar { width: 100%; border-radius: 4px 4px 0 0; min-height: 2px; transition: height 0.5s ease; background: linear-gradient(to top, var(--accent), rgba(59,158,255,0.4)); }
+.bar-label { font-size: 9px; color: var(--text3); }
+.bar-val { font-size: 9px; color: var(--text2); font-family: var(--mono); }
+#topbar {
+  display: none;
+  position: fixed; top: 0; left: 0; right: 0;
+  background: rgba(8,12,18,0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px;
+  z-index: 200;
+  align-items: center; justify-content: space-between;
+}
+.topbar-logo { font-family: var(--mono); font-size: 16px; color: var(--accent); letter-spacing: 4px; }
+#hamburger { background: none; border: none; color: var(--text); font-size: 22px; cursor: pointer; }
+#mobile-nav {
+  display: none;
+  position: fixed; top: 56px; left: 0; right: 0; bottom: 0;
+  background: rgba(8,12,18,0.97);
+  backdrop-filter: blur(20px);
+  z-index: 150;
+  flex-direction: column;
+  padding: 24px;
+  overflow-y: auto;
+}
+#mobile-nav.open { display: flex; }
+.mnav-btn {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 12px;
+  border-radius: var(--radius);
+  border: none;
+  background: transparent;
+  color: var(--text2);
+  font-family: var(--sans);
+  font-size: 15px;
+  cursor: pointer;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.mnav-btn:hover, .mnav-btn.active { color: var(--accent); }
+.mnav-btn .icon { font-size: 20px; }
+.todo-input-row { display: flex; gap: 8px; margin-bottom: 16px; }
+.input { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: var(--sans); font-size: 13px; padding: 10px 14px; outline: none; transition: border 0.2s; }
+.input:focus { border-color: var(--accent); }
+.input-full { flex: 1; }
+.todo-item { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 8px; transition: all 0.2s; position: relative; }
+.todo-item:hover { border-color: var(--border2); }
+.todo-item.done { opacity: 0.5; }
+.todo-item.done .todo-text { text-decoration: line-through; color: var(--text3); }
+.todo-item.half .todo-text { text-decoration: underline; text-decoration-style: dashed; color: var(--accent4); }
+.todo-check { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border2); cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; transition: all 0.2s; background: transparent; color: transparent; }
+.todo-item.done .todo-check { background: var(--accent); border-color: var(--accent); color: white; }
+.todo-item.half .todo-check { background: var(--accent4); border-color: var(--accent4); color: #000; }
+.todo-text { flex: 1; font-size: 13px; outline: none; background: transparent; border: none; color: var(--text); font-family: var(--sans); }
+.todo-text:focus { color: var(--accent); }
+.todo-actions { display: flex; gap: 4px; opacity: 0; transition: opacity 0.2s; }
+.todo-item:hover .todo-actions { opacity: 1; }
+.todo-priority { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.filter-bar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.filter-btn { padding: 5px 12px; border-radius: 20px; font-size: 12px; border: 1px solid var(--border2); background: transparent; color: var(--text2); cursor: pointer; transition: all 0.2s; }
+.filter-btn.active { background: rgba(59,158,255,0.12); color: var(--accent); border-color: rgba(59,158,255,0.3); }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 3px; }
+.circle-progress { transition: stroke-dashoffset 0.5s ease; }
+#snack {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(40px);
+  background: var(--surface2); border: 1px solid var(--border2);
+  color: var(--text); padding: 10px 20px; border-radius: 8px;
+  font-size: 13px; opacity: 0; transition: all 0.3s; z-index: 9999;
+}
+#snack.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+@media (max-width: 768px) {
+  #sidebar { display: none; }
+  #topbar { display: flex; }
+  #main { margin-left: 0; padding: 80px 16px 80px; }
+  .grid-2 { grid-template-columns: 1fr; }
+  .grid-3 { grid-template-columns: 1fr 1fr; }
+  .pomo-settings { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 480px) {
+  .grid-3 { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div id="intro">
+  <div class="intro-logo">FOCUS</div>
+  <div class="intro-sub" id="introQuote"></div>
+  <div class="intro-bar"><div class="intro-bar-fill"></div></div>
+</div>
+
+<div id="topbar">
+  <span class="topbar-logo">FOCUS</span>
+  <button id="hamburger" onclick="toggleMobileNav()">☰</button>
+</div>
+<div id="mobile-nav"></div>
+
+<div id="app">
+  <nav id="sidebar">
+    <div class="sidebar-logo">FOCUS</div>
+    <div class="nav-label">Overview</div>
+    <div class="nav-group" id="nav-desktop"></div>
+    <div class="sidebar-footer">
+      Built by <a href="https://portfolio-erenn.vercel.app" target="_blank">Eren</a>
+    </div>
+  </nav>
+
+  <main id="main">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <h1>Dashboard</h1>
+        <p id="dash-greeting">Good morning — let's get to work.</p>
+      </div>
+      <div class="grid-3" style="margin-bottom:20px;">
+        <div class="stat-card"><div class="stat-value" id="dash-today">0.00</div><div class="stat-label">Hours Today</div></div>
+        <div class="stat-card"><div class="stat-value" id="dash-week">0.00</div><div class="stat-label">Hours This Week</div></div>
+        <div class="stat-card"><div class="stat-value" id="dash-all">0.00</div><div class="stat-label">All Time Hours</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Study Timer</div>
+          <div class="timer-display" id="mainTimer">00:00:00</div>
+          <div class="btn-group">
+            <button class="btn btn-primary" onclick="startStudy()">▶ Start</button>
+            <button class="btn btn-secondary" onclick="pauseStudy()">⏸ Pause</button>
+            <button class="btn btn-danger" onclick="resetStudy()">↺ Reset</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Weekly Progress</div>
+          <div class="bar-chart" id="weekChart"></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:20px;">
+        <div class="cal-nav">
+          <button onclick="calPrev()">‹</button>
+          <h3 id="calTitle"></h3>
+          <button onclick="calNext()">›</button>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+      </div>
+      <div class="page-footer" id="footer-dashboard"></div>
+    </div>
+
+    <!-- FOCUS TIMER -->
+    <div class="page" id="page-focus">
+      <div class="page-header"><h1>Focus Timers</h1><p>Pomodoro & Stopwatch</p></div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Pomodoro</div>
+          <div class="pomo-phases">
+            <button class="phase-btn active" onclick="setPhase('work',this)">Focus</button>
+            <button class="phase-btn" onclick="setPhase('short',this)">Short Break</button>
+            <button class="phase-btn" onclick="setPhase('long',this)">Long Break</button>
+          </div>
+          <div class="pomo-ring">
+            <svg width="220" height="220" viewBox="0 0 220 220">
+              <circle cx="110" cy="110" r="96" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="12"/>
+              <circle id="pomoRing" class="circle-progress" cx="110" cy="110" r="96" fill="none" stroke="var(--accent)" stroke-width="12" stroke-linecap="round" stroke-dasharray="603" stroke-dashoffset="0"/>
+            </svg>
+            <div class="pomo-time">
+              <div class="big" id="pomoDisplay">25:00</div>
+              <div class="label" id="pomoPhaseLabel">Focus</div>
+            </div>
+          </div>
+          <div class="pomo-count" id="pomoDots"></div>
+          <div class="btn-group">
+            <button class="btn btn-primary" onclick="startPomo()">▶ Start</button>
+            <button class="btn btn-secondary" onclick="pausePomo()">⏸ Pause</button>
+            <button class="btn btn-danger" onclick="resetPomo()">↺ Reset</button>
+          </div>
+          <div class="pomo-settings">
+            <div class="pomo-set-item"><label>Focus (min)</label><input type="number" id="pomoWorkMin" value="25" min="1" max="120" onchange="applyPomoSettings()"></div>
+            <div class="pomo-set-item"><label>Short Break</label><input type="number" id="pomoShortMin" value="5" min="1" max="60" onchange="applyPomoSettings()"></div>
+            <div class="pomo-set-item"><label>Long Break</label><input type="number" id="pomoLongMin" value="15" min="1" max="60" onchange="applyPomoSettings()"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Stopwatch</div>
+          <div class="timer-display green" id="swDisplay">00:00:00</div>
+          <div class="btn-group">
+            <button class="btn btn-primary" onclick="startSW()">▶ Start</button>
+            <button class="btn btn-secondary" onclick="pauseSW()">⏸ Pause</button>
+            <button class="btn btn-success" onclick="lapSW()">⊕ Lap</button>
+            <button class="btn btn-danger" onclick="resetSW()">↺ Reset</button>
+          </div>
+          <div class="lap-list" id="lapList"></div>
+        </div>
+      </div>
+      <div class="page-footer" id="footer-focus"></div>
+    </div>
+
+    <!-- TODO -->
+    <div class="page" id="page-todo">
+      <div class="page-header"><h1>To-Do</h1><p>Manage your tasks</p></div>
+      <div class="card">
+        <div class="todo-input-row">
+          <input class="input input-full" id="taskInput" placeholder="Add a task…" onkeydown="if(event.key==='Enter')addTask()">
+          <select class="input" id="taskPriority" style="width:120px;">
+            <option value="high">🔴 High</option>
+            <option value="med" selected>🟡 Medium</option>
+            <option value="low">🟢 Low</option>
+          </select>
+          <button class="btn btn-primary" onclick="addTask()">+ Add</button>
+        </div>
+        <div class="filter-bar" id="taskFilterBar">
+          <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+          <button class="filter-btn" onclick="setFilter('active',this)">Active</button>
+          <button class="filter-btn" onclick="setFilter('half',this)">In Progress</button>
+          <button class="filter-btn" onclick="setFilter('done',this)">Done</button>
+          <button class="filter-btn" onclick="setFilter('high',this)">🔴 High</button>
+        </div>
+        <div id="taskList"></div>
+        <div style="display:flex;justify-content:flex-end;margin-top:12px;">
+          <button class="btn btn-danger btn-sm" onclick="clearDone()">Clear Done</button>
+        </div>
+      </div>
+      <div class="page-footer" id="footer-todo"></div>
+    </div>
+
+    <!-- NOTES -->
+    <div class="page" id="page-notes">
+      <div class="page-header"><h1>Notes</h1><p>Your quick-capture scratchpad</p></div>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
+        <button class="btn btn-primary" onclick="addNote()">+ New Note</button>
+      </div>
+      <div class="note-grid" id="noteGrid"></div>
+      <div class="page-footer" id="footer-notes"></div>
+    </div>
+
+    <!-- HABITS -->
+    <div class="page" id="page-habits">
+      <div class="page-header"><h1>Habit Tracker</h1><p>Last 7 days streak tracking</p></div>
+      <div class="card">
+        <div class="todo-input-row" style="margin-bottom:20px;">
+          <input class="input input-full" id="habitInput" placeholder="New habit…" onkeydown="if(event.key==='Enter')addHabit()">
+          <button class="btn btn-primary" onclick="addHabit()">+ Add</button>
+        </div>
+        <div id="habitList"></div>
+      </div>
+      <div class="page-footer" id="footer-habits"></div>
+    </div>
+
+    <!-- ANALYTICS -->
+    <div class="page" id="page-analytics">
+      <div class="page-header"><h1>Analytics</h1><p>Your study insights</p></div>
+      <div class="grid-3" style="margin-bottom:20px;">
+        <div class="stat-card"><div class="stat-value" id="an-today">0.00</div><div class="stat-label">Today (hrs)</div></div>
+        <div class="stat-card"><div class="stat-value" id="an-avg">0.00</div><div class="stat-label">Daily Avg (7d)</div></div>
+        <div class="stat-card"><div class="stat-value" id="an-streak">0</div><div class="stat-label">Day Streak</div></div>
+      </div>
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-title">Last 30 Days</div>
+        <div class="bar-chart" id="an30Chart" style="height:160px;"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">All Sessions</div>
+        <div id="sessionLog" style="max-height:300px;overflow-y:auto;"></div>
+      </div>
+      <div class="page-footer" id="footer-analytics"></div>
+    </div>
+
+  </main>
+</div>
+
+<div id="snack"></div>
+
+<script>
+/* ===== FOOTER ===== */
+function makeFooter() {
+  return `
+    <a class="pf-link" href="https://t.me/hammadgotnochill" target="_blank">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.93 7.235l-1.694 7.988c-.127.566-.461.703-.934.437l-2.585-1.905-1.247 1.2c-.138.138-.254.254-.52.254l.185-2.637 4.797-4.334c.209-.185-.045-.288-.322-.103L8.222 14.37l-2.54-.793c-.552-.173-.564-.552.115-.817l9.921-3.826c.46-.167.862.103.712.3z" fill="var(--accent)"/>
+      </svg>
+      @hammadgotnochill
+    </a>
+    <span class="pf-dot">·</span>
+    <a class="pf-link" href="https://portfolio-erenn.vercel.app" target="_blank">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 2c4.418 0 8 3.582 8 8 0 .935-.16 1.832-.455 2.667C18.548 13.72 17.316 13 16 13c-.892 0-1.715.308-2.364.818L12 12.5l-1.636 1.318A3.977 3.977 0 0 0 8 13c-1.316 0-2.548.72-3.545 1.667A7.966 7.966 0 0 1 4 12c0-4.418 3.582-8 8-8zm0 3a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm0 2a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" fill="var(--accent2)"/>
+      </svg>
+      portfolio
+    </a>
+  `;
+}
+
+const footerIds = ['dashboard','focus','todo','notes','habits','analytics'];
+footerIds.forEach(id => {
+  const el = document.getElementById('footer-' + id);
+  if (el) el.innerHTML = makeFooter();
+});
+
+/* ===== NAVIGATION ===== */
+const pages = [
+  { id:'dashboard', label:'Dashboard', icon:'⬛' },
+  { id:'focus',     label:'Focus Timers', icon:'⏱' },
+  { id:'todo',      label:'To-Do',     icon:'✅' },
+  { id:'notes',     label:'Notes',     icon:'📝' },
+  { id:'habits',    label:'Habits',    icon:'🔥' },
+  { id:'analytics', label:'Analytics', icon:'📊' },
+];
+let currentPage = 'dashboard';
+
+function buildNav() {
+  const desktop = document.getElementById('nav-desktop');
+  const mobileNav = document.getElementById('mobile-nav');
+  desktop.innerHTML = '';
+  mobileNav.innerHTML = '';
+  pages.forEach(p => {
+    const btn = document.createElement('button');
+    btn.className = 'nav-btn' + (p.id === currentPage ? ' active' : '');
+    btn.innerHTML = `<span class="icon">${p.icon}</span>${p.label}`;
+    btn.onclick = () => navigate(p.id);
+    desktop.appendChild(btn);
+    const mbtn = document.createElement('button');
+    mbtn.className = 'mnav-btn' + (p.id === currentPage ? ' active' : '');
+    mbtn.innerHTML = `<span class="icon">${p.icon}</span>${p.label}`;
+    mbtn.onclick = () => { navigate(p.id); closeMobileNav(); };
+    mobileNav.appendChild(mbtn);
+  });
+}
+
+function navigate(id) {
+  currentPage = id;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  buildNav();
+  if(id==='analytics') updateAnalytics();
+  if(id==='dashboard') { updateStats(); buildChart(); }
+}
+
+function toggleMobileNav() { document.getElementById('mobile-nav').classList.toggle('open'); }
+function closeMobileNav() { document.getElementById('mobile-nav').classList.remove('open'); }
+
+/* ===== INTRO ===== */
+const quotes = ["Discipline creates freedom.","Focus beats motivation.","Outwork yesterday.","Small progress daily.","Be obsessively consistent.","Ship it. Refine it. Repeat."];
+document.getElementById('introQuote').textContent = quotes[Math.floor(Math.random()*quotes.length)];
+setTimeout(() => {
+  document.getElementById('intro').classList.add('hidden');
+  setTimeout(() => document.getElementById('intro').style.display='none', 900);
+}, 2600);
+
+function setGreeting() {
+  const h = new Date().getHours();
+  const g = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('dash-greeting').textContent = `${g} — let's get to work.`;
+}
+setGreeting();
+
+const S = {
+  get: (k, def) => { try { const v = localStorage.getItem(k); return v !== null ? JSON.parse(v) : def; } catch { return def; } },
+  set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+};
+
+/* ===== STUDY TIMER ===== */
+let studyStart = S.get('studyStart', null);
+let sessions = S.get('sessions', []);
+let studyInterval;
+
+function getAllSec() { return sessions.reduce((a,b) => a + b.duration, 0); }
+function fmtTime(sec) {
+  const h = String(Math.floor(sec/3600)).padStart(2,'0');
+  const m = String(Math.floor((sec%3600)/60)).padStart(2,'0');
+  const s = String(sec%60).padStart(2,'0');
+  return `${h}:${m}:${s}`;
+}
+function updateStudyTimer() {
+  if (studyStart) {
+    const elapsed = Math.floor((Date.now() - studyStart) / 1000);
+    document.getElementById('mainTimer').textContent = fmtTime(getAllSec() + elapsed);
+  }
+}
+function startStudy() {
+  if (!studyStart) {
+    studyStart = Date.now();
+    S.set('studyStart', studyStart);
+    studyInterval = setInterval(updateStudyTimer, 1000);
+  }
+}
+function pauseStudy() {
+  if (studyStart) {
+    const dur = Math.floor((Date.now() - studyStart) / 1000);
+    const today = new Date().toISOString().slice(0,10);
+    sessions.push({ date: today, duration: dur });
+    S.set('sessions', sessions);
+    localStorage.removeItem('studyStart');
+    studyStart = null;
+    clearInterval(studyInterval);
+    updateStats(); buildCalendar(); buildChart();
+  }
+}
+function resetStudy() {
+  clearInterval(studyInterval);
+  studyStart = null;
+  localStorage.removeItem('studyStart');
+  sessions = [];
+  S.set('sessions', sessions);
+  document.getElementById('mainTimer').textContent = '00:00:00';
+  updateStats(); buildCalendar(); buildChart();
+  snack('Timer reset');
+}
+if (studyStart) { studyInterval = setInterval(updateStudyTimer, 1000); updateStudyTimer(); }
+
+function todaySec() {
+  const today = new Date().toISOString().slice(0,10);
+  return sessions.filter(s => s.date === today).reduce((a,b) => a+b.duration, 0);
+}
+function weekSec() {
+  const weekAgo = new Date(Date.now() - 7*86400000).toISOString().slice(0,10);
+  return sessions.filter(s => s.date >= weekAgo).reduce((a,b) => a+b.duration, 0);
+}
+function updateStats() {
+  const ts = (todaySec()/3600).toFixed(2);
+  const ws = (weekSec()/3600).toFixed(2);
+  const all = (getAllSec()/3600).toFixed(2);
+  ['dash-today','an-today'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=ts; });
+  const dw = document.getElementById('dash-week'); if(dw) dw.textContent=ws;
+  const da = document.getElementById('dash-all'); if(da) da.textContent=all;
+}
+updateStats();
+
+/* ===== CALENDAR ===== */
+let calYear, calMonth;
+(function initCal() { const n=new Date(); calYear=n.getFullYear(); calMonth=n.getMonth(); })();
+function buildCalendar() {
+  const grid = document.getElementById('calGrid');
+  const title = document.getElementById('calTitle');
+  if (!grid) return;
+  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  title.textContent = `${monthNames[calMonth]} ${calYear}`;
+  grid.innerHTML = '';
+  ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d => {
+    const el = document.createElement('div'); el.className = 'cal-dow'; el.textContent = d; grid.appendChild(el);
+  });
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+  const today = new Date();
+  for (let i=0;i<firstDay;i++) { const el=document.createElement('div'); el.className='cal-day empty'; grid.appendChild(el); }
+  for (let day=1; day<=daysInMonth; day++) {
+    const el = document.createElement('div'); el.className = 'cal-day'; el.textContent = day;
+    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    if (today.getFullYear()===calYear && today.getMonth()===calMonth && today.getDate()===day) el.classList.add('today');
+    if (sessions.some(s => s.date===dateStr)) el.classList.add('studied');
+    grid.appendChild(el);
+  }
+}
+buildCalendar();
+function calPrev() { calMonth--; if(calMonth<0){calMonth=11;calYear--;} buildCalendar(); }
+function calNext() { calMonth++; if(calMonth>11){calMonth=0;calYear++;} buildCalendar(); }
+
+/* ===== WEEK CHART ===== */
+function buildChart() {
+  const el = document.getElementById('weekChart'); if (!el) return;
+  const days = [];
+  const now = new Date();
+  for (let i=6;i>=0;i--) {
+    const d = new Date(now - i*86400000);
+    const key = d.toISOString().slice(0,10);
+    const sec = sessions.filter(s => s.date===key).reduce((a,b)=>a+b.duration,0);
+    days.push({ label: ['Su','Mo','Tu','We','Th','Fr','Sa'][d.getDay()], hrs: sec/3600 });
+  }
+  const maxH = Math.max(...days.map(d=>d.hrs), 0.5);
+  el.innerHTML = days.map(d => `<div class="bar-wrap"><div class="bar-val">${d.hrs>0?d.hrs.toFixed(1):''}</div><div class="bar" style="height:${(d.hrs/maxH)*100}%"></div><div class="bar-label">${d.label}</div></div>`).join('');
+}
+buildChart();
+
+/* ===== POMODORO ===== */
+let pomoPhase = 'work';
+let pomoSettings = S.get('pomoSettings', {work:25, short:5, long:15});
+let pomoTime = pomoSettings.work * 60;
+let pomoTotal = pomoSettings.work * 60;
+let pomoRunning = false;
+let pomoInt2;
+let pomoSession = 0;
+const POMO_SESSIONS_BEFORE_LONG = 4;
+
+function applyPomoSettings() {
+  pomoSettings = { work: parseInt(document.getElementById('pomoWorkMin').value)||25, short: parseInt(document.getElementById('pomoShortMin').value)||5, long: parseInt(document.getElementById('pomoLongMin').value)||15 };
+  S.set('pomoSettings', pomoSettings); resetPomo();
+}
+function setPhase(phase, btn) {
+  pomoPhase = phase;
+  document.querySelectorAll('.phase-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  resetPomo();
+  document.getElementById('pomoPhaseLabel').textContent = {work:'Focus',short:'Short Break',long:'Long Break'}[phase];
+}
+function getPomoDuration() { return (pomoPhase==='work' ? pomoSettings.work : pomoPhase==='short' ? pomoSettings.short : pomoSettings.long) * 60; }
+function startPomo() {
+  if (pomoRunning) return; pomoRunning = true;
+  pomoInt2 = setInterval(() => { if (pomoTime > 0) { pomoTime--; renderPomo(); } else { clearInterval(pomoInt2); pomoRunning=false; onPomoEnd(); } }, 1000);
+}
+function pausePomo() { clearInterval(pomoInt2); pomoRunning=false; }
+function resetPomo() { clearInterval(pomoInt2); pomoRunning=false; pomoTotal = getPomoDuration(); pomoTime = pomoTotal; renderPomo(); }
+function renderPomo() {
+  const m = String(Math.floor(pomoTime/60)).padStart(2,'0');
+  const s = String(pomoTime%60).padStart(2,'0');
+  document.getElementById('pomoDisplay').textContent = `${m}:${s}`;
+  const circ = 2 * Math.PI * 96;
+  document.getElementById('pomoRing').setAttribute('stroke-dasharray', circ);
+  document.getElementById('pomoRing').setAttribute('stroke-dashoffset', circ - circ * (pomoTime / pomoTotal));
+  document.getElementById('pomoRing').setAttribute('stroke', pomoPhase==='work' ? 'var(--accent)' : pomoPhase==='short' ? 'var(--accent2)' : 'var(--accent4)');
+}
+function onPomoEnd() {
+  if (pomoPhase==='work') { pomoSession++; snack('Focus session done! 🎉'); if (pomoSession % POMO_SESSIONS_BEFORE_LONG === 0) setPhaseAuto('long'); else setPhaseAuto('short'); }
+  else { snack('Break over — back to focus!'); setPhaseAuto('work'); }
+  renderDots();
+}
+function setPhaseAuto(phase) {
+  pomoPhase = phase;
+  document.getElementById('pomoPhaseLabel').textContent = {work:'Focus',short:'Short Break',long:'Long Break'}[phase];
+  document.querySelectorAll('.phase-btn').forEach((b,i) => b.classList.toggle('active', ['work','short','long'][i]===phase));
+  resetPomo();
+}
+function renderDots() {
+  const dots = document.getElementById('pomoDots'); dots.innerHTML = '';
+  for (let i=0;i<POMO_SESSIONS_BEFORE_LONG;i++) {
+    const d = document.createElement('div'); d.className='pomo-dot'; if(i < (pomoSession % POMO_SESSIONS_BEFORE_LONG)) d.classList.add('done'); dots.appendChild(d);
+  }
+}
+document.getElementById('pomoWorkMin').value = pomoSettings.work;
+document.getElementById('pomoShortMin').value = pomoSettings.short;
+document.getElementById('pomoLongMin').value = pomoSettings.long;
+resetPomo(); renderDots();
+
+/* ===== STOPWATCH ===== */
+let swTime=0, swRunning=false, swInt2, laps=[];
+function startSW() { if(!swRunning){swRunning=true;swInt2=setInterval(()=>{swTime++;renderSW();},1000);} }
+function pauseSW() { clearInterval(swInt2);swRunning=false; }
+function lapSW() {
+  if(!swRunning)return;
+  laps.unshift({time:swTime, lap: laps.length ? swTime - (laps[0]?.cumulative||0) : swTime, cumulative:swTime});
+  renderLaps();
+}
+function resetSW() { clearInterval(swInt2);swRunning=false;swTime=0;laps=[];renderSW();renderLaps(); }
+function renderSW() { document.getElementById('swDisplay').textContent = fmtTime(swTime); }
+function renderLaps() {
+  const el = document.getElementById('lapList'); if(!el)return;
+  if(!laps.length){el.innerHTML='';return;}
+  const lapTimes = laps.map(l=>l.lap);
+  const bestT = Math.min(...lapTimes); const worstT = Math.max(...lapTimes);
+  el.innerHTML = laps.map((l,i) => {
+    let cls = l.lap===bestT&&laps.length>1?' best':l.lap===worstT&&laps.length>1?' worst':'';
+    return `<div class="lap-item${cls}"><span>Lap ${laps.length-i}</span><span>${fmtTime(l.lap)}</span><span>${fmtTime(l.cumulative)}</span></div>`;
+  }).join('');
+}
+
+/* ===== TODO ===== */
+let tasks = S.get('tasks', []);
+let taskFilter = 'all';
+function addTask() {
+  const val = document.getElementById('taskInput').value.trim(); if (!val) return;
+  const priority = document.getElementById('taskPriority').value;
+  tasks.push({ id: Date.now(), text: val, status: 'active', priority, created: new Date().toISOString() });
+  S.set('tasks', tasks); document.getElementById('taskInput').value=''; renderTasks();
+}
+function renderTasks() {
+  const el = document.getElementById('taskList'); if(!el) return;
+  let filtered = tasks;
+  if(taskFilter==='done') filtered = tasks.filter(t=>t.status==='done');
+  else if(taskFilter==='half') filtered = tasks.filter(t=>t.status==='half');
+  else if(taskFilter==='active') filtered = tasks.filter(t=>t.status==='active');
+  else if(taskFilter==='high') filtered = tasks.filter(t=>t.priority==='high');
+  if(!filtered.length) { el.innerHTML='<div style="text-align:center;color:var(--text3);padding:24px;font-size:13px;">No tasks here!</div>'; return; }
+  const pColor = {high:'var(--accent3)',med:'var(--accent4)',low:'var(--accent2)'};
+  el.innerHTML = filtered.map(t => `
+    <div class="todo-item ${t.status}" id="task-${t.id}">
+      <div class="todo-priority" style="background:${pColor[t.priority]||'var(--text3)'}"></div>
+      <div class="todo-check" onclick="cycleTask(${t.id})">${t.status==='done'?'✓':t.status==='half'?'~':''}</div>
+      <input class="todo-text" value="${escHtml(t.text)}" onchange="editTask(${t.id},this.value)" ${t.status==='done'?'disabled':''}>
+      <div class="todo-actions">
+        <button class="btn btn-sm btn-secondary" onclick="cycleTask(${t.id})">↻</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteTask(${t.id})">✕</button>
+      </div>
+    </div>`).join('');
+}
+function cycleTask(id) { const t=tasks.find(t=>t.id===id); if(!t)return; t.status=t.status==='active'?'half':t.status==='half'?'done':'active'; S.set('tasks',tasks); renderTasks(); }
+function editTask(id,val) { const t=tasks.find(t=>t.id===id); if(!t)return; t.text=val; S.set('tasks',tasks); }
+function deleteTask(id) { tasks=tasks.filter(t=>t.id!==id); S.set('tasks',tasks); renderTasks(); }
+function clearDone() { tasks=tasks.filter(t=>t.status!=='done'); S.set('tasks',tasks); renderTasks(); snack('Done tasks cleared'); }
+function setFilter(f,btn) { taskFilter=f; document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderTasks(); }
+renderTasks();
+
+/* ===== NOTES ===== */
+let notes = S.get('notes', []);
+const NOTE_COLORS = ['#1a2333','#1a1a2e','#1a2a1a','#2a1a1a','#2a2018'];
+const NOTE_ACCENTS = ['var(--accent)','var(--accent2)','var(--accent3)','var(--accent4)','#c084fc'];
+function addNote() { notes.unshift({ id: Date.now(), text: '', color: 0, created: new Date().toISOString() }); S.set('notes',notes); renderNotes(); }
+function renderNotes() {
+  const el = document.getElementById('noteGrid'); if(!el) return;
+  if(!notes.length) { el.innerHTML='<div style="color:var(--text3);font-size:13px;">No notes yet. Click + New Note.</div>'; return; }
+  el.innerHTML = notes.map((n,i) => `
+    <div class="note-card" style="background:${NOTE_COLORS[n.color]};border-color:${NOTE_ACCENTS[n.color]}33;">
+      <div class="note-colors">
+        ${NOTE_COLORS.map((c,ci)=>`<div class="note-color${n.color===ci?' sel':''}" style="background:${NOTE_ACCENTS[ci]}" onclick="setNoteColor(${n.id},${ci})"></div>`).join('')}
+        <span style="margin-left:auto;font-size:11px;color:var(--text3);">${timeAgo(n.created)}</span>
+        <button onclick="deleteNote(${n.id})" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;">✕</button>
+      </div>
+      <textarea rows="5" placeholder="Write something…" onchange="saveNote(${n.id},this.value)">${escHtml(n.text)}</textarea>
+    </div>`).join('');
+}
+function saveNote(id,val) { const n=notes.find(n=>n.id===id); if(!n)return; n.text=val; S.set('notes',notes); }
+function setNoteColor(id,ci) { const n=notes.find(n=>n.id===id); if(!n)return; n.color=ci; S.set('notes',notes); renderNotes(); }
+function deleteNote(id) { notes=notes.filter(n=>n.id!==id); S.set('notes',notes); renderNotes(); }
+renderNotes();
+
+/* ===== HABITS ===== */
+let habits = S.get('habits', []);
+function addHabit() {
+  const val = document.getElementById('habitInput').value.trim(); if(!val)return;
+  const last7=getLast7Keys(); const checks={}; last7.forEach(k=>checks[k]=false);
+  habits.push({id:Date.now(),name:val,checks}); S.set('habits',habits); document.getElementById('habitInput').value=''; renderHabits();
+}
+function getLast7Keys() { const keys=[]; for(let i=6;i>=0;i--){const d=new Date(Date.now()-i*86400000);keys.push(d.toISOString().slice(0,10));} return keys; }
+function renderHabits() {
+  const el=document.getElementById('habitList'); if(!el)return;
+  if(!habits.length){el.innerHTML='<div style="color:var(--text3);font-size:13px;padding:12px;">No habits yet.</div>';return;}
+  const last7=getLast7Keys();
+  el.innerHTML=habits.map(h=>`<div class="habit-row">
+    <div class="habit-name">${escHtml(h.name)}</div>
+    <div class="habit-dots">${last7.map(k=>`<div class="habit-dot${h.checks&&h.checks[k]?' done':''}" onclick="toggleHabit(${h.id},'${k}')">${h.checks&&h.checks[k]?'✓':''}</div>`).join('')}</div>
+    <div class="habit-streak">${calcStreak(h)}🔥</div>
+    <button class="btn btn-danger btn-sm" onclick="deleteHabit(${h.id})">✕</button>
+  </div>`).join('');
+}
+function calcStreak(h) { let streak=0,d=new Date(); while(true){const k=d.toISOString().slice(0,10);if(h.checks&&h.checks[k]){streak++;d=new Date(d-86400000);}else break;} return streak; }
+function toggleHabit(id,key) { const h=habits.find(h=>h.id===id); if(!h)return; if(!h.checks)h.checks={}; h.checks[key]=!h.checks[key]; S.set('habits',habits); renderHabits(); }
+function deleteHabit(id) { habits=habits.filter(h=>h.id!==id); S.set('habits',habits); renderHabits(); }
+renderHabits();
+
+/* ===== ANALYTICS ===== */
+function updateAnalytics() {
+  updateStats();
+  const ts=(todaySec()/3600).toFixed(2);
+  const an=document.getElementById('an-today'); if(an)an.textContent=ts;
+  const last7=getLast7Keys();
+  const s7=sessions.filter(s=>last7.includes(s.date)).reduce((a,b)=>a+b.duration,0);
+  const avg=document.getElementById('an-avg'); if(avg)avg.textContent=(s7/7/3600).toFixed(2);
+  let streak=0,d=new Date();
+  while(true){const k=d.toISOString().slice(0,10);if(sessions.some(s=>s.date===k)){streak++;d=new Date(d-86400000);}else break;}
+  const st=document.getElementById('an-streak'); if(st)st.textContent=streak;
+  const ch=document.getElementById('an30Chart');
+  if(ch){
+    const days30=[];
+    for(let i=29;i>=0;i--){const dd=new Date(Date.now()-i*86400000);const k=dd.toISOString().slice(0,10);const sec=sessions.filter(s=>s.date===k).reduce((a,b)=>a+b.duration,0);days30.push({label:i%7===0?['Su','Mo','Tu','We','Th','Fr','Sa'][dd.getDay()]:'',hrs:sec/3600});}
+    const maxH=Math.max(...days30.map(d=>d.hrs),0.5);
+    ch.innerHTML=days30.map(d=>`<div class="bar-wrap"><div class="bar" style="height:${(d.hrs/maxH)*100}%"></div><div class="bar-label">${d.label}</div></div>`).join('');
+  }
+  const log=document.getElementById('sessionLog');
+  if(log){
+    const sorted=[...sessions].sort((a,b)=>b.date.localeCompare(a.date));
+    if(!sorted.length){log.innerHTML='<div style="color:var(--text3);font-size:13px;padding:12px;">No sessions yet.</div>';return;}
+    log.innerHTML=sorted.map(s=>`<div class="lap-item"><span>${s.date}</span><span>${fmtTime(s.duration)}</span></div>`).join('');
+  }
+}
+
+/* ===== UTILS ===== */
+function snack(msg) { const el=document.getElementById('snack'); el.textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),2500); }
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function timeAgo(iso) { const diff=(Date.now()-new Date(iso))/1000; if(diff<60)return 'just now'; if(diff<3600)return `${Math.floor(diff/60)}m ago`; if(diff<86400)return `${Math.floor(diff/3600)}h ago`; return `${Math.floor(diff/86400)}d ago`; }
+
+buildNav();
+</script>
+</body>
+</html>

@@ -158,19 +158,17 @@ body::after {
 .page-header p { font-size: 13px; color: var(--text2); margin-top: 4px; }
 
 /* ===================== PANEL BACKGROUND SYSTEM ===================== */
-/* Cards must be position:relative and overflow:hidden for bg to work */
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 24px;
   box-shadow: var(--glow);
-  position: relative;      /* needed for bg layer */
-  overflow: hidden;         /* needed for bg layer */
+  position: relative;
+  overflow: hidden;
   isolation: isolate;
 }
 
-/* The bg image layer sits behind everything */
 .card-bg-layer {
   position: absolute;
   inset: 0;
@@ -185,7 +183,6 @@ body::after {
 }
 .card-bg-layer.active { opacity: 1; }
 
-/* Dark scrim so text stays readable over any photo */
 .card-bg-scrim {
   position: absolute;
   inset: 0;
@@ -199,13 +196,11 @@ body::after {
 }
 .card-bg-scrim.active { opacity: 1; }
 
-/* All real card content must be above the bg layers */
 .card > *:not(.card-bg-layer):not(.card-bg-scrim) {
   position: relative;
   z-index: 2;
 }
 
-/* card-title row: holds title text + bg button inline */
 .card-title {
   font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
   color: var(--text3); margin-bottom: 16px;
@@ -214,7 +209,6 @@ body::after {
 }
 .card-title-text { flex: 1; }
 
-/* BG control button group */
 .card-bg-controls {
   display: flex; align-items: center; gap: 4px; flex-shrink: 0;
 }
@@ -235,7 +229,6 @@ body::after {
 .bg-remove-btn:hover { background: rgba(255,107,107,0.22); }
 .bg-remove-btn.visible { display: flex; }
 
-/* BG Resize popover */
 .bg-popover {
   position: absolute; top: 48px; right: 16px; z-index: 300;
   background: var(--surface);
@@ -267,7 +260,6 @@ body::after {
 }
 .bg-popover-close:hover { background: var(--bg3); color: var(--text); }
 
-/* Scrim strength slider (extra control) */
 .scrim-label { font-size: 10px; color: var(--text2); width: 36px; }
 
 /* ============================================================= */
@@ -664,17 +656,6 @@ body::after {
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 3px; }
 
-/* RESPONSIVE */
-@media (max-width: 768px) {
-  #sidebar { display: none; }
-  #topbar { display: flex; }
-  #main { margin-left: 0; padding: 80px 16px 24px; }
-  .grid-2 { grid-template-columns: 1fr; }
-  .grid-3 { grid-template-columns: 1fr 1fr; }
-  .pomo-settings { grid-template-columns: 1fr 1fr; }
-}
-@media (max-width: 480px) { .grid-3 { grid-template-columns: 1fr; } }
-
 /* SNACKBAR */
 #snack {
   position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(40px);
@@ -707,6 +688,87 @@ body::after {
 /* Grid helpers */
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+/* =============================================
+   MOBILE LAYOUT FIX - Comprehensive Override
+   Fixes grid-2 not stacking on phone screens
+   ============================================= */
+@media (max-width: 768px) {
+  #sidebar { display: none; }
+  #topbar { display: flex; }
+  #main { margin-left: 0; padding: 80px 16px 24px; }
+
+  /* CRITICAL: Force all 2-col grids to single column */
+  .grid-2 { grid-template-columns: 1fr !important; gap: 16px; }
+
+  /* 3-col grids: stats stay 3-col */
+  .grid-3 { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+
+  /* Notebook & notes - single column */
+  .nb-entries { grid-template-columns: 1fr !important; }
+  .note-grid { grid-template-columns: 1fr !important; }
+
+  /* Pomo settings: 2-col */
+  .pomo-settings { grid-template-columns: 1fr 1fr; }
+
+  /* Card padding */
+  .card { padding: 16px; }
+  .page-header h1 { font-size: 22px; }
+
+  /* Timers */
+  .timer-display { font-size: clamp(32px, 8vw, 50px) !important; }
+
+  /* Pomodoro ring shrink */
+  .pomo-ring { width: 180px !important; height: 180px !important; }
+  .pomo-ring svg { width: 180px !important; height: 180px !important; }
+  .pomo-time .big { font-size: 36px; }
+
+  /* Buttons compact */
+  .btn { padding: 8px 14px; font-size: 12px; }
+  .btn-group { gap: 6px; }
+
+  /* Stat cards compact */
+  .stat-card { padding: 12px 8px; }
+  .stat-value { font-size: 20px; }
+  .stat-label { font-size: 9px; letter-spacing: 0; }
+
+  /* Habits */
+  .habit-dots { flex-wrap: wrap; max-width: 200px; }
+  .habit-dot { width: 20px; height: 20px; font-size: 9px; }
+  .habit-row { flex-wrap: wrap; }
+
+  /* Revision tracker */
+  .rv-subject-header { flex-wrap: wrap; gap: 8px; }
+  .rv-progress-bar { width: 60px; }
+  .rv-revisions { flex-wrap: wrap; gap: 3px; }
+  .rv-rev-dot { width: 20px; height: 20px; font-size: 9px; }
+  .rv-topic-row { flex-wrap: wrap; gap: 6px; }
+  .rv-topic-actions { opacity: 1; }
+
+  /* Filters */
+  .filter-bar { gap: 6px; }
+  .filter-btn { padding: 4px 10px; font-size: 11px; }
+
+  /* Todo input row - wrap on small screens */
+  .todo-input-row { flex-wrap: wrap; }
+
+  /* Quick capture */
+  .quick-capture { bottom: 16px; right: 16px; }
+
+  /* Pomo phases wrap */
+  .pomo-phases { flex-wrap: wrap; gap: 6px; }
+  .phase-btn { font-size: 11px; padding: 5px 12px; }
+}
+
+@media (max-width: 480px) {
+  /* Very small phones */
+  .grid-3 { grid-template-columns: 1fr !important; }
+  .stat-value { font-size: 22px; }
+  .pomo-settings { grid-template-columns: 1fr !important; }
+  .pomo-ring { width: 160px !important; height: 160px !important; }
+  .pomo-ring svg { width: 160px !important; height: 160px !important; }
+  .pomo-time .big { font-size: 32px; }
+}
 </style>
 </head>
 <body>
@@ -774,7 +836,6 @@ body::after {
               <button class="bg-set-btn" id="bge-study" onclick="bgTogglePopover('study')" style="display:none;">⚙ Edit</button>
             </div>
           </div>
-          <!-- BG resize/position popover -->
           <div class="bg-popover" id="bgp-study">
             <h5>Background Settings</h5>
             <div class="bg-slider-row">
@@ -1277,15 +1338,10 @@ updatePWAStatus();
 
 /* =====================================================================
    PANEL BACKGROUND PHOTO SYSTEM
-   - Cards: study, weekly, calendar, pomo, sw
-   - Each gets: bgl-{id} (bg layer), bgs-{id} (scrim), bgp-{id} (popover)
-   - Sliders: bgsz-{id}=zoom, bgpx-{id}=posX, bgpy-{id}=posY, bgsc-{id}=scrim%
-   - Images stored as base64 in localStorage key: cardBg_{id}
-   - Settings stored in localStorage key: cardBgSettings_{id}
 ===================================================================== */
 
 const BG_CARD_IDS = ['study','weekly','calendar','pomo','sw'];
-let _bgCurrentTarget = null; // which card is being picked for
+let _bgCurrentTarget = null;
 
 function bgPickPhoto(cardId) {
   _bgCurrentTarget = cardId;
@@ -1295,13 +1351,10 @@ function bgPickPhoto(cardId) {
 function bgHandleFile(e) {
   const file = e.target.files[0];
   if (!file || !_bgCurrentTarget) return;
-  e.target.value = ''; // reset so same file can be re-picked
-
-  // Read as base64 and store
+  e.target.value = '';
   const reader = new FileReader();
   reader.onload = function(ev) {
     const dataUrl = ev.target.result;
-    // Store image — use try/catch in case quota exceeded
     try {
       localStorage.setItem('cardBg_' + _bgCurrentTarget, dataUrl);
     } catch(err) {
@@ -1321,7 +1374,6 @@ function bgApplyToCard(cardId, dataUrl) {
   const edbtn = document.getElementById('bge-' + cardId);
   if (!layer) return;
 
-  // Restore saved settings if any
   const settings = S.get('cardBgSettings_' + cardId, { zoom: 100, px: 50, py: 50, scrim: 70 });
   const sz = document.getElementById('bgsz-' + cardId);
   const px = document.getElementById('bgpx-' + cardId);
@@ -1354,7 +1406,6 @@ function bgApplyStyle(cardId) {
   layer.style.backgroundSize = zoom + '%';
   layer.style.backgroundPosition = px + '% ' + py + '%';
 
-  // Save settings
   S.set('cardBgSettings_' + cardId, { zoom, px, py, scrim: sc });
 }
 
@@ -1362,7 +1413,6 @@ function bgApplyScrim(cardId) {
   const scrim = document.getElementById('bgs-' + cardId); if (!scrim) return;
   const sc = parseInt(document.getElementById('bgsc-' + cardId).value);
   scrim.style.background = `rgba(8,12,18,${sc / 100})`;
-  // Also save
   const settings = S.get('cardBgSettings_' + cardId, { zoom: 100, px: 50, py: 50, scrim: 70 });
   settings.scrim = sc;
   S.set('cardBgSettings_' + cardId, settings);
@@ -1384,7 +1434,6 @@ function bgRemove(cardId) {
 }
 
 function bgTogglePopover(cardId) {
-  // Close all other popovers first
   BG_CARD_IDS.forEach(id => {
     if (id !== cardId) {
       const p = document.getElementById('bgp-' + id);
@@ -1404,7 +1453,6 @@ function bgClearAll() {
   snack('All backgrounds cleared');
 }
 
-// Restore backgrounds on page load
 function bgRestoreAll() {
   BG_CARD_IDS.forEach(id => {
     const dataUrl = localStorage.getItem('cardBg_' + id);
@@ -1412,12 +1460,10 @@ function bgRestoreAll() {
   });
 }
 
-// Close popover when clicking outside
 document.addEventListener('click', function(e) {
   if (!e.target.closest('.bg-popover') && !e.target.closest('.bg-set-btn')) {
     BG_CARD_IDS.forEach(id => {
       const p = document.getElementById('bgp-' + id);
-      // Only close if click is not on the edit button for that card
       if (p && p.classList.contains('open')) {
         const editBtn = document.getElementById('bge-' + id);
         if (editBtn && editBtn.contains(e.target)) return;
@@ -2147,7 +2193,7 @@ function timeAgo(iso){const diff=(Date.now()-new Date(iso))/1000;if(diff<60)retu
 /* ===================== INIT ===================== */
 buildNav();
 renderRevision();
-bgRestoreAll(); // Restore any saved card backgrounds on load
+bgRestoreAll();
 </script>
 </body>
 </html>

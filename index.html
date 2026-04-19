@@ -4,6 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Focus Lab</title>
+
+<!-- ===================== PWA META TAGS ===================== -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#3b9eff">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Focus Lab">
+<link rel="apple-touch-icon" href="icon-192.png">
+<!-- ========================================================= -->
+
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⌬</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -476,7 +487,7 @@ body::after {
 .rv-confidence-picker { display: flex; gap: 4px; }
 .rv-conf-btn {
   padding: 4px 10px; border-radius: 6px; font-size: 11px; border: 1px solid var(--border2);
-  background: transparent; color: var(--text2); cursor: pointer; transition: all 0.15s;
+  background: transparent; color: var(--text2); cursor: pointer; transition: all 0.15px;
 }
 .rv-conf-btn:hover { border-color: var(--accent2); color: var(--accent2); }
 .rv-conf-btn.good:hover, .rv-conf-btn.good.sel { background: rgba(0,212,170,0.15); color: var(--accent2); border-color: var(--accent2); }
@@ -533,6 +544,21 @@ body::after {
   padding: 10px; outline: none; resize: none;
 }
 .qc-panel textarea:focus { border-color: var(--accent); }
+
+/* INSTALL BANNER */
+#installBanner {
+  display: none;
+  position: fixed; bottom: 84px; left: 50%; transform: translateX(-50%);
+  background: var(--surface); border: 1px solid var(--accent);
+  border-radius: var(--radius); padding: 14px 20px;
+  box-shadow: 0 4px 30px rgba(59,158,255,0.2);
+  z-index: 600; align-items: center; gap: 14px;
+  max-width: 340px; width: calc(100% - 32px);
+  animation: fadeUp 0.3s ease;
+}
+#installBanner.show { display: flex; }
+#installBanner p { font-size: 13px; color: var(--text); flex: 1; }
+#installBanner strong { color: var(--accent); display: block; font-size: 14px; margin-bottom: 2px; }
 
 /* SCROLLBAR */
 ::-webkit-scrollbar { width: 6px; }
@@ -596,13 +622,26 @@ body::after {
 </div>
 <div id="mobile-nav"></div>
 
+<!-- PWA INSTALL BANNER -->
+<div id="installBanner">
+  <div style="font-size:28px;">📱</div>
+  <div style="flex:1;">
+    <strong>Install Focus Lab</strong>
+    <p style="font-size:12px;color:var(--text2);margin:0;">Add to home screen for offline use</p>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:6px;">
+    <button class="btn btn-primary btn-sm" id="installBtn">Install</button>
+    <button class="btn btn-secondary btn-sm" onclick="dismissInstall()">Later</button>
+  </div>
+</div>
+
 <!-- APP -->
 <div id="app">
   <nav id="sidebar">
     <div class="sidebar-logo">FOCUS</div>
     <div class="nav-label">Overview</div>
     <div class="nav-group" id="nav-desktop"></div>
-    <div class="sidebar-footer">Focus Lab v2</div>
+    <div class="sidebar-footer">Focus Lab v2 · PWA</div>
   </nav>
 
   <main id="main">
@@ -738,7 +777,6 @@ body::after {
         <h1>Smart Notebook</h1>
         <p>Rich text notes with tags, categories & search — all saved permanently</p>
       </div>
-
       <div class="nb-toolbar">
         <button class="nb-upload-btn" onclick="addNBNote()">📝 New Note</button>
         <button class="nb-upload-btn" onclick="addNBNote('formula')">🔢 Formula Note</button>
@@ -751,7 +789,6 @@ body::after {
           </div>
         </div>
       </div>
-
       <div class="nb-filter-row">
         <button class="filter-btn active" onclick="setNBFilter('all',this)">All</button>
         <button class="filter-btn" onclick="setNBFilter('pinned',this)">📌 Pinned</button>
@@ -760,7 +797,6 @@ body::after {
         <button class="filter-btn" onclick="setNBFilter('question',this)">❓ Q&amp;A</button>
         <button class="filter-btn" onclick="setNBFilter('note',this)">📝 General</button>
       </div>
-
       <div class="nb-entries" id="nbEntries"></div>
     </div>
 
@@ -770,18 +806,15 @@ body::after {
         <h1>Revision Tracker</h1>
         <p>Track topics, schedule revisions, monitor mastery</p>
       </div>
-
       <div class="grid-3" style="margin-bottom:20px;">
         <div class="stat-card"><div class="stat-value" id="rv-total">0</div><div class="stat-label">Total Topics</div></div>
         <div class="stat-card"><div class="stat-value" id="rv-due">0</div><div class="stat-label">Due Today</div></div>
         <div class="stat-card"><div class="stat-value" id="rv-mastered">0</div><div class="stat-label">Mastered</div></div>
       </div>
-
       <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
         <button class="btn btn-primary" onclick="openAddSubjectModal()">+ Add Subject</button>
         <button class="btn btn-secondary" onclick="showDueToday()">📋 Due Today</button>
       </div>
-
       <div id="rvSubjectList"></div>
     </div>
 
@@ -819,6 +852,18 @@ body::after {
     <div class="page" id="page-settings">
       <div class="page-header"><h1>Settings</h1><p>Preferences & Data Management</p></div>
 
+      <!-- PWA INSTALL SECTION -->
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-title">Install App</div>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:14px;">Install Focus Lab on your device for offline access and a native app experience.</p>
+        <div id="pwaStatus" style="font-size:13px;color:var(--text3);margin-bottom:12px;">Checking install status…</div>
+        <button class="btn btn-primary" id="settingsInstallBtn" style="display:none;" onclick="triggerInstall()">📱 Install App</button>
+        <div style="margin-top:12px;padding:12px;background:var(--bg3);border-radius:8px;border:1px solid var(--border);">
+          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">iPhone / Safari</div>
+          <div style="font-size:12px;color:var(--text2);">Tap <strong style="color:var(--text);">Share ↑</strong> → <strong style="color:var(--text);">Add to Home Screen</strong></div>
+        </div>
+      </div>
+
       <div class="card" style="margin-bottom:20px;">
         <div class="card-title">Daily Study Goal</div>
         <div style="display:flex;align-items:center;gap:12px;">
@@ -848,7 +893,7 @@ body::after {
         </div>
       </div>
       <div style="margin-top:20px;text-align:center;">
-        <a href="https://portfolio-erenn.vercel.app/" target="_blank" class="btn btn-secondary" 
+        <a href="https://portfolio-erenn.vercel.app/" target="_blank" class="btn btn-secondary"
            style="font-family:var(--mono);letter-spacing:2px;font-size:13px;text-decoration:none;">
           ~ HAMMAD
         </a>
@@ -920,7 +965,10 @@ function navigate(id) {
   if(id==='dashboard') { updateStats(); buildChart(); buildGoalWidget(); }
   if(id==='revision') renderRevision();
   if(id==='notebook') renderNB();
-  if(id==='settings') { document.getElementById('dailyGoalInput').value = S.get('dailyGoal', 4); }
+  if(id==='settings') {
+    document.getElementById('dailyGoalInput').value = S.get('dailyGoal', 4);
+    updatePWAStatus();
+  }
 }
 
 function toggleMobileNav() { document.getElementById('mobile-nav').classList.toggle('open'); }
@@ -947,6 +995,78 @@ const S = {
   set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
   del: (k) => { try { localStorage.removeItem(k); } catch {} }
 };
+
+/* ===================== PWA / SERVICE WORKER ===================== */
+let deferredInstallPrompt = null;
+
+// Register Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('✅ SW registered:', reg.scope))
+      .catch(err => console.log('SW error:', err));
+  });
+}
+
+// Catch the install prompt (Android/Chrome)
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  // Only show banner if not dismissed recently
+  const dismissed = S.get('installDismissed', 0);
+  if (Date.now() - dismissed > 7 * 86400000) { // show again after 7 days
+    setTimeout(() => {
+      document.getElementById('installBanner').classList.add('show');
+    }, 3000);
+  }
+  document.getElementById('settingsInstallBtn').style.display = 'inline-flex';
+  updatePWAStatus();
+});
+
+// Hide banner when app is installed
+window.addEventListener('appinstalled', () => {
+  deferredInstallPrompt = null;
+  document.getElementById('installBanner').classList.remove('show');
+  updatePWAStatus();
+  snack('✅ Focus Lab installed successfully!');
+});
+
+function triggerInstall() {
+  if (!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  deferredInstallPrompt.userChoice.then(choice => {
+    if (choice.outcome === 'accepted') snack('Installing Focus Lab…');
+    deferredInstallPrompt = null;
+    document.getElementById('installBanner').classList.remove('show');
+    document.getElementById('settingsInstallBtn').style.display = 'none';
+  });
+}
+
+document.getElementById('installBtn').addEventListener('click', triggerInstall);
+
+function dismissInstall() {
+  S.set('installDismissed', Date.now());
+  document.getElementById('installBanner').classList.remove('show');
+}
+
+function updatePWAStatus() {
+  const el = document.getElementById('pwaStatus');
+  if (!el) return;
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+  if (isStandalone) {
+    el.textContent = '✅ Running as installed app';
+    el.style.color = 'var(--accent2)';
+    document.getElementById('settingsInstallBtn').style.display = 'none';
+  } else if (deferredInstallPrompt) {
+    el.textContent = '📱 Ready to install — click the button below';
+    el.style.color = 'var(--accent4)';
+    document.getElementById('settingsInstallBtn').style.display = 'inline-flex';
+  } else {
+    el.textContent = 'ℹ️ Use browser menu to install, or visit on Android Chrome for auto-prompt';
+    el.style.color = 'var(--text3)';
+  }
+}
+updatePWAStatus();
 
 /* ===================== STUDY TIMER ===================== */
 let studyStart = S.get('studyStart', null);
@@ -994,7 +1114,6 @@ function pauseStudy() {
   }
 }
 
-// FIXED: Reset only resets the RUNNING timer - sessions are preserved
 function resetStudyTimer() {
   if (!confirm('Reset the current running timer? Saved sessions will NOT be lost.')) return;
   clearInterval(studyInterval);
@@ -1141,6 +1260,10 @@ function onPomoEnd() {
   if(pomoPhase==='work'){pomoSession++;snack('Focus session done! 🎉');if(pomoSession%POMO_SESSIONS_BEFORE_LONG===0)setPhaseAuto('long');else setPhaseAuto('short');}
   else{snack('Break over — back to focus!');setPhaseAuto('work');}
   renderDots();
+  // Send notification if permission granted
+  if(Notification.permission === 'granted') {
+    new Notification('Focus Lab', { body: pomoPhase==='work' ? '✅ Focus session complete! Take a break.' : '⏰ Break over — time to focus!', icon: 'icon-192.png' });
+  }
 }
 function setPhaseAuto(phase) {
   pomoPhase=phase;
@@ -1160,6 +1283,11 @@ document.getElementById('pomoWorkMin').value=pomoSettings.work;
 document.getElementById('pomoShortMin').value=pomoSettings.short;
 document.getElementById('pomoLongMin').value=pomoSettings.long;
 resetPomo(); renderDots();
+
+// Request notification permission for Pomodoro alerts
+if('Notification' in window && Notification.permission === 'default') {
+  setTimeout(() => Notification.requestPermission(), 5000);
+}
 
 /* ===================== STOPWATCH ===================== */
 let swTime=0,swRunning=false,swInt2,laps=[];
@@ -1327,24 +1455,13 @@ function addNBNote(type='note') {
     question: 'Q: \n\nA: ',
   };
   nbEntries.unshift({
-    id: Date.now(),
-    type,
-    title: '',
-    body: '',
-    placeholder: placeholders[type],
-    tags: [],
-    pinned: false,
-    created: new Date().toISOString(),
-    updated: new Date().toISOString(),
+    id: Date.now(), type, title: '', body: '',
+    placeholder: placeholders[type], tags: [], pinned: false,
+    created: new Date().toISOString(), updated: new Date().toISOString(),
   });
-  S.set('nbEntries', nbEntries);
-  renderNB();
+  S.set('nbEntries', nbEntries); renderNB();
   snack(NB_TYPE_META[type].icon + ' New ' + NB_TYPE_META[type].label + ' note added');
-  // Auto-focus the new note's title
-  setTimeout(() => {
-    const first = document.querySelector('.nb-entry-title');
-    if (first) first.focus();
-  }, 60);
+  setTimeout(() => { const first = document.querySelector('.nb-entry-title'); if (first) first.focus(); }, 60);
 }
 
 function filterNB(query) { nbSearch = query.toLowerCase(); renderNB(); }
@@ -1352,65 +1469,47 @@ function filterNB(query) { nbSearch = query.toLowerCase(); renderNB(); }
 function setNBFilter(f, btn) {
   nbFilter = f;
   document.querySelectorAll('.nb-filter-row .filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderNB();
+  btn.classList.add('active'); renderNB();
 }
 
 function renderNB() {
-  const el = document.getElementById('nbEntries');
-  if (!el) return;
-
-  // Sort: pinned first, then by updated desc
+  const el = document.getElementById('nbEntries'); if (!el) return;
   let entries = [...nbEntries].sort((a, b) => {
     if (a.pinned && !b.pinned) return -1;
     if (!a.pinned && b.pinned) return 1;
     return new Date(b.updated) - new Date(a.updated);
   });
-
   if (nbFilter === 'pinned') entries = entries.filter(e => e.pinned);
   else if (nbFilter !== 'all') entries = entries.filter(e => e.type === nbFilter);
-
   if (nbSearch) entries = entries.filter(e =>
     (e.title||'').toLowerCase().includes(nbSearch) ||
     (e.body||'').toLowerCase().includes(nbSearch) ||
     (e.tags||[]).some(t => t.toLowerCase().includes(nbSearch))
   );
-
   if (!entries.length) {
-    el.innerHTML = `<div class="nb-empty">
-      <div class="nb-empty-icon">📚</div>
+    el.innerHTML = `<div class="nb-empty"><div class="nb-empty-icon">📚</div>
       <div>${nbSearch ? 'No notes match "'+escHtml(nbSearch)+'"' : nbFilter !== 'all' ? 'No '+nbFilter+' notes yet.' : 'No notes yet.'}</div>
-      <div style="margin-top:6px;color:var(--text3);">Click a button above to create your first note.</div>
-    </div>`;
+      <div style="margin-top:6px;color:var(--text3);">Click a button above to create your first note.</div></div>`;
     return;
   }
-
   el.innerHTML = entries.map(entry => {
     const meta = NB_TYPE_META[entry.type] || NB_TYPE_META.note;
     const tagHtml = (entry.tags || []).map(t =>
       `<span class="nb-tag" onclick="removeNBTag(${entry.id},'${escHtml(t)}')" title="Click to remove">${escHtml(t)} ✕</span>`
     ).join('');
     const wordCount = (entry.body||'').trim().split(/\s+/).filter(Boolean).length;
-    const placeholder = entry.placeholder || 'Write your notes here…';
-
     return `<div class="nb-entry${entry.pinned?' pinned':''}" id="nbe-${entry.id}">
       <div class="nb-entry-header">
         <span class="nb-entry-type ${entry.type}">${meta.icon} ${meta.label}</span>
-        <input class="nb-entry-title" value="${escHtml(entry.title)}"
-          placeholder="Untitled…"
-          oninput="updateNBField(${entry.id},'title',this.value)">
+        <input class="nb-entry-title" value="${escHtml(entry.title)}" placeholder="Untitled…" oninput="updateNBField(${entry.id},'title',this.value)">
         <button class="nb-pin-btn" onclick="toggleNBPin(${entry.id})" title="${entry.pinned?'Unpin':'Pin'}">📌</button>
         <button onclick="deleteNBEntry(${entry.id})" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:2px 4px;">✕</button>
       </div>
       <div class="nb-entry-body">
-        <textarea class="nb-note-textarea ${meta.textareaClass}"
-          placeholder="${escHtml(placeholder)}"
-          oninput="updateNBField(${entry.id},'body',this.value);updateWordCount(${entry.id},this.value)"
-          rows="6">${escHtml(entry.body||'')}</textarea>
-        <div class="nb-tags-row">
-          ${tagHtml}
-          <input class="nb-tag-input" placeholder="+ add tag"
-            onkeydown="if(event.key==='Enter'||event.key===','){addNBTag(${entry.id},this.value);this.value='';}">
+        <textarea class="nb-note-textarea ${meta.textareaClass}" placeholder="${escHtml(entry.placeholder||'Write here…')}"
+          oninput="updateNBField(${entry.id},'body',this.value);updateWordCount(${entry.id},this.value)" rows="6">${escHtml(entry.body||'')}</textarea>
+        <div class="nb-tags-row">${tagHtml}
+          <input class="nb-tag-input" placeholder="+ add tag" onkeydown="if(event.key==='Enter'||event.key===','){addNBTag(${entry.id},this.value);this.value='';}">
         </div>
       </div>
       <div class="nb-entry-footer">
@@ -1423,37 +1522,30 @@ function renderNB() {
 
 function updateNBField(id, field, val) {
   const e = nbEntries.find(e => e.id === id); if (!e) return;
-  e[field] = val;
-  e.updated = new Date().toISOString();
+  e[field] = val; e.updated = new Date().toISOString();
   S.set('nbEntries', nbEntries);
 }
-
 function updateWordCount(id, val) {
   const el = document.getElementById('wc-'+id); if (!el) return;
   const wc = val.trim().split(/\s+/).filter(Boolean).length;
   el.textContent = wc + ' word' + (wc!==1?'s':'');
 }
-
 function toggleNBPin(id) {
   const e = nbEntries.find(e => e.id === id); if (!e) return;
-  e.pinned = !e.pinned;
-  S.set('nbEntries', nbEntries); renderNB();
+  e.pinned = !e.pinned; S.set('nbEntries', nbEntries); renderNB();
   snack(e.pinned ? '📌 Pinned' : 'Unpinned');
 }
-
 function addNBTag(id, val) {
   val = val.trim().replace(/,/g, ''); if (!val) return;
   const e = nbEntries.find(e => e.id === id); if (!e) return;
   if (!e.tags) e.tags = [];
   if (!e.tags.includes(val)) { e.tags.push(val); S.set('nbEntries', nbEntries); renderNB(); }
 }
-
 function removeNBTag(id, tag) {
   const e = nbEntries.find(e => e.id === id); if (!e) return;
   e.tags = (e.tags || []).filter(t => t !== tag);
   S.set('nbEntries', nbEntries); renderNB();
 }
-
 function deleteNBEntry(id) {
   if (!confirm('Delete this note?')) return;
   nbEntries = nbEntries.filter(e => e.id !== id);
@@ -1463,7 +1555,7 @@ renderNB();
 
 /* ===================== REVISION TRACKER ===================== */
 let rvSubjects = S.get('rvSubjects', []);
-const REVISION_INTERVALS = [1, 3, 7, 14, 30]; // spaced repetition days
+const REVISION_INTERVALS = [1, 3, 7, 14, 30];
 
 function openAddSubjectModal() {
   document.getElementById('modalContent').innerHTML = `
@@ -1488,14 +1580,13 @@ function addSubject() {
   const color = document.getElementById('rvColorPick').value;
   if(!name) return;
   rvSubjects.push({ id: Date.now(), name, color, topics: [], open: true });
-  S.set('rvSubjects', rvSubjects);
-  closeModal(); renderRevision(); snack('Subject added');
+  S.set('rvSubjects', rvSubjects); closeModal(); renderRevision(); snack('Subject added');
 }
 
 function openAddTopicModal(subId) {
   document.getElementById('modalContent').innerHTML = `
     <h3>Add Topic</h3>
-    <div class="form-row"><label>Topic Name</label><input class="input input-full" id="rvTopicName" placeholder="e.g. Thermodynamics, World War II…"></div>
+    <div class="form-row"><label>Topic Name</label><input class="input input-full" id="rvTopicName" placeholder="e.g. Thermodynamics…"></div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
       <button class="btn btn-primary" onclick="addTopic(${subId})">Add Topic</button>
@@ -1505,17 +1596,14 @@ function openAddTopicModal(subId) {
 }
 
 function addTopic(subId) {
-  const name = document.getElementById('rvTopicName').value.trim();
-  if(!name) return;
+  const name = document.getElementById('rvTopicName').value.trim(); if(!name) return;
   const sub = rvSubjects.find(s=>s.id===subId); if(!sub) return;
   const today = new Date().toISOString().slice(0,10);
   sub.topics.push({ id: Date.now(), name, revisions: [], nextDue: today, created: today });
-  S.set('rvSubjects', rvSubjects);
-  closeModal(); renderRevision(); snack('Topic added');
+  S.set('rvSubjects', rvSubjects); closeModal(); renderRevision(); snack('Topic added');
 }
 
 function logRevision(subId, topicId, quality) {
-  // quality: 'good', 'ok', 'bad'
   const sub = rvSubjects.find(s=>s.id===subId); if(!sub) return;
   const topic = sub.topics.find(t=>t.id===topicId); if(!topic) return;
   const today = new Date().toISOString().slice(0,10);
@@ -1524,8 +1612,7 @@ function logRevision(subId, topicId, quality) {
   const interval = quality === 'bad' ? 1 : REVISION_INTERVALS[Math.min(revCount, REVISION_INTERVALS.length-1)];
   const due = new Date(Date.now() + interval*86400000);
   topic.nextDue = due.toISOString().slice(0,10);
-  S.set('rvSubjects', rvSubjects);
-  renderRevision(); snack(`Revision logged — next due in ${interval}d`);
+  S.set('rvSubjects', rvSubjects); renderRevision(); snack(`Revision logged — next due in ${interval}d`);
 }
 
 function deleteRVTopic(subId, topicId) {
@@ -1547,20 +1634,13 @@ function getDueBadge(topic) {
   return `<span class="rv-due-badge upcoming">Due ${topic.nextDue}</span>`;
 }
 
-function getMasteryClass(revisions) {
-  if(!revisions.length) return '';
-  const last = revisions[revisions.length-1].quality;
-  return last==='good'?'done-good':last==='ok'?'done-ok':'done-bad';
-}
-
 function showDueToday() {
   const today = new Date().toISOString().slice(0,10);
   let dueItems = [];
   rvSubjects.forEach(sub => {
     sub.topics.forEach(topic => {
-      if(topic.nextDue <= today && topic.revisions.length > 0) {
+      if(topic.nextDue <= today && topic.revisions.length > 0)
         dueItems.push({ subName: sub.name, topicName: topic.name, subId: sub.id, topicId: topic.id });
-      }
     });
   });
   if(!dueItems.length) { snack('🎉 No revisions due today!'); return; }
@@ -1585,7 +1665,6 @@ function showDueToday() {
 function renderRevision() {
   const el = document.getElementById('rvSubjectList'); if(!el)return;
   const today = new Date().toISOString().slice(0,10);
-
   let totalTopics=0, dueCount=0, masteredCount=0;
   rvSubjects.forEach(sub=>{
     totalTopics+=sub.topics.length;
@@ -1597,20 +1676,15 @@ function renderRevision() {
   const rv1=document.getElementById('rv-total');if(rv1)rv1.textContent=totalTopics;
   const rv2=document.getElementById('rv-due');if(rv2)rv2.textContent=dueCount;
   const rv3=document.getElementById('rv-mastered');if(rv3)rv3.textContent=masteredCount;
-
   if(!rvSubjects.length){
     el.innerHTML=`<div style="text-align:center;padding:60px 20px;color:var(--text3);font-size:13px;">
-      <div style="font-size:48px;margin-bottom:12px;">🔄</div>
-      No subjects yet. Add a subject to start tracking revisions.
-    </div>`;
+      <div style="font-size:48px;margin-bottom:12px;">🔄</div>No subjects yet. Add a subject to start tracking revisions.</div>`;
     return;
   }
-
   el.innerHTML = rvSubjects.map(sub => {
     const totalT = sub.topics.length;
     const doneT = sub.topics.filter(t=>t.revisions.length>0).length;
     const pct = totalT ? Math.round((doneT/totalT)*100) : 0;
-
     const topicsHtml = sub.topics.map(topic => {
       const revDots = REVISION_INTERVALS.map((_, i) => {
         const rev = topic.revisions[i];
@@ -1619,7 +1693,6 @@ function renderRevision() {
         const sym = rev.quality==='good'?'✓':rev.quality==='ok'?'~':'✕';
         return `<div class="rv-rev-dot ${cls}" title="Rev ${i+1}: ${rev.quality} (${rev.date})">${sym}</div>`;
       }).join('');
-
       return `<div class="rv-topic-row">
         <div class="rv-topic-name">${escHtml(topic.name)}</div>
         <div class="rv-revisions">${revDots}</div>
@@ -1630,7 +1703,6 @@ function renderRevision() {
         </div>
       </div>`;
     }).join('');
-
     return `<div class="rv-subject-card">
       <div class="rv-subject-header" onclick="toggleRVSubject(${sub.id})">
         <div style="width:12px;height:12px;border-radius:50%;background:${sub.color};flex-shrink:0;"></div>
@@ -1651,10 +1723,8 @@ function renderRevision() {
 
 function toggleRVSubject(subId) {
   const sub = rvSubjects.find(s=>s.id===subId); if(!sub)return;
-  sub.open = sub.open === false;
-  S.set('rvSubjects', rvSubjects); renderRevision();
+  sub.open = sub.open === false; S.set('rvSubjects', rvSubjects); renderRevision();
 }
-
 function openRevisionModal(subId, topicId) {
   const sub = rvSubjects.find(s=>s.id===subId); if(!sub)return;
   const topic = sub.topics.find(t=>t.id===topicId); if(!topic)return;
@@ -1683,8 +1753,7 @@ function closeQC(){document.getElementById('qcPanel').classList.remove('open');}
 function saveQuickCapture(){
   const val=document.getElementById('qcText').value.trim(); if(!val)return;
   addNote('⚡ ' + val);
-  document.getElementById('qcText').value='';
-  closeQC(); snack('Captured to Notes ✓');
+  document.getElementById('qcText').value=''; closeQC(); snack('Captured to Notes ✓');
 }
 
 /* ===================== MODAL ===================== */
@@ -1702,7 +1771,7 @@ function clearNotebook(){if(!confirm('Clear ALL notebook entries?'))return;nbEnt
 function clearRevisions(){if(!confirm('Clear ALL subjects and revision data?'))return;rvSubjects=[];S.set('rvSubjects',[]);renderRevision();snack('Revision data cleared');}
 function clearEverything(){
   if(!confirm('⚠️ CLEAR ALL DATA? This cannot be undone.'))return;
-  if(!confirm('Are you 100% sure? All sessions, tasks, notes, habits, notebook and revisions will be deleted.'))return;
+  if(!confirm('Are you 100% sure?'))return;
   clearInterval(studyInterval);
   studyStart=null; sessions=[]; tasks=[]; notes=[]; habits=[]; nbEntries=[]; rvSubjects=[];
   S.del('studyStart'); S.set('sessions',[]); S.set('tasks',[]); S.set('notes',[]); S.set('habits',[]); S.set('nbEntries',[]); S.set('rvSubjects',[]);

@@ -4,8 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Focus Lab</title>
-
-<!-- ===================== PWA META TAGS ===================== -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#3b9eff">
 <meta name="mobile-web-app-capable" content="yes">
@@ -13,8 +11,6 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Focus Lab">
 <link rel="apple-touch-icon" href="icon-192.png">
-<!-- ========================================================= -->
-
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⌬</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -161,17 +157,128 @@ body::after {
 .page-header h1 { font-size: 26px; font-weight: 700; color: var(--text); }
 .page-header p { font-size: 13px; color: var(--text2); margin-top: 4px; }
 
-/* CARDS */
+/* ===================== PANEL BACKGROUND SYSTEM ===================== */
+/* Cards must be position:relative and overflow:hidden for bg to work */
 .card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 24px; box-shadow: var(--glow);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--glow);
+  position: relative;      /* needed for bg layer */
+  overflow: hidden;         /* needed for bg layer */
+  isolation: isolate;
 }
+
+/* The bg image layer sits behind everything */
+.card-bg-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  border-radius: var(--radius);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+.card-bg-layer.active { opacity: 1; }
+
+/* Dark scrim so text stays readable over any photo */
+.card-bg-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: rgba(8,12,18,0.70);
+  border-radius: var(--radius);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  backdrop-filter: blur(0px);
+}
+.card-bg-scrim.active { opacity: 1; }
+
+/* All real card content must be above the bg layers */
+.card > *:not(.card-bg-layer):not(.card-bg-scrim) {
+  position: relative;
+  z-index: 2;
+}
+
+/* card-title row: holds title text + bg button inline */
 .card-title {
   font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
   color: var(--text3); margin-bottom: 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px;
 }
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.card-title-text { flex: 1; }
+
+/* BG control button group */
+.card-bg-controls {
+  display: flex; align-items: center; gap: 4px; flex-shrink: 0;
+}
+.bg-set-btn {
+  padding: 3px 9px; border-radius: 6px; border: 1px solid var(--border2);
+  background: rgba(255,255,255,0.06); color: var(--text2);
+  font-size: 10px; cursor: pointer; font-family: var(--sans);
+  transition: all 0.18s; display: flex; align-items: center; gap: 4px;
+  white-space: nowrap;
+}
+.bg-set-btn:hover { background: rgba(59,158,255,0.14); color: var(--accent); border-color: rgba(59,158,255,0.3); }
+.bg-remove-btn {
+  padding: 3px 7px; border-radius: 6px; border: 1px solid rgba(255,107,107,0.25);
+  background: rgba(255,107,107,0.10); color: var(--accent3);
+  font-size: 10px; cursor: pointer; font-family: var(--sans);
+  transition: all 0.18s; display: none; align-items: center;
+}
+.bg-remove-btn:hover { background: rgba(255,107,107,0.22); }
+.bg-remove-btn.visible { display: flex; }
+
+/* BG Resize popover */
+.bg-popover {
+  position: absolute; top: 48px; right: 16px; z-index: 300;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 10px; padding: 14px 16px; width: 230px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  display: none;
+}
+.bg-popover.open { display: block; animation: fadeUp 0.18s ease; }
+.bg-popover h5 {
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--text3); margin-bottom: 10px;
+}
+.bg-slider-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.bg-slider-label { font-size: 10px; color: var(--text2); width: 36px; flex-shrink: 0; }
+.bg-slider {
+  flex: 1; -webkit-appearance: none; appearance: none;
+  height: 4px; border-radius: 2px; background: var(--surface2); outline: none; cursor: pointer;
+}
+.bg-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%;
+  background: var(--accent); cursor: pointer; border: 2px solid var(--bg);
+  box-shadow: 0 0 8px rgba(59,158,255,0.4);
+}
+.bg-popover-close {
+  width: 100%; margin-top: 10px; padding: 6px; border-radius: 6px;
+  background: var(--surface2); border: 1px solid var(--border2);
+  color: var(--text2); font-size: 11px; cursor: pointer; font-family: var(--sans);
+}
+.bg-popover-close:hover { background: var(--bg3); color: var(--text); }
+
+/* Scrim strength slider (extra control) */
+.scrim-label { font-size: 10px; color: var(--text2); width: 36px; }
+
+/* ============================================================= */
+
+/* STAT CARDS */
+.stat-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px; text-align: center;
+}
+.stat-value { font-family: var(--mono); font-size: 28px; color: var(--accent); font-weight: 700; }
+.stat-label { font-size: 11px; color: var(--text3); margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
 
 /* TIMER DISPLAY */
 .timer-display {
@@ -200,14 +307,6 @@ body::after {
 .btn-purple { background: rgba(192,132,252,0.15); color: var(--accent5); border: 1px solid rgba(192,132,252,0.2); }
 .btn-sm { padding: 6px 12px; font-size: 12px; }
 .btn-group { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 16px; }
-
-/* STAT CARDS */
-.stat-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 20px; text-align: center;
-}
-.stat-value { font-family: var(--mono); font-size: 28px; color: var(--accent); font-weight: 700; }
-.stat-label { font-size: 11px; color: var(--text3); margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
 
 /* CALENDAR */
 .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
@@ -359,7 +458,7 @@ body::after {
 .mnav-btn:hover, .mnav-btn.active { color: var(--accent); }
 .mnav-btn .icon { font-size: 20px; }
 
-/* ===================== SMART NOTEBOOK ===================== */
+/* SMART NOTEBOOK */
 .nb-toolbar {
   display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
   padding: 12px 16px; background: var(--bg3);
@@ -436,7 +535,7 @@ body::after {
 .nb-filter-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
 .nb-word-count { font-size: 10px; color: var(--text3); }
 
-/* ===================== REVISION TRACKER ===================== */
+/* REVISION TRACKER */
 .rv-subject-card {
   background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius); overflow: hidden; margin-bottom: 16px;
@@ -604,6 +703,10 @@ body::after {
 .goal-bar-wrap { width: 100px; height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
 .goal-bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--accent2), var(--accent)); transition: width 0.5s ease; }
 .goal-pct { font-family: var(--mono); font-size: 11px; color: var(--text2); width: 32px; text-align: right; }
+
+/* Grid helpers */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 </style>
 </head>
 <body>
@@ -658,8 +761,40 @@ body::after {
         <div class="stat-card"><div class="stat-value" id="dash-all">0.00</div><div class="stat-label">All Time Hours</div></div>
       </div>
       <div class="grid-2">
-        <div class="card">
-          <div class="card-title">Study Timer</div>
+
+        <!-- STUDY TIMER CARD -->
+        <div class="card" id="card-study">
+          <div class="card-bg-layer" id="bgl-study"></div>
+          <div class="card-bg-scrim" id="bgs-study"></div>
+          <div class="card-title">
+            <span class="card-title-text">Study Timer</span>
+            <div class="card-bg-controls">
+              <button class="bg-set-btn" onclick="bgPickPhoto('study')">🖼 BG</button>
+              <button class="bg-remove-btn" id="bgr-study" onclick="bgRemove('study')">✕ Remove</button>
+              <button class="bg-set-btn" id="bge-study" onclick="bgTogglePopover('study')" style="display:none;">⚙ Edit</button>
+            </div>
+          </div>
+          <!-- BG resize/position popover -->
+          <div class="bg-popover" id="bgp-study">
+            <h5>Background Settings</h5>
+            <div class="bg-slider-row">
+              <span class="bg-slider-label">Zoom</span>
+              <input type="range" class="bg-slider" id="bgsz-study" min="100" max="300" value="100" oninput="bgApplyStyle('study')">
+            </div>
+            <div class="bg-slider-row">
+              <span class="bg-slider-label">Pos X</span>
+              <input type="range" class="bg-slider" id="bgpx-study" min="0" max="100" value="50" oninput="bgApplyStyle('study')">
+            </div>
+            <div class="bg-slider-row">
+              <span class="bg-slider-label">Pos Y</span>
+              <input type="range" class="bg-slider" id="bgpy-study" min="0" max="100" value="50" oninput="bgApplyStyle('study')">
+            </div>
+            <div class="bg-slider-row">
+              <span class="bg-slider-label">Scrim</span>
+              <input type="range" class="bg-slider" id="bgsc-study" min="20" max="90" value="70" oninput="bgApplyScrim('study')">
+            </div>
+            <button class="bg-popover-close" onclick="bgTogglePopover('study')">✓ Done</button>
+          </div>
           <div class="timer-display" id="mainTimer">00:00:00</div>
           <div class="btn-group">
             <button class="btn btn-primary" onclick="startStudy()">▶ Start</button>
@@ -667,16 +802,55 @@ body::after {
             <button class="btn btn-danger" onclick="resetStudyTimer()">↺ Reset Timer</button>
           </div>
         </div>
-        <div class="card">
-          <div class="card-title">Weekly Progress</div>
+
+        <!-- WEEKLY PROGRESS CARD -->
+        <div class="card" id="card-weekly">
+          <div class="card-bg-layer" id="bgl-weekly"></div>
+          <div class="card-bg-scrim" id="bgs-weekly"></div>
+          <div class="card-title">
+            <span class="card-title-text">Weekly Progress</span>
+            <div class="card-bg-controls">
+              <button class="bg-set-btn" onclick="bgPickPhoto('weekly')">🖼 BG</button>
+              <button class="bg-remove-btn" id="bgr-weekly" onclick="bgRemove('weekly')">✕ Remove</button>
+              <button class="bg-set-btn" id="bge-weekly" onclick="bgTogglePopover('weekly')" style="display:none;">⚙ Edit</button>
+            </div>
+          </div>
+          <div class="bg-popover" id="bgp-weekly">
+            <h5>Background Settings</h5>
+            <div class="bg-slider-row"><span class="bg-slider-label">Zoom</span><input type="range" class="bg-slider" id="bgsz-weekly" min="100" max="300" value="100" oninput="bgApplyStyle('weekly')"></div>
+            <div class="bg-slider-row"><span class="bg-slider-label">Pos X</span><input type="range" class="bg-slider" id="bgpx-weekly" min="0" max="100" value="50" oninput="bgApplyStyle('weekly')"></div>
+            <div class="bg-slider-row"><span class="bg-slider-label">Pos Y</span><input type="range" class="bg-slider" id="bgpy-weekly" min="0" max="100" value="50" oninput="bgApplyStyle('weekly')"></div>
+            <div class="bg-slider-row"><span class="bg-slider-label">Scrim</span><input type="range" class="bg-slider" id="bgsc-weekly" min="20" max="90" value="70" oninput="bgApplyScrim('weekly')"></div>
+            <button class="bg-popover-close" onclick="bgTogglePopover('weekly')">✓ Done</button>
+          </div>
           <div class="bar-chart" id="weekChart"></div>
           <div style="margin-top:16px;">
-            <div class="card-title">Daily Goal</div>
+            <div class="card-title"><span class="card-title-text">Daily Goal</span></div>
             <div id="goalRows"></div>
           </div>
         </div>
       </div>
-      <div class="card" style="margin-top:20px;">
+
+      <!-- CALENDAR CARD -->
+      <div class="card" id="card-calendar" style="margin-top:20px;">
+        <div class="card-bg-layer" id="bgl-calendar"></div>
+        <div class="card-bg-scrim" id="bgs-calendar"></div>
+        <div class="card-title">
+          <span class="card-title-text">Study Calendar</span>
+          <div class="card-bg-controls">
+            <button class="bg-set-btn" onclick="bgPickPhoto('calendar')">🖼 BG</button>
+            <button class="bg-remove-btn" id="bgr-calendar" onclick="bgRemove('calendar')">✕ Remove</button>
+            <button class="bg-set-btn" id="bge-calendar" onclick="bgTogglePopover('calendar')" style="display:none;">⚙ Edit</button>
+          </div>
+        </div>
+        <div class="bg-popover" id="bgp-calendar">
+          <h5>Background Settings</h5>
+          <div class="bg-slider-row"><span class="bg-slider-label">Zoom</span><input type="range" class="bg-slider" id="bgsz-calendar" min="100" max="300" value="100" oninput="bgApplyStyle('calendar')"></div>
+          <div class="bg-slider-row"><span class="bg-slider-label">Pos X</span><input type="range" class="bg-slider" id="bgpx-calendar" min="0" max="100" value="50" oninput="bgApplyStyle('calendar')"></div>
+          <div class="bg-slider-row"><span class="bg-slider-label">Pos Y</span><input type="range" class="bg-slider" id="bgpy-calendar" min="0" max="100" value="50" oninput="bgApplyStyle('calendar')"></div>
+          <div class="bg-slider-row"><span class="bg-slider-label">Scrim</span><input type="range" class="bg-slider" id="bgsc-calendar" min="20" max="90" value="70" oninput="bgApplyScrim('calendar')"></div>
+          <button class="bg-popover-close" onclick="bgTogglePopover('calendar')">✓ Done</button>
+        </div>
         <div class="cal-nav">
           <button onclick="calPrev()">‹</button>
           <h3 id="calTitle"></h3>
@@ -686,12 +860,31 @@ body::after {
       </div>
     </div>
 
-    <!-- FOCUS TIMER -->
+    <!-- FOCUS TIMER PAGE -->
     <div class="page" id="page-focus">
-      <div class="page-header"><h1>Focus Timers</h1><p>Pomodoro & Stopwatch</p></div>
+      <div class="page-header"><h1>Focus Timers</h1><p>Pomodoro &amp; Stopwatch</p></div>
       <div class="grid-2">
-        <div class="card">
-          <div class="card-title">Pomodoro</div>
+
+        <!-- POMODORO CARD -->
+        <div class="card" id="card-pomo">
+          <div class="card-bg-layer" id="bgl-pomo"></div>
+          <div class="card-bg-scrim" id="bgs-pomo"></div>
+          <div class="card-title">
+            <span class="card-title-text">Pomodoro</span>
+            <div class="card-bg-controls">
+              <button class="bg-set-btn" onclick="bgPickPhoto('pomo')">🖼 BG</button>
+              <button class="bg-remove-btn" id="bgr-pomo" onclick="bgRemove('pomo')">✕ Remove</button>
+              <button class="bg-set-btn" id="bge-pomo" onclick="bgTogglePopover('pomo')" style="display:none;">⚙ Edit</button>
+            </div>
+          </div>
+          <div class="bg-popover" id="bgp-pomo">
+            <h5>Background Settings</h5>
+            <div class="bg-slider-row"><span class="bg-slider-label">Zoom</span><input type="range" class="bg-slider" id="bgsz-pomo" min="100" max="300" value="100" oninput="bgApplyStyle('pomo')"></div>
+            <div class="bg-slider-row"><span class="bg-slider-label">Pos X</span><input type="range" class="bg-slider" id="bgpx-pomo" min="0" max="100" value="50" oninput="bgApplyStyle('pomo')"></div>
+            <div class="bg-slider-row"><span class="bg-slider-label">Pos Y</span><input type="range" class="bg-slider" id="bgpy-pomo" min="0" max="100" value="50" oninput="bgApplyStyle('pomo')"></div>
+            <div class="bg-slider-row"><span class="bg-slider-label">Scrim</span><input type="range" class="bg-slider" id="bgsc-pomo" min="20" max="90" value="70" oninput="bgApplyScrim('pomo')"></div>
+            <button class="bg-popover-close" onclick="bgTogglePopover('pomo')">✓ Done</button>
+          </div>
           <div class="pomo-phases">
             <button class="phase-btn active" onclick="setPhase('work',this)">Focus</button>
             <button class="phase-btn" onclick="setPhase('short',this)">Short Break</button>
@@ -721,8 +914,27 @@ body::after {
             <div class="pomo-set-item"><label>Long Break</label><input type="number" id="pomoLongMin" value="15" min="1" max="60" onchange="applyPomoSettings()"></div>
           </div>
         </div>
-        <div class="card">
-          <div class="card-title">Stopwatch</div>
+
+        <!-- STOPWATCH CARD -->
+        <div class="card" id="card-sw">
+          <div class="card-bg-layer" id="bgl-sw"></div>
+          <div class="card-bg-scrim" id="bgs-sw"></div>
+          <div class="card-title">
+            <span class="card-title-text">Stopwatch</span>
+            <div class="card-bg-controls">
+              <button class="bg-set-btn" onclick="bgPickPhoto('sw')">🖼 BG</button>
+              <button class="bg-remove-btn" id="bgr-sw" onclick="bgRemove('sw')">✕ Remove</button>
+              <button class="bg-set-btn" id="bge-sw" onclick="bgTogglePopover('sw')" style="display:none;">⚙ Edit</button>
+            </div>
+          </div>
+          <div class="bg-popover" id="bgp-sw">
+            <h5>Background Settings</h5>
+            <div class="bg-slider-row"><span class="bg-slider-label">Zoom</span><input type="range" class="bg-slider" id="bgsz-sw" min="100" max="300" value="100" oninput="bgApplyStyle('sw')"></div>
+            <div class="bg-slider-row"><span class="bg-slider-label">Pos X</span><input type="range" class="bg-slider" id="bgpx-sw" min="0" max="100" value="50" oninput="bgApplyStyle('sw')"></div>
+            <div class="bg-slider-row"><span class="bg-slider-label">Pos Y</span><input type="range" class="bg-slider" id="bgpy-sw" min="0" max="100" value="50" oninput="bgApplyStyle('sw')"></div>
+            <div class="bg-slider-row"><span class="bg-slider-label">Scrim</span><input type="range" class="bg-slider" id="bgsc-sw" min="20" max="90" value="70" oninput="bgApplyScrim('sw')"></div>
+            <button class="bg-popover-close" onclick="bgTogglePopover('sw')">✓ Done</button>
+          </div>
           <div class="timer-display green" id="swDisplay">00:00:00</div>
           <div class="btn-group">
             <button class="btn btn-primary" onclick="startSW()">▶ Start</button>
@@ -775,7 +987,7 @@ body::after {
     <div class="page" id="page-notebook">
       <div class="page-header">
         <h1>Smart Notebook</h1>
-        <p>Rich text notes with tags, categories & search — all saved permanently</p>
+        <p>Rich text notes with tags, categories &amp; search — all saved permanently</p>
       </div>
       <div class="nb-toolbar">
         <button class="nb-upload-btn" onclick="addNBNote()">📝 New Note</button>
@@ -839,22 +1051,21 @@ body::after {
         <div class="stat-card"><div class="stat-value" id="an-streak">0</div><div class="stat-label">Day Streak</div></div>
       </div>
       <div class="card" style="margin-bottom:20px;">
-        <div class="card-title">Last 30 Days</div>
+        <div class="card-title"><span class="card-title-text">Last 30 Days</span></div>
         <div class="bar-chart" id="an30Chart" style="height:160px;"></div>
       </div>
       <div class="card">
-        <div class="card-title">All Sessions</div>
+        <div class="card-title"><span class="card-title-text">All Sessions</span></div>
         <div id="sessionLog" style="max-height:300px;overflow-y:auto;"></div>
       </div>
     </div>
 
     <!-- SETTINGS -->
     <div class="page" id="page-settings">
-      <div class="page-header"><h1>Settings</h1><p>Preferences & Data Management</p></div>
+      <div class="page-header"><h1>Settings</h1><p>Preferences &amp; Data Management</p></div>
 
-      <!-- PWA INSTALL SECTION -->
       <div class="card" style="margin-bottom:20px;">
-        <div class="card-title">Install App</div>
+        <div class="card-title"><span class="card-title-text">Install App</span></div>
         <p style="font-size:13px;color:var(--text2);margin-bottom:14px;">Install Focus Lab on your device for offline access and a native app experience.</p>
         <div id="pwaStatus" style="font-size:13px;color:var(--text3);margin-bottom:12px;">Checking install status…</div>
         <button class="btn btn-primary" id="settingsInstallBtn" style="display:none;" onclick="triggerInstall()">📱 Install App</button>
@@ -865,7 +1076,7 @@ body::after {
       </div>
 
       <div class="card" style="margin-bottom:20px;">
-        <div class="card-title">Daily Study Goal</div>
+        <div class="card-title"><span class="card-title-text">Daily Study Goal</span></div>
         <div style="display:flex;align-items:center;gap:12px;">
           <input class="input" type="number" id="dailyGoalInput" value="4" min="0.5" max="24" step="0.5" style="width:80px;">
           <span style="font-size:13px;color:var(--text2);">hours per day</span>
@@ -874,7 +1085,16 @@ body::after {
       </div>
 
       <div class="card" style="margin-bottom:20px;">
-        <div class="card-title">Export Data</div>
+        <div class="card-title"><span class="card-title-text">Card Backgrounds</span></div>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:14px;">
+          Click the <strong style="color:var(--accent);">🖼 BG</strong> button on any card to set a custom background photo.
+          After uploading, use <strong style="color:var(--accent);">⚙ Edit</strong> to adjust zoom, position, and overlay darkness.
+        </p>
+        <button class="btn btn-danger btn-sm" onclick="bgClearAll()">🗑 Clear All Card Backgrounds</button>
+      </div>
+
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-title"><span class="card-title-text">Export Data</span></div>
         <p style="font-size:13px;color:var(--text2);margin-bottom:14px;">Download all your study sessions, tasks, habits as JSON.</p>
         <button class="btn btn-success" onclick="exportData()">⬇ Export JSON</button>
       </div>
@@ -902,6 +1122,9 @@ body::after {
 
   </main>
 </div>
+
+<!-- Hidden file input for BG photo picker -->
+<input type="file" id="bg-file-input" accept="image/*" style="display:none;" onchange="bgHandleFile(event)">
 
 <!-- QUICK CAPTURE -->
 <div class="quick-capture">
@@ -998,8 +1221,6 @@ const S = {
 
 /* ===================== PWA / SERVICE WORKER ===================== */
 let deferredInstallPrompt = null;
-
-// Register Service Worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js')
@@ -1007,30 +1228,22 @@ if ('serviceWorker' in navigator) {
       .catch(err => console.log('SW error:', err));
   });
 }
-
-// Catch the install prompt (Android/Chrome)
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredInstallPrompt = e;
-  // Only show banner if not dismissed recently
   const dismissed = S.get('installDismissed', 0);
-  if (Date.now() - dismissed > 7 * 86400000) { // show again after 7 days
-    setTimeout(() => {
-      document.getElementById('installBanner').classList.add('show');
-    }, 3000);
+  if (Date.now() - dismissed > 7 * 86400000) {
+    setTimeout(() => { document.getElementById('installBanner').classList.add('show'); }, 3000);
   }
   document.getElementById('settingsInstallBtn').style.display = 'inline-flex';
   updatePWAStatus();
 });
-
-// Hide banner when app is installed
 window.addEventListener('appinstalled', () => {
   deferredInstallPrompt = null;
   document.getElementById('installBanner').classList.remove('show');
   updatePWAStatus();
   snack('✅ Focus Lab installed successfully!');
 });
-
 function triggerInstall() {
   if (!deferredInstallPrompt) return;
   deferredInstallPrompt.prompt();
@@ -1041,25 +1254,19 @@ function triggerInstall() {
     document.getElementById('settingsInstallBtn').style.display = 'none';
   });
 }
-
 document.getElementById('installBtn').addEventListener('click', triggerInstall);
-
 function dismissInstall() {
   S.set('installDismissed', Date.now());
   document.getElementById('installBanner').classList.remove('show');
 }
-
 function updatePWAStatus() {
-  const el = document.getElementById('pwaStatus');
-  if (!el) return;
+  const el = document.getElementById('pwaStatus'); if (!el) return;
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
   if (isStandalone) {
-    el.textContent = '✅ Running as installed app';
-    el.style.color = 'var(--accent2)';
+    el.textContent = '✅ Running as installed app'; el.style.color = 'var(--accent2)';
     document.getElementById('settingsInstallBtn').style.display = 'none';
   } else if (deferredInstallPrompt) {
-    el.textContent = '📱 Ready to install — click the button below';
-    el.style.color = 'var(--accent4)';
+    el.textContent = '📱 Ready to install — click the button below'; el.style.color = 'var(--accent4)';
     document.getElementById('settingsInstallBtn').style.display = 'inline-flex';
   } else {
     el.textContent = 'ℹ️ Use browser menu to install, or visit on Android Chrome for auto-prompt';
@@ -1068,8 +1275,160 @@ function updatePWAStatus() {
 }
 updatePWAStatus();
 
+/* =====================================================================
+   PANEL BACKGROUND PHOTO SYSTEM
+   - Cards: study, weekly, calendar, pomo, sw
+   - Each gets: bgl-{id} (bg layer), bgs-{id} (scrim), bgp-{id} (popover)
+   - Sliders: bgsz-{id}=zoom, bgpx-{id}=posX, bgpy-{id}=posY, bgsc-{id}=scrim%
+   - Images stored as base64 in localStorage key: cardBg_{id}
+   - Settings stored in localStorage key: cardBgSettings_{id}
+===================================================================== */
+
+const BG_CARD_IDS = ['study','weekly','calendar','pomo','sw'];
+let _bgCurrentTarget = null; // which card is being picked for
+
+function bgPickPhoto(cardId) {
+  _bgCurrentTarget = cardId;
+  document.getElementById('bg-file-input').click();
+}
+
+function bgHandleFile(e) {
+  const file = e.target.files[0];
+  if (!file || !_bgCurrentTarget) return;
+  e.target.value = ''; // reset so same file can be re-picked
+
+  // Read as base64 and store
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    const dataUrl = ev.target.result;
+    // Store image — use try/catch in case quota exceeded
+    try {
+      localStorage.setItem('cardBg_' + _bgCurrentTarget, dataUrl);
+    } catch(err) {
+      snack('⚠ Image too large for storage. Try a smaller photo.');
+      return;
+    }
+    bgApplyToCard(_bgCurrentTarget, dataUrl);
+    snack('✅ Background set! Click ⚙ Edit to adjust.');
+  };
+  reader.readAsDataURL(file);
+}
+
+function bgApplyToCard(cardId, dataUrl) {
+  const layer = document.getElementById('bgl-' + cardId);
+  const scrim = document.getElementById('bgs-' + cardId);
+  const rmbtn = document.getElementById('bgr-' + cardId);
+  const edbtn = document.getElementById('bge-' + cardId);
+  if (!layer) return;
+
+  // Restore saved settings if any
+  const settings = S.get('cardBgSettings_' + cardId, { zoom: 100, px: 50, py: 50, scrim: 70 });
+  const sz = document.getElementById('bgsz-' + cardId);
+  const px = document.getElementById('bgpx-' + cardId);
+  const py = document.getElementById('bgpy-' + cardId);
+  const sc = document.getElementById('bgsc-' + cardId);
+  if (sz) sz.value = settings.zoom;
+  if (px) px.value = settings.px;
+  if (py) py.value = settings.py;
+  if (sc) sc.value = settings.scrim;
+
+  layer.style.backgroundImage = `url(${dataUrl})`;
+  layer.style.backgroundSize = settings.zoom + '%';
+  layer.style.backgroundPosition = settings.px + '% ' + settings.py + '%';
+  layer.classList.add('active');
+
+  scrim.style.background = `rgba(8,12,18,${settings.scrim / 100})`;
+  scrim.classList.add('active');
+
+  if (rmbtn) rmbtn.classList.add('visible');
+  if (edbtn) edbtn.style.display = 'flex';
+}
+
+function bgApplyStyle(cardId) {
+  const layer = document.getElementById('bgl-' + cardId); if (!layer) return;
+  const zoom = parseInt(document.getElementById('bgsz-' + cardId).value);
+  const px   = parseInt(document.getElementById('bgpx-' + cardId).value);
+  const py   = parseInt(document.getElementById('bgpy-' + cardId).value);
+  const sc   = parseInt(document.getElementById('bgsc-' + cardId).value);
+
+  layer.style.backgroundSize = zoom + '%';
+  layer.style.backgroundPosition = px + '% ' + py + '%';
+
+  // Save settings
+  S.set('cardBgSettings_' + cardId, { zoom, px, py, scrim: sc });
+}
+
+function bgApplyScrim(cardId) {
+  const scrim = document.getElementById('bgs-' + cardId); if (!scrim) return;
+  const sc = parseInt(document.getElementById('bgsc-' + cardId).value);
+  scrim.style.background = `rgba(8,12,18,${sc / 100})`;
+  // Also save
+  const settings = S.get('cardBgSettings_' + cardId, { zoom: 100, px: 50, py: 50, scrim: 70 });
+  settings.scrim = sc;
+  S.set('cardBgSettings_' + cardId, settings);
+}
+
+function bgRemove(cardId) {
+  const layer = document.getElementById('bgl-' + cardId);
+  const scrim = document.getElementById('bgs-' + cardId);
+  const rmbtn = document.getElementById('bgr-' + cardId);
+  const edbtn = document.getElementById('bge-' + cardId);
+  const popover = document.getElementById('bgp-' + cardId);
+  if (layer) { layer.style.backgroundImage = ''; layer.classList.remove('active'); }
+  if (scrim) scrim.classList.remove('active');
+  if (rmbtn) rmbtn.classList.remove('visible');
+  if (edbtn) edbtn.style.display = 'none';
+  if (popover) popover.classList.remove('open');
+  localStorage.removeItem('cardBg_' + cardId);
+  snack('Background removed');
+}
+
+function bgTogglePopover(cardId) {
+  // Close all other popovers first
+  BG_CARD_IDS.forEach(id => {
+    if (id !== cardId) {
+      const p = document.getElementById('bgp-' + id);
+      if (p) p.classList.remove('open');
+    }
+  });
+  const popover = document.getElementById('bgp-' + cardId);
+  if (popover) popover.classList.toggle('open');
+}
+
+function bgClearAll() {
+  if (!confirm('Remove all card backgrounds?')) return;
+  BG_CARD_IDS.forEach(id => {
+    bgRemove(id);
+    localStorage.removeItem('cardBgSettings_' + id);
+  });
+  snack('All backgrounds cleared');
+}
+
+// Restore backgrounds on page load
+function bgRestoreAll() {
+  BG_CARD_IDS.forEach(id => {
+    const dataUrl = localStorage.getItem('cardBg_' + id);
+    if (dataUrl) bgApplyToCard(id, dataUrl);
+  });
+}
+
+// Close popover when clicking outside
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.bg-popover') && !e.target.closest('.bg-set-btn')) {
+    BG_CARD_IDS.forEach(id => {
+      const p = document.getElementById('bgp-' + id);
+      // Only close if click is not on the edit button for that card
+      if (p && p.classList.contains('open')) {
+        const editBtn = document.getElementById('bge-' + id);
+        if (editBtn && editBtn.contains(e.target)) return;
+        p.classList.remove('open');
+      }
+    });
+  }
+});
+
 /* ===================== STUDY TIMER ===================== */
-let studyStart = S.get('studyStart', null);
+let studyStartTime = S.get('studyStart', null);
 let sessions   = S.get('sessions', []);
 let studyInterval;
 
@@ -1083,31 +1442,31 @@ function fmtTime(sec) {
 }
 
 function updateStudyTimer() {
-  if (studyStart) {
-    const elapsed = Math.floor((Date.now() - studyStart) / 1000);
+  if (studyStartTime) {
+    const elapsed = Math.floor((Date.now() - studyStartTime) / 1000);
     document.getElementById('mainTimer').textContent = fmtTime(getAllSec() + elapsed);
   }
 }
 
 function startStudy() {
-  if (!studyStart) {
-    studyStart = Date.now();
-    S.set('studyStart', studyStart);
+  if (!studyStartTime) {
+    studyStartTime = Date.now();
+    S.set('studyStart', studyStartTime);
     studyInterval = setInterval(updateStudyTimer, 1000);
     snack('Timer started ▶');
   }
 }
 
 function pauseStudy() {
-  if (studyStart) {
-    const dur = Math.floor((Date.now() - studyStart) / 1000);
+  if (studyStartTime) {
+    const dur = Math.floor((Date.now() - studyStartTime) / 1000);
     if (dur > 0) {
       const today = new Date().toISOString().slice(0,10);
       sessions.push({ date: today, duration: dur });
       S.set('sessions', sessions);
     }
     S.del('studyStart');
-    studyStart = null;
+    studyStartTime = null;
     clearInterval(studyInterval);
     updateStats(); buildCalendar(); buildChart(); buildGoalWidget();
     snack('Session saved ✓');
@@ -1118,12 +1477,12 @@ function resetStudyTimer() {
   if (!confirm('Reset the current running timer? Saved sessions will NOT be lost.')) return;
   clearInterval(studyInterval);
   S.del('studyStart');
-  studyStart = null;
+  studyStartTime = null;
   document.getElementById('mainTimer').textContent = fmtTime(getAllSec());
   snack('Timer reset (sessions kept)');
 }
 
-if (studyStart) { studyInterval = setInterval(updateStudyTimer, 1000); updateStudyTimer(); }
+if (studyStartTime) { studyInterval = setInterval(updateStudyTimer, 1000); updateStudyTimer(); }
 
 function todaySec() {
   const today = new Date().toISOString().slice(0,10);
@@ -1145,8 +1504,7 @@ function updateStats() {
 updateStats();
 
 function buildGoalWidget() {
-  const el = document.getElementById('goalRows');
-  if (!el) return;
+  const el = document.getElementById('goalRows'); if (!el) return;
   const goal = S.get('dailyGoal', 4);
   const done = todaySec() / 3600;
   const pct = Math.min(100, (done/goal)*100);
@@ -1160,9 +1518,7 @@ buildGoalWidget();
 
 function saveDailyGoal() {
   const v = parseFloat(document.getElementById('dailyGoalInput').value) || 4;
-  S.set('dailyGoal', v);
-  buildGoalWidget();
-  snack('Daily goal saved');
+  S.set('dailyGoal', v); buildGoalWidget(); snack('Daily goal saved');
 }
 
 /* ===================== CALENDAR ===================== */
@@ -1191,14 +1547,12 @@ function buildCalendar() {
   }
 }
 buildCalendar();
-
 function calPrev() { calMonth--; if(calMonth<0){calMonth=11;calYear--;} buildCalendar(); }
 function calNext() { calMonth++; if(calMonth>11){calMonth=0;calYear++;} buildCalendar(); }
 
 /* ===================== WEEK CHART ===================== */
 function buildChart() {
-  const el = document.getElementById('weekChart');
-  if (!el) return;
+  const el = document.getElementById('weekChart'); if (!el) return;
   const days = [];
   const now = new Date();
   for (let i=6;i>=0;i--) {
@@ -1260,7 +1614,6 @@ function onPomoEnd() {
   if(pomoPhase==='work'){pomoSession++;snack('Focus session done! 🎉');if(pomoSession%POMO_SESSIONS_BEFORE_LONG===0)setPhaseAuto('long');else setPhaseAuto('short');}
   else{snack('Break over — back to focus!');setPhaseAuto('work');}
   renderDots();
-  // Send notification if permission granted
   if(Notification.permission === 'granted') {
     new Notification('Focus Lab', { body: pomoPhase==='work' ? '✅ Focus session complete! Take a break.' : '⏰ Break over — time to focus!', icon: 'icon-192.png' });
   }
@@ -1283,8 +1636,6 @@ document.getElementById('pomoWorkMin').value=pomoSettings.work;
 document.getElementById('pomoShortMin').value=pomoSettings.short;
 document.getElementById('pomoLongMin').value=pomoSettings.long;
 resetPomo(); renderDots();
-
-// Request notification permission for Pomodoro alerts
 if('Notification' in window && Notification.permission === 'default') {
   setTimeout(() => Notification.requestPermission(), 5000);
 }
@@ -1773,7 +2124,7 @@ function clearEverything(){
   if(!confirm('⚠️ CLEAR ALL DATA? This cannot be undone.'))return;
   if(!confirm('Are you 100% sure?'))return;
   clearInterval(studyInterval);
-  studyStart=null; sessions=[]; tasks=[]; notes=[]; habits=[]; nbEntries=[]; rvSubjects=[];
+  studyStartTime=null; sessions=[]; tasks=[]; notes=[]; habits=[]; nbEntries=[]; rvSubjects=[];
   S.del('studyStart'); S.set('sessions',[]); S.set('tasks',[]); S.set('notes',[]); S.set('habits',[]); S.set('nbEntries',[]); S.set('rvSubjects',[]);
   document.getElementById('mainTimer').textContent='00:00:00';
   updateStats();buildCalendar();buildChart();buildGoalWidget();renderTasks();renderNotes();renderHabits();renderNB();renderRevision();
@@ -1796,6 +2147,7 @@ function timeAgo(iso){const diff=(Date.now()-new Date(iso))/1000;if(diff<60)retu
 /* ===================== INIT ===================== */
 buildNav();
 renderRevision();
+bgRestoreAll(); // Restore any saved card backgrounds on load
 </script>
 </body>
 </html>

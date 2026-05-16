@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Focus Lab — Group Study</title>
+<title>Focus Lab  Group Study</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -48,10 +48,10 @@ body::after{
   pointer-events:none;z-index:0;
 }
 
-/* ── LAYOUT ── */
+/*  LAYOUT  */
 #root{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;}
 
-/* ── TOPBAR ── */
+/*  TOPBAR  */
 .topbar{
   display:flex;align-items:center;justify-content:space-between;
   padding:16px 28px;
@@ -76,10 +76,10 @@ body::after{
   font-size:11px;font-weight:700;color:#fff;
 }
 
-/* ── MAIN ── */
+/*  MAIN  */
 main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 
-/* ── CARDS ── */
+/*  CARDS  */
 .card{
   background:var(--surface);
   border:1px solid var(--border);
@@ -92,7 +92,7 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
   color:var(--text3);margin-bottom:16px;
 }
 
-/* ── BUTTONS ── */
+/*  BUTTONS  */
 .btn{
   display:inline-flex;align-items:center;gap:6px;
   padding:9px 18px;border-radius:8px;border:none;
@@ -110,7 +110,7 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 .btn-sm{padding:5px 12px;font-size:12px;}
 .btn:disabled{opacity:0.4;cursor:not-allowed;}
 
-/* ── INPUT ── */
+/*  INPUT  */
 .input{
   background:var(--bg3);border:1px solid var(--border);
   border-radius:8px;color:var(--text);font-family:var(--sans);
@@ -119,12 +119,12 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 }
 .input:focus{border-color:var(--accent);}
 
-/* ── SCREENS ── */
+/*  SCREENS  */
 .screen{display:none;animation:fadeUp 0.3s ease;}
 .screen.active{display:block;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 
-/* ── LANDING ── */
+/*  LANDING  */
 .hero{text-align:center;padding:60px 20px 40px;}
 .hero h1{
   font-family:var(--mono);font-size:clamp(32px,5vw,52px);
@@ -144,7 +144,7 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 .action-card h3{font-size:15px;font-weight:600;margin-bottom:6px;}
 .action-card p{font-size:12px;color:var(--text3);}
 
-/* ── GROUPS LIST ── */
+/*  GROUPS LIST  */
 .groups-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
 .groups-header h2{font-size:22px;font-weight:700;}
 .groups-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;}
@@ -182,7 +182,7 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 }
 .mini-avatar:first-child{margin-left:0;}
 
-/* ── CREATE / JOIN FORM ── */
+/*  CREATE / JOIN FORM  */
 .form-wrap{max-width:480px;margin:0 auto;}
 .form-row{margin-bottom:16px;}
 .form-row label{display:block;font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
@@ -197,7 +197,7 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 }
 .join-link-box:hover{border-color:var(--accent);}
 
-/* ── ROOM ── */
+/*  ROOM  */
 #roomScreen{display:none;}
 #roomScreen.active{display:block;}
 .room-header{
@@ -216,7 +216,7 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 .room-info-item{font-size:12px;color:var(--text2);}
 .room-info-item strong{color:var(--text);font-weight:600;}
 
-/* ── MY TIMER (big card) ── */
+/*  MY TIMER (big card)  */
 .my-timer-card{
   background:var(--surface);border:1px solid var(--border);
   border-radius:var(--radius);padding:28px;
@@ -247,7 +247,7 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 .my-status-tag.running{background:rgba(0,212,170,0.1);color:var(--accent2);border-color:rgba(0,212,170,0.2);}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
 
-/* ── MEMBERS GRID ── */
+/*  MEMBERS GRID  */
 .members-section-title{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:16px;}
 .members-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;}
 .member-tile{
@@ -291,7 +291,7 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
   border:1px solid rgba(59,158,255,0.3);
 }
 
-/* ── CHAT ── */
+/*  CHAT  */
 .chat-panel{
   background:var(--surface);border:1px solid var(--border);
   border-radius:var(--radius);margin-top:24px;overflow:hidden;
@@ -315,7 +315,7 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 .chat-input-row input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--sans);font-size:13px;padding:8px 12px;outline:none;}
 .chat-input-row input:focus{border-color:var(--accent);}
 
-/* ── LEADERBOARD ── */
+/*  LEADERBOARD  */
 .lb-row{
   display:flex;align-items:center;gap:12px;
   padding:10px 14px;border-radius:8px;margin-bottom:6px;
@@ -330,7 +330,7 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 .lb-row:nth-child(2){border-color:rgba(100,180,255,0.2);}
 .lb-row:nth-child(3){border-color:rgba(192,132,252,0.2);}
 
-/* ── MODAL ── */
+/*  MODAL  */
 .modal-overlay{
   position:fixed;inset:0;background:rgba(0,0,0,0.75);
   z-index:1000;display:none;align-items:center;justify-content:center;
@@ -351,7 +351,7 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 }
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
 
-/* ── SNACK ── */
+/*  SNACK  */
 #snack{
   position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(40px);
   background:var(--surface2);border:1px solid var(--border2);
@@ -360,7 +360,7 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 }
 #snack.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
-/* ── SHARE STRIP ── */
+/*  SHARE STRIP  */
 .share-strip{
   display:flex;align-items:center;gap:10px;
   background:var(--bg3);border:1px solid var(--border2);
@@ -372,7 +372,7 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
   outline:none;
 }
 
-/* ── RESPONSIVE ── */
+/*  RESPONSIVE  */
 @media(max-width:600px){
   .action-grid{grid-template-columns:1fr;}
   .members-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));}
@@ -382,7 +382,7 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
   .my-timer-display{font-size:clamp(40px,10vw,64px);}
 }
 
-/* ── COLORS for avatars ── */
+/*  COLORS for avatars  */
 .av-0{background:linear-gradient(135deg,#3b9eff,#00aaff);}
 .av-1{background:linear-gradient(135deg,#00d4aa,#00b894);}
 .av-2{background:linear-gradient(135deg,#ff6b6b,#ee5a24);}
@@ -392,7 +392,7 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 .av-6{background:linear-gradient(135deg,#55efc4,#00b894);}
 .av-7{background:linear-gradient(135deg,#74b9ff,#0984e3);}
 
-/* ── TABS ── */
+/*  TABS  */
 .tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:24px;}
 .tab-btn{
   padding:10px 20px;font-size:13px;color:var(--text3);
@@ -405,13 +405,13 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 .tab-pane{display:none;}
 .tab-pane.active{display:block;animation:fadeUp 0.2s ease;}
 
-/* ── EMPTY STATE ── */
+/*  EMPTY STATE  */
 .empty-state{text-align:center;padding:60px 20px;color:var(--text3);}
 .empty-state .ei{font-size:48px;margin-bottom:12px;}
 .empty-state p{font-size:14px;margin-bottom:6px;color:var(--text2);}
 .empty-state small{font-size:12px;}
 
-/* ── SETTINGS in room ── */
+/*  SETTINGS in room  */
 .setting-row{
   display:flex;align-items:center;justify-content:space-between;
   padding:12px 0;border-bottom:1px solid var(--border);
@@ -440,16 +440,16 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
   <div class="screen active" id="landingScreen">
     <div class="hero">
       <h1>Group Study</h1>
-      <p>Study together in real-time. Create a room, share the link — your friends join instantly, no account needed.</p>
+      <p>Study together in real-time. Create a room, share the link  your friends join instantly, no account needed.</p>
     </div>
     <div class="action-grid">
       <div class="action-card" onclick="showCreate()">
-        <div class="ac-icon">➕</div>
+        <div class="ac-icon"></div>
         <h3>Create Room</h3>
         <p>Start a new group study session and invite others</p>
       </div>
       <div class="action-card" onclick="showJoin()">
-        <div class="ac-icon">🔗</div>
+        <div class="ac-icon"></div>
         <h3>Join Room</h3>
         <p>Enter a room code or paste an invite link</p>
       </div>
@@ -457,7 +457,7 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
     <div style="max-width:700px;margin:32px auto 0;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
         <div class="card-title" style="margin-bottom:0;">Active Rooms</div>
-        <button class="btn btn-secondary btn-sm" onclick="loadPublicRooms()">↻ Refresh</button>
+        <button class="btn btn-secondary btn-sm" onclick="loadPublicRooms()"> Refresh</button>
       </div>
       <div id="publicRoomsGrid" class="groups-grid"></div>
     </div>
@@ -465,10 +465,10 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 
   <!-- CREATE SCREEN -->
   <div class="screen" id="createScreen">
-    <div class="form-back" onclick="showLanding()">← Back</div>
+    <div class="form-back" onclick="showLanding()"> Back</div>
     <div class="form-wrap">
       <h2 style="font-size:22px;font-weight:700;margin-bottom:4px;">Create a Room</h2>
-      <p style="font-size:13px;color:var(--text2);margin-bottom:24px;">Share the link after creating — anyone can join instantly.</p>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:24px;">Share the link after creating  anyone can join instantly.</p>
 
       <div class="form-row">
         <label>Room Name</label>
@@ -476,7 +476,7 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
       </div>
       <div class="form-row">
         <label>Subject / Focus Area</label>
-        <input class="input" id="createSubject" placeholder="e.g. Physics, Biology, Maths…" maxlength="40">
+        <input class="input" id="createSubject" placeholder="e.g. Physics, Biology, Maths" maxlength="40">
       </div>
       <div class="form-row">
         <label>Max Members</label>
@@ -495,20 +495,20 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
         <input class="input" id="createUserName" placeholder="How others see you" maxlength="24">
       </div>
 
-      <button class="btn btn-primary btn-lg" style="width:100%" onclick="createRoom()">🚀 Create Room</button>
+      <button class="btn btn-primary btn-lg" style="width:100%" onclick="createRoom()"> Create Room</button>
     </div>
   </div>
 
   <!-- JOIN SCREEN -->
   <div class="screen" id="joinScreen">
-    <div class="form-back" onclick="showLanding()">← Back</div>
+    <div class="form-back" onclick="showLanding()"> Back</div>
     <div class="form-wrap">
       <h2 style="font-size:22px;font-weight:700;margin-bottom:4px;">Join a Room</h2>
       <p style="font-size:13px;color:var(--text2);margin-bottom:24px;">Enter a room code from a friend or paste the link.</p>
 
       <div class="form-row">
         <label>Room Code or Link</label>
-        <input class="input" id="joinCode" placeholder="e.g. ABC123 or https://…?room=ABC123" maxlength="200" oninput="extractCode(this)">
+        <input class="input" id="joinCode" placeholder="e.g. ABC123 or https://?room=ABC123" maxlength="200" oninput="extractCode(this)">
       </div>
       <div class="form-row">
         <label>Your Display Name</label>
@@ -519,7 +519,7 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
         <input class="input" id="joinPassword" placeholder="Enter room password" type="password">
       </div>
 
-      <button class="btn btn-primary btn-lg" style="width:100%" onclick="joinRoom()">🔑 Join Room</button>
+      <button class="btn btn-primary btn-lg" style="width:100%" onclick="joinRoom()"> Join Room</button>
     </div>
   </div>
 
@@ -531,9 +531,9 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
         <div class="room-meta" id="roomMeta"></div>
       </div>
       <div class="room-actions">
-        <button class="btn btn-secondary btn-sm" onclick="copyRoomLink()">📋 Copy Link</button>
-        <button class="btn btn-secondary btn-sm" onclick="toggleLeaderboard()">🏆 Board</button>
-        <button class="btn btn-danger btn-sm" onclick="leaveRoom()">🚪 Leave</button>
+        <button class="btn btn-secondary btn-sm" onclick="copyRoomLink()"> Copy Link</button>
+        <button class="btn btn-secondary btn-sm" onclick="toggleLeaderboard()"> Board</button>
+        <button class="btn btn-danger btn-sm" onclick="leaveRoom()"> Leave</button>
       </div>
     </div>
 
@@ -550,17 +550,17 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
       <div class="my-timer-display" id="myTimerDisplay">00:00:00</div>
       <div class="my-status-tag" id="myStatusTag"><div class="dot"></div><span id="myStatusText">Not studying</span></div>
       <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-        <button class="btn btn-primary" id="myStartBtn" onclick="myStart()">▶ Start Studying</button>
-        <button class="btn btn-secondary" id="myPauseBtn" onclick="myPause()" disabled>⏸ Pause</button>
-        <button class="btn btn-success btn-sm" id="myResumeBtn" onclick="myResume()" style="display:none;">▶ Resume</button>
+        <button class="btn btn-primary" id="myStartBtn" onclick="myStart()"> Start Studying</button>
+        <button class="btn btn-secondary" id="myPauseBtn" onclick="myPause()" disabled> Pause</button>
+        <button class="btn btn-success btn-sm" id="myResumeBtn" onclick="myResume()" style="display:none;"> Resume</button>
       </div>
     </div>
 
     <!-- Tabs -->
     <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('members',this)">👥 Members <span id="memberCountBadge" style="font-size:11px;color:var(--text3);"></span></button>
-      <button class="tab-btn" onclick="switchTab('leaderboard',this)">🏆 Rankings</button>
-      <button class="tab-btn" onclick="switchTab('chat',this)">💬 Chat</button>
+      <button class="tab-btn active" onclick="switchTab('members',this)"> Members <span id="memberCountBadge" style="font-size:11px;color:var(--text3);"></span></button>
+      <button class="tab-btn" onclick="switchTab('leaderboard',this)"> Rankings</button>
+      <button class="tab-btn" onclick="switchTab('chat',this)"> Chat</button>
     </div>
 
     <!-- Members Tab -->
@@ -581,10 +581,10 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
           <span style="font-size:11px;color:var(--text3);">Messages visible to all members</span>
         </div>
         <div class="chat-messages" id="chatMessages">
-          <div class="chat-msg sys"><span class="cm-text">Welcome to the study room! Stay focused. 💪</span></div>
+          <div class="chat-msg sys"><span class="cm-text">Welcome to the study room! Stay focused. </span></div>
         </div>
         <div class="chat-input-row">
-          <input id="chatInput" placeholder="Type a message…" maxlength="200" onkeydown="if(event.key==='Enter')sendChatMsg()">
+          <input id="chatInput" placeholder="Type a message" maxlength="200" onkeydown="if(event.key==='Enter')sendChatMsg()">
           <button class="btn btn-primary btn-sm" onclick="sendChatMsg()">Send</button>
         </div>
       </div>
@@ -605,7 +605,7 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 <!-- PASSWORD MODAL -->
 <div class="modal-overlay" id="pwModal">
   <div class="modal">
-    <h3>🔐 Password Required</h3>
+    <h3> Password Required</h3>
     <p class="subtitle">This room is password protected.</p>
     <div class="form-row">
       <label>Password</label>
@@ -627,12 +627,10 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 
 <script>
 /* ============================================================
-   FIREBASE CONFIG — Replace with your own Firebase project keys
-   Go to: console.firebase.google.com → Add project → Web App
-   Copy the firebaseConfig object from there
+   FIREBASE CONFIG
    ============================================================ */
 const FB_CONFIG = {
- apiKey: "AIzaSyA2yHdXCpNJeSpy6-NEjVlQDLz1W4zI5Qo",
+  apiKey: "AIzaSyA2yHdXCpNJeSpy6-NEjVlQDLz1W4zI5Qo",
   authDomain: "focus-lab-cf401.firebaseapp.com",
   databaseURL: "https://focus-lab-cf401-default-rtdb.firebaseio.com",
   projectId: "focus-lab-cf401",
@@ -641,10 +639,6 @@ const FB_CONFIG = {
   appId: "1:1073970407517:web:b65a08e7cba21b760185b4"
 };
 
-/* ── DEMO MODE: runs without Firebase until you replace the config above ─────
-   In demo mode data lives in memory only (single tab, no real-time sync).
-   Everything works: create/join/timers/chat/leaderboard — just not persisted.
-   ────────────────────────────────────────────────────────────────────────── */
 const DEMO_MODE = FB_CONFIG.apiKey === "REPLACE_WITH_YOUR_API_KEY";
 
 let db = null, auth = null, firebaseReady = false;
@@ -660,7 +654,7 @@ if (!DEMO_MODE) {
   }
 }
 
-/* ── DEMO DATABASE (in-memory fallback) ── */
+/*  DEMO DATABASE (in-memory fallback)  */
 const _memDB = {};
 let _memListeners = {};
 
@@ -703,7 +697,7 @@ function memOn(path,fn){
   return ()=>{ _memListeners[path]=_memListeners[path].filter(f=>f!==fn); };
 }
 
-/* ── DB ABSTRACTION ── */
+/*  DB ABSTRACTION  */
 function dbSet(path, val){ return firebaseReady ? db.ref(path).set(val) : Promise.resolve(memSet(path,val)); }
 function dbUpdate(path, val){ return firebaseReady ? db.ref(path).update(val) : Promise.resolve(Object.entries(val).forEach(([k,v])=>memSet(path+'/'+k,v))); }
 function dbGet(path){ return firebaseReady ? db.ref(path).get().then(s=>s.val()) : Promise.resolve(memGet(path)); }
@@ -717,15 +711,19 @@ function dbOn(path, cb){
     return memOn(path, cb);
   }
 }
-function dbOnDisconnect(path){ return firebaseReady ? db.ref(path).onDisconnect().remove() : null; }
-function dbPush(path){ return firebaseReady ? db.ref(path).push() : {key: '_'+Date.now(), set:(v)=>Promise.resolve(memSet(path+'/_'+Date.now(), v))}; }
+function dbPush(path){
+  if(firebaseReady) return db.ref(path).push();
+  const key = '_' + Date.now() + '_' + Math.floor(Math.random() * 9999);
+  return {key, set:(v)=>Promise.resolve(memSet(path + '/' + key, v))};
+}
 
 /* ============================================================
    STATE
    ============================================================ */
 const S = {
   get:(k,d)=>{ try{const v=localStorage.getItem(k);return v!==null?JSON.parse(v):d;}catch{return d;}},
-  set:(k,v)=>{ try{localStorage.setItem(k,JSON.stringify(v));}catch{} }
+  set:(k,v)=>{ try{localStorage.setItem(k,JSON.stringify(v));}catch{} },
+  del:(k)=>{ try{localStorage.removeItem(k);}catch{} }
 };
 
 let currentUser = null;   // {uid, name, colorIdx}
@@ -734,6 +732,7 @@ let roomData = null;      // room metadata snapshot
 let membersUnsub = null;
 let chatUnsub = null;
 let roomUnsub = null;
+let presenceInt = null;
 
 // My timer state
 let myTimerStart = null;
@@ -746,7 +745,6 @@ let memberTimerInts = {}; // {memberId: interval}
 function initUser() {
   const saved = S.get('gsUser', null);
   if(saved) { currentUser = saved; updateUserPill(); return; }
-  // default guest
   const names = ["Arjun","Priya","Rohan","Ananya","Karan","Isha","Varun","Meera","Dev","Riya"];
   const name = names[Math.floor(Math.random()*names.length)] + Math.floor(Math.random()*900+100);
   currentUser = { uid: 'guest_'+Date.now(), name, colorIdx: Math.floor(Math.random()*8), isGuest: true };
@@ -776,7 +774,6 @@ function showCreate(){
 function showJoin(){
   showScreen('joinScreen');
   document.getElementById('joinUserName').value = currentUser?.name || '';
-  // check URL param
   const code = new URLSearchParams(location.search).get('room');
   if(code) document.getElementById('joinCode').value = code;
 }
@@ -827,7 +824,7 @@ async function createRoom() {
 
   try {
     await dbSet('rooms/'+code, roomObj);
-    snack('Room created! 🎉');
+    snack('Room created! ');
     updateUserPill();
     enterRoom(code, roomObj);
   } catch(e) {
@@ -856,11 +853,11 @@ async function joinRoom() {
   const room = await dbGet('rooms/'+code);
   if(!room || !room.active){ snack('Room not found or no longer active'); return; }
 
-  // check member count
   const members = await dbGet('rooms/'+code+'/members') || {};
-  if(Object.keys(members).length >= (room.maxMembers||50)){ snack('Room is full!'); return; }
+  const isAlreadyMember = !!members[currentUser.uid];
+  if(!isAlreadyMember && Object.keys(members).length >= (room.maxMembers||50)){ snack('Room is full!'); return; }
 
-  if(room.locked && room.passwordHash) {
+  if(room.locked && room.passwordHash && !isAlreadyMember) {
     _pendingJoinCode = {code, room};
     document.getElementById('pwModalInput').value='';
     document.getElementById('pwModal').classList.add('open');
@@ -896,23 +893,36 @@ async function enterRoom(code, room) {
 
   showScreen('roomScreen');
   document.getElementById('roomTitle').textContent = room.name;
-  document.getElementById('roomMeta').textContent = (room.subject||'') + ' · Code: ' + code;
+  document.getElementById('roomMeta').textContent = (room.subject||'') + '  Code: ' + code;
   const link = getRoomLink(code);
   document.getElementById('shareUrlInput').value = link;
 
-  // register myself as member
   const memberRef = 'rooms/'+code+'/members/'+currentUser.uid;
+  const existingMember = await dbGet(memberRef);
+  const wasAlreadyMember = !!existingMember;
+
+  // Important: do not use onDisconnect().remove().
+  // Refresh, browser back, or app close should not remove a member.
   const memberData = {
+    ...(existingMember || {}),
     name: currentUser.name,
     colorIdx: currentUser.colorIdx,
-    isGuest: currentUser.isGuest || true,
-    joinedAt: Date.now(),
-    studying: false,
-    totalSec: 0,
-    lastStart: null,
+    isGuest: currentUser.isGuest !== false,
+    joinedAt: existingMember?.joinedAt || Date.now(),
+    studying: !!(existingMember?.studying && existingMember?.lastStart),
+    totalSec: existingMember?.totalSec || 0,
+    lastStart: existingMember?.lastStart || null,
+    lastSeen: Date.now()
   };
   await dbSet(memberRef, memberData);
-  dbOnDisconnect(memberRef);  // auto-remove on disconnect
+  S.set('gsLastRoom', code);
+
+  if(presenceInt) clearInterval(presenceInt);
+  presenceInt = setInterval(()=>{
+    if(currentRoom && currentUser) {
+      dbUpdate('rooms/'+currentRoom+'/members/'+currentUser.uid, { lastSeen: Date.now() });
+    }
+  }, 30000);
 
   // listen members
   if(membersUnsub) membersUnsub();
@@ -922,28 +932,52 @@ async function enterRoom(code, room) {
   if(chatUnsub) chatUnsub();
   chatUnsub = dbOn('rooms/'+code+'/chat', renderChat);
 
-  // post join message
-  postSystemMsg(currentUser.name + ' joined the room 👋');
+  if(!wasAlreadyMember) postSystemMsg(currentUser.name + ' joined the room ');
 
-  // reset my timer UI
-  myTimerAccum = 0;
-  myTimerStart = null;
-  myRunning = false;
-  clearInterval(myTimerInt);
-  document.getElementById('myTimerDisplay').textContent = '00:00:00';
-  document.getElementById('myTimerDisplay').classList.remove('running');
-  document.getElementById('myStatusTag').classList.remove('running');
-  document.getElementById('myStatusText').textContent = 'Not studying';
-  document.getElementById('myStartBtn').disabled = false;
-  document.getElementById('myPauseBtn').disabled = true;
-  document.getElementById('myResumeBtn').style.display = 'none';
+  restoreMyTimerUi(memberData);
 
-  // update URL
   const url = new URL(location.href);
   url.searchParams.set('room', code);
   history.replaceState({}, '', url);
 
-  snack('Joined room! Start studying when ready 🚀');
+  snack(wasAlreadyMember ? 'Room restored ' : 'Joined room! Start studying when ready ');
+}
+
+function restoreMyTimerUi(memberData) {
+  clearInterval(myTimerInt);
+  myTimerAccum = memberData.totalSec || 0;
+  myTimerStart = memberData.studying && memberData.lastStart ? memberData.lastStart : null;
+  myRunning = !!myTimerStart;
+
+  const total = calcMemberSec(memberData);
+  const display = document.getElementById('myTimerDisplay');
+  const tag = document.getElementById('myStatusTag');
+  const status = document.getElementById('myStatusText');
+  const startBtn = document.getElementById('myStartBtn');
+  const pauseBtn = document.getElementById('myPauseBtn');
+  const resumeBtn = document.getElementById('myResumeBtn');
+
+  display.textContent = fmtTime(total);
+  display.classList.toggle('running', myRunning);
+  tag.classList.toggle('running', myRunning);
+
+  if(myRunning) {
+    status.textContent = 'Studying';
+    startBtn.disabled = true;
+    pauseBtn.disabled = false;
+    resumeBtn.style.display = 'none';
+    myTimerInt = setInterval(tickMyTimer, 1000);
+  } else if(myTimerAccum > 0) {
+    status.textContent = 'Paused';
+    startBtn.disabled = true;
+    pauseBtn.disabled = true;
+    resumeBtn.style.display = 'inline-flex';
+  } else {
+    status.textContent = 'Not studying';
+    startBtn.disabled = false;
+    pauseBtn.disabled = true;
+    resumeBtn.style.display = 'none';
+  }
 }
 
 /* ============================================================
@@ -957,13 +991,13 @@ function myStart() {
   myTimerInt = setInterval(tickMyTimer, 1000);
   document.getElementById('myTimerDisplay').classList.add('running');
   document.getElementById('myStatusTag').classList.add('running');
-  document.getElementById('myStatusText').textContent = 'Studying…';
+  document.getElementById('myStatusText').textContent = 'Studying';
   document.getElementById('myStartBtn').disabled = true;
   document.getElementById('myPauseBtn').disabled = false;
   document.getElementById('myResumeBtn').style.display = 'none';
 
   dbUpdate('rooms/'+currentRoom+'/members/'+currentUser.uid, {
-    studying: true, lastStart: myTimerStart
+    studying: true, lastStart: myTimerStart, lastSeen: Date.now()
   });
 }
 
@@ -981,7 +1015,7 @@ function myPause() {
   document.getElementById('myResumeBtn').style.display = 'inline-flex';
 
   dbUpdate('rooms/'+currentRoom+'/members/'+currentUser.uid, {
-    studying: false, totalSec: myTimerAccum, lastStart: null
+    studying: false, totalSec: myTimerAccum, lastStart: null, lastSeen: Date.now()
   });
   tickMyTimer();
 }
@@ -997,7 +1031,11 @@ function tickMyTimer() {
   const total = myTimerAccum + elapsed;
   document.getElementById('myTimerDisplay').textContent = fmtTime(total);
   if(myRunning && total%15===0) {
-    dbUpdate('rooms/'+currentRoom+'/members/'+currentUser.uid, { totalSec: total, lastStart: myTimerStart });
+    dbUpdate('rooms/'+currentRoom+'/members/'+currentUser.uid, {
+      totalSec: total,
+      lastStart: myTimerStart,
+      lastSeen: Date.now()
+    });
   }
 }
 
@@ -1006,12 +1044,11 @@ function tickMyTimer() {
    ============================================================ */
 function renderMembers(data) {
   const grid = document.getElementById('membersGrid');
-  if(!data){ grid.innerHTML='<div class="empty-state"><div class="ei">👥</div><p>No members yet</p></div>'; return; }
+  if(!data){ grid.innerHTML='<div class="empty-state"><div class="ei"></div><p>No members yet</p></div>'; return; }
 
-  const members = Object.entries(data).map(([uid, m])=>({uid,...m}));
+  const members = Object.entries(data).filter(([,m])=>m).map(([uid, m])=>({uid,...m}));
   document.getElementById('memberCountBadge').textContent = `(${members.length})`;
 
-  // Clear old intervals
   Object.values(memberTimerInts).forEach(clearInterval);
   memberTimerInts = {};
 
@@ -1028,20 +1065,16 @@ function renderMembers(data) {
     </div>`;
   }).join('');
 
-  // Start live tick for studying members
   members.forEach(m=>{
     if(m.studying && m.lastStart) {
       memberTimerInts[m.uid] = setInterval(()=>{
         const el = document.getElementById('mtime-'+m.uid);
         if(!el){ clearInterval(memberTimerInts[m.uid]); return; }
-        const sec = calcMemberSec(m);
-        const extra = Math.floor((Date.now()-m.lastStart)/1000);
-        el.textContent = fmtTime(sec+extra);
+        el.textContent = fmtTime(calcMemberSec(m));
       }, 1000);
     }
   });
 
-  // Leaderboard
   renderLeaderboard(members);
 }
 
@@ -1055,7 +1088,7 @@ function renderLeaderboard(members) {
   const sorted = [...members].sort((a,b)=>calcMemberSec(b)-calcMemberSec(a));
   const el = document.getElementById('leaderboardList');
   if(!el) return;
-  const medals = ['🥇','🥈','🥉'];
+  const medals = ['','',''];
   el.innerHTML = sorted.map((m,i)=>`
     <div class="lb-row">
       <div class="lb-rank">${medals[i]||('#'+(i+1))}</div>
@@ -1071,7 +1104,7 @@ function renderLeaderboard(members) {
 function renderChat(data) {
   const el = document.getElementById('chatMessages');
   if(!data) return;
-  const msgs = Object.values(data).sort((a,b)=>a.ts-b.ts).slice(-100);
+  const msgs = Object.values(data).filter(Boolean).sort((a,b)=>a.ts-b.ts).slice(-100);
   el.innerHTML = msgs.map(m=>{
     if(m.sys) return `<div class="chat-msg sys"><span class="cm-text">${esc(m.text)}</span></div>`;
     return `<div class="chat-msg"><span class="cm-name">${esc(m.name)}</span><span class="cm-text">${esc(m.text)}</span></div>`;
@@ -1098,32 +1131,32 @@ function postSystemMsg(text) {
    ============================================================ */
 async function loadPublicRooms() {
   const el = document.getElementById('publicRoomsGrid');
-  el.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:12px;">Loading rooms…</div>';
+  el.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:12px;">Loading rooms</div>';
   try {
     const all = await dbGet('rooms');
-    if(!all){ el.innerHTML='<div class="empty-state"><div class="ei">🚀</div><p>No active rooms</p><small>Create one and invite friends!</small></div>'; return; }
+    if(!all){ el.innerHTML='<div class="empty-state"><div class="ei"></div><p>No active rooms</p><small>Create one and invite friends!</small></div>'; return; }
     const rooms = Object.entries(all).filter(([code,r])=>r&&r.active).map(([code,r])=>({code,...r}));
-    if(!rooms.length){ el.innerHTML='<div class="empty-state"><div class="ei">🚀</div><p>No active rooms</p><small>Create one and invite friends!</small></div>'; return; }
+    if(!rooms.length){ el.innerHTML='<div class="empty-state"><div class="ei"></div><p>No active rooms</p><small>Create one and invite friends!</small></div>'; return; }
     el.innerHTML = rooms.map(r=>{
-      const members = r.members ? Object.values(r.members) : [];
+      const members = r.members ? Object.values(r.members).filter(Boolean) : [];
       const studying = members.filter(m=>m.studying).length;
       const avatars = members.slice(0,5).map(m=>`<div class="mini-avatar av-${m.colorIdx||0}">${(m.name||'?')[0].toUpperCase()}</div>`).join('');
-      return `<div class="group-card" onclick="${r.locked?"joinRoomByCode('"+r.code+"')":`joinRoomByCode('${r.code}')`}">
+      return `<div class="group-card" onclick="joinRoomByCode('${r.code}')">
         <div class="group-card-header">
           <div class="group-name">${esc(r.name)}</div>
-          <div class="group-badge ${studying>0?'live':''}">${studying>0?'● LIVE':r.locked?'🔐 Private':'Public'}</div>
+          <div class="group-badge ${studying>0?'live':''}">${studying>0?' LIVE':r.locked?' Private':'Public'}</div>
         </div>
         <div style="font-size:12px;color:var(--text3);margin-bottom:8px;">${esc(r.subject||'General')}</div>
         <div class="group-meta">
-          <span>👥 ${members.length}/${r.maxMembers||50}</span>
-          <span>📖 ${studying} studying</span>
-          <span>🔑 ${r.code}</span>
+          <span> ${members.length}/${r.maxMembers||50}</span>
+          <span> ${studying} studying</span>
+          <span> ${r.code}</span>
         </div>
         <div class="member-pile" style="margin-top:10px;">${avatars}</div>
       </div>`;
     }).join('');
   } catch(e) {
-    el.innerHTML='<div style="color:var(--accent3);font-size:12px;padding:12px;">Could not load rooms. '+(DEMO_MODE?'Demo mode — create a room to test!':'Check Firebase config.')+'</div>';
+    el.innerHTML='<div style="color:var(--accent3);font-size:12px;padding:12px;">Could not load rooms. '+(DEMO_MODE?'Demo mode  create a room to test!':'Check Firebase config.')+'</div>';
   }
 }
 
@@ -1132,14 +1165,20 @@ async function loadPublicRooms() {
    ============================================================ */
 async function leaveRoom() {
   if(!currentRoom) return;
+  const leavingRoom = currentRoom;
   if(myRunning) myPause();
   postSystemMsg(currentUser.name + ' left the room');
-  await dbRemove('rooms/'+currentRoom+'/members/'+currentUser.uid);
+  await dbRemove('rooms/'+leavingRoom+'/members/'+currentUser.uid);
+  S.del('gsLastRoom');
+  clearInterval(myTimerInt);
+  clearInterval(presenceInt);
+  presenceInt = null;
   if(membersUnsub){ membersUnsub(); membersUnsub=null; }
   if(chatUnsub){ chatUnsub(); chatUnsub=null; }
   Object.values(memberTimerInts).forEach(clearInterval);
   memberTimerInts={};
   currentRoom=null; roomData=null;
+  myTimerStart=null; myTimerAccum=0; myRunning=false;
   const url=new URL(location.href);
   url.searchParams.delete('room');
   history.replaceState({},'',url);
@@ -1153,7 +1192,7 @@ async function leaveRoom() {
 function getRoomLink(code){ return location.origin+location.pathname+'?room='+code; }
 function copyRoomLink() {
   const link = getRoomLink(currentRoom);
-  navigator.clipboard.writeText(link).then(()=>snack('Link copied! 📋')).catch(()=>{ document.getElementById('shareUrlInput').select(); document.execCommand('copy'); snack('Link copied!'); });
+  navigator.clipboard.writeText(link).then(()=>snack('Link copied! ')).catch(()=>{ document.getElementById('shareUrlInput').select(); document.execCommand('copy'); snack('Link copied!'); });
 }
 
 /* ============================================================
@@ -1195,13 +1234,14 @@ function saveAsGuest(){
   const name=(document.getElementById('authName')?.value||'').trim();
   if(!name){snack('Enter your name');return;}
   currentUser.name=name; currentUser.isGuest=true; S.set('gsUser',currentUser);
-  updateUserPill(); closeAuthModal(); snack('Saved as guest ✓');
+  updateUserPill(); closeAuthModal(); snack('Saved as guest ');
 }
 function saveName(){
   const name=(document.getElementById('authChangeName')?.value||'').trim();
   if(!name){snack('Enter a name');return;}
   currentUser.name=name; S.set('gsUser',currentUser);
-  updateUserPill(); closeAuthModal(); snack('Name updated ✓');
+  if(currentRoom) dbUpdate('rooms/'+currentRoom+'/members/'+currentUser.uid, { name });
+  updateUserPill(); closeAuthModal(); snack('Name updated ');
 }
 async function signUp(){
   if(!firebaseReady)return;
@@ -1211,7 +1251,7 @@ async function signUp(){
   try{
     const cred=await auth.createUserWithEmailAndPassword(email,pw);
     currentUser={uid:cred.user.uid,name:name||email.split('@')[0],colorIdx:currentUser?.colorIdx||0,isGuest:false};
-    S.set('gsUser',currentUser); updateUserPill(); closeAuthModal(); snack('Account created! 🎉');
+    S.set('gsUser',currentUser); updateUserPill(); closeAuthModal(); snack('Account created! ');
   }catch(e){snack(e.message);}
 }
 async function signIn(){
@@ -1221,12 +1261,14 @@ async function signIn(){
   try{
     const cred=await auth.signInWithEmailAndPassword(email,pw);
     currentUser={uid:cred.user.uid,name:currentUser?.name||email.split('@')[0],colorIdx:currentUser?.colorIdx||0,isGuest:false};
-    S.set('gsUser',currentUser); updateUserPill(); closeAuthModal(); snack('Signed in ✓');
+    S.set('gsUser',currentUser); updateUserPill(); closeAuthModal(); snack('Signed in ');
   }catch(e){snack(e.message);}
 }
 async function signOut(){
   if(firebaseReady) await auth.signOut();
-  S.del('gsUser'); initUser(); closeAuthModal(); snack('Signed out');
+  S.del('gsUser');
+  S.del('gsLastRoom');
+  initUser(); closeAuthModal(); snack('Signed out');
 }
 
 /* ============================================================
@@ -1262,20 +1304,44 @@ function toggleLeaderboard(){ switchTab('leaderboard', document.querySelector('.
 /* ============================================================
    INIT
    ============================================================ */
-initUser();
+async function initApp() {
+  initUser();
 
-// Check URL for room code
-const urlCode = new URLSearchParams(location.search).get('room');
-if(urlCode) {
-  showScreen('joinScreen');
-  document.getElementById('joinCode').value = urlCode;
-  document.getElementById('joinUserName').value = currentUser?.name||'';
-} else {
+  const urlCodeRaw = new URLSearchParams(location.search).get('room');
+  const urlCode = urlCodeRaw ? urlCodeRaw.toUpperCase() : null;
+  const savedCodeRaw = S.get('gsLastRoom', null);
+  const savedCode = savedCodeRaw ? String(savedCodeRaw).toUpperCase() : null;
+  const code = urlCode || savedCode;
+
+  if(code) {
+    const room = await dbGet('rooms/'+code);
+    if(room && room.active) {
+      const existingMember = await dbGet('rooms/'+code+'/members/'+currentUser.uid);
+      const cameFromSavedRoom = savedCode === code;
+
+      if(existingMember || (cameFromSavedRoom && !room.locked)) {
+        await enterRoom(code, room);
+        return;
+      }
+
+      if(urlCode) {
+        showScreen('joinScreen');
+        document.getElementById('joinCode').value = code;
+        document.getElementById('joinUserName').value = currentUser?.name||'';
+        return;
+      }
+    } else {
+      S.del('gsLastRoom');
+    }
+  }
+
   showLanding();
 }
 
+initApp();
+
 if(DEMO_MODE){
-  snack('🔧 Demo mode — add your Firebase config to enable real-time sync');
+  snack(' Demo mode  add your Firebase config to enable real-time sync');
   console.log('%cFOCUS LAB GROUP STUDY', 'color:#3b9eff;font-size:18px;font-weight:bold');
   console.log('%cReplace FB_CONFIG at the top of the script with your Firebase project credentials.', 'color:#8ba3c7');
   console.log('Get them at: https://console.firebase.google.com');
@@ -1283,3 +1349,4 @@ if(DEMO_MODE){
 </script>
 </body>
 </html>
+

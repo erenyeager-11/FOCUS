@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Focus Lab  Group Study</title>
+<title>Focus Lab – Group Study</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -48,10 +48,8 @@ body::after{
   pointer-events:none;z-index:0;
 }
 
-/*  LAYOUT  */
 #root{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;}
 
-/*  TOPBAR  */
 .topbar{
   display:flex;align-items:center;justify-content:space-between;
   padding:16px 28px;
@@ -75,12 +73,12 @@ body::after{
   background:linear-gradient(135deg,var(--accent),var(--accent2));
   display:flex;align-items:center;justify-content:center;
   font-size:11px;font-weight:700;color:#fff;
+  overflow:hidden;
 }
+.user-pill .avatar img{width:100%;height:100%;object-fit:cover;}
 
-/*  MAIN  */
 main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 
-/*  CARDS  */
 .card{
   background:var(--surface);
   border:1px solid var(--border);
@@ -93,7 +91,6 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
   color:var(--text3);margin-bottom:16px;
 }
 
-/*  BUTTONS  */
 .btn{
   display:inline-flex;align-items:center;gap:6px;
   padding:9px 18px;border-radius:8px;border:none;
@@ -112,7 +109,6 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 .btn-sm{padding:5px 12px;font-size:12px;}
 .btn:disabled{opacity:0.4;cursor:not-allowed;}
 
-/*  INPUT  */
 .input{
   background:var(--bg3);border:1px solid var(--border);
   border-radius:8px;color:var(--text);font-family:var(--sans);
@@ -121,12 +117,10 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 }
 .input:focus{border-color:var(--accent);}
 
-/*  SCREENS  */
 .screen{display:none;animation:fadeUp 0.3s ease;}
 .screen.active{display:block;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 
-/*  LANDING  */
 .hero{text-align:center;padding:60px 20px 40px;}
 .hero h1{
   font-family:var(--mono);font-size:clamp(32px,5vw,52px);
@@ -146,7 +140,6 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 .action-card h3{font-size:15px;font-weight:600;margin-bottom:6px;}
 .action-card p{font-size:12px;color:var(--text3);}
 
-/*  GROUPS LIST  */
 .groups-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
 .groups-header h2{font-size:22px;font-weight:700;}
 .groups-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;}
@@ -183,25 +176,17 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
   display:flex;align-items:center;justify-content:center;
   font-size:10px;font-weight:700;color:#fff;
   margin-left:-8px;
+  overflow:hidden;
 }
 .mini-avatar:first-child{margin-left:0;}
+.mini-avatar img{width:100%;height:100%;object-fit:cover;}
 
-/*  CREATE / JOIN FORM  */
 .form-wrap{max-width:480px;margin:0 auto;}
 .form-row{margin-bottom:16px;}
 .form-row label{display:block;font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
 .form-back{display:flex;align-items:center;gap:8px;margin-bottom:24px;cursor:pointer;color:var(--text2);font-size:13px;transition:color 0.2s;}
 .form-back:hover{color:var(--accent);}
-.join-link-box{
-  background:var(--bg3);border:1px solid var(--border2);
-  border-radius:8px;padding:12px 16px;
-  font-family:var(--mono);font-size:13px;color:var(--accent);
-  word-break:break-all;cursor:pointer;transition:all 0.2s;
-  display:flex;align-items:center;justify-content:space-between;gap:8px;
-}
-.join-link-box:hover{border-color:var(--accent);}
 
-/*  ROOM  */
 #roomScreen{display:none;}
 #roomScreen.active{display:block;}
 .room-header{
@@ -211,16 +196,8 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 .room-title{font-size:24px;font-weight:700;}
 .room-meta{font-size:12px;color:var(--text3);}
 .room-actions{display:flex;gap:8px;flex-wrap:wrap;}
-.room-info-bar{
-  display:flex;align-items:center;gap:16px;
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:10px;padding:12px 20px;margin-bottom:24px;
-  flex-wrap:wrap;
-}
-.room-info-item{font-size:12px;color:var(--text2);}
-.room-info-item strong{color:var(--text);font-weight:600;}
 
-/*  MY TIMER (big card)  */
+/* MY TIMER */
 .my-timer-card{
   background:var(--surface);border:1px solid var(--border);
   border-radius:var(--radius);padding:28px;
@@ -251,14 +228,33 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 .my-status-tag.running{background:rgba(0,212,170,0.1);color:var(--accent2);border-color:rgba(0,212,170,0.2);}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
 
-/*  MEMBERS GRID  */
+/* DAILY TIMER BAR */
+.daily-timer-bar{
+  display:flex;align-items:center;justify-content:center;gap:20px;
+  margin-top:16px;padding-top:16px;
+  border-top:1px solid var(--border);
+  flex-wrap:wrap;
+}
+.daily-stat{text-align:center;}
+.daily-stat-label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:4px;}
+.daily-stat-value{font-family:var(--mono);font-size:18px;color:var(--accent4);}
+.daily-stat-value.today{color:var(--accent4);}
+.midnight-countdown{
+  font-size:11px;color:var(--text3);
+  display:flex;align-items:center;gap:5px;
+}
+.midnight-countdown .mc-time{font-family:var(--mono);color:var(--accent3);font-size:12px;}
+
+/* MEMBERS */
 .members-section-title{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:16px;}
 .members-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;}
 .member-tile{
   background:var(--surface);border:1px solid var(--border);
   border-radius:12px;padding:16px;text-align:center;
   transition:all 0.2s;position:relative;overflow:hidden;
+  cursor:pointer;
 }
+.member-tile:hover{border-color:var(--border2);transform:translateY(-1px);}
 .member-tile.studying{border-color:rgba(0,212,170,0.3);box-shadow:0 0 16px rgba(0,212,170,0.07);}
 .member-tile.studying::before{
   content:'';position:absolute;top:0;left:0;right:0;height:2px;
@@ -274,14 +270,14 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
   margin:0 auto 10px;
   display:flex;align-items:center;justify-content:center;
   font-size:16px;font-weight:700;color:#fff;
+  overflow:hidden;
 }
+.member-avatar img{width:100%;height:100%;object-fit:cover;}
 .member-name{font-size:13px;font-weight:600;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.member-time{
-  font-family:var(--mono);font-size:18px;
-  color:var(--text2);transition:color 0.3s;
-}
+.member-time{font-family:var(--mono);font-size:18px;color:var(--text2);transition:color 0.3s;}
 .member-tile.studying .member-time{color:var(--accent2);}
 .member-tile.me .member-time{color:var(--accent);}
+.member-daily-time{font-family:var(--mono);font-size:11px;color:var(--accent4);margin-top:2px;}
 .member-status-dot{
   width:8px;height:8px;border-radius:50%;
   background:var(--text3);margin:6px auto 0;
@@ -301,12 +297,10 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 }
 .member-role-badge.owner{background:rgba(255,209,102,0.13);color:var(--accent4);border-color:rgba(255,209,102,0.28);}
 .member-role-badge.manager{background:rgba(192,132,252,0.13);color:var(--accent5);border-color:rgba(192,132,252,0.28);}
-.member-admin-actions{
-  display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin-top:10px;
-}
+.member-admin-actions{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin-top:10px;}
 .member-admin-actions .btn{padding:4px 8px;font-size:10px;}
 
-/*  CHAT  */
+/* CHAT */
 .chat-panel{
   background:var(--surface);border:1px solid var(--border);
   border-radius:var(--radius);margin-top:24px;overflow:hidden;
@@ -330,22 +324,22 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 .chat-input-row input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--sans);font-size:13px;padding:8px 12px;outline:none;}
 .chat-input-row input:focus{border-color:var(--accent);}
 
-/*  LEADERBOARD  */
+/* LEADERBOARD */
 .lb-row{
   display:flex;align-items:center;gap:12px;
   padding:10px 14px;border-radius:8px;margin-bottom:6px;
   background:var(--bg3);border:1px solid var(--border);
-  transition:all 0.2s;
 }
 .lb-rank{font-family:var(--mono);font-size:13px;color:var(--text3);width:20px;}
 .lb-name{flex:1;font-size:13px;}
 .lb-time{font-family:var(--mono);font-size:13px;color:var(--accent2);}
+.lb-daily{font-family:var(--mono);font-size:11px;color:var(--accent4);margin-left:4px;}
 .lb-row:first-child{border-color:rgba(255,209,102,0.3);background:rgba(255,209,102,0.04);}
 .lb-row:first-child .lb-rank{color:var(--accent4);}
 .lb-row:nth-child(2){border-color:rgba(100,180,255,0.2);}
 .lb-row:nth-child(3){border-color:rgba(192,132,252,0.2);}
 
-/*  MODAL  */
+/* MODAL */
 .modal-overlay{
   position:fixed;inset:0;background:rgba(0,0,0,0.75);
   z-index:1000;display:none;align-items:center;justify-content:center;
@@ -356,17 +350,48 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
   background:var(--surface);border:1px solid var(--border2);
   border-radius:var(--radius);padding:30px;width:min(440px,90vw);
   box-shadow:0 0 60px rgba(0,0,0,0.5);animation:fadeUp 0.25s ease;
+  max-height:85vh;overflow-y:auto;
 }
 .modal h3{font-size:18px;font-weight:700;margin-bottom:6px;}
 .modal .subtitle{font-size:13px;color:var(--text2);margin-bottom:24px;}
 .modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:22px;}
-.divider{
-  display:flex;align-items:center;gap:10px;margin:16px 0;
-  color:var(--text3);font-size:12px;
-}
+.divider{display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--text3);font-size:12px;}
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
 
-/*  SNACK  */
+/* ANALYTICS */
+.analytics-header{
+  display:flex;align-items:center;gap:16px;margin-bottom:24px;
+  padding-bottom:16px;border-bottom:1px solid var(--border);
+}
+.analytics-avatar{
+  width:60px;height:60px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;font-weight:700;color:#fff;
+  overflow:hidden;flex-shrink:0;
+}
+.analytics-avatar img{width:100%;height:100%;object-fit:cover;}
+.analytics-info h4{font-size:16px;font-weight:600;margin-bottom:4px;}
+.analytics-info p{font-size:12px;color:var(--text3);}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+.stat-box{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center;}
+.stat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.stat-value{font-family:var(--mono);font-size:20px;color:var(--accent);font-weight:700;}
+.history-section{margin-top:20px;}
+.history-title{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;}
+.session-item{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 12px;background:var(--bg3);border:1px solid var(--border);
+  border-radius:8px;margin-bottom:8px;font-size:12px;
+}
+.session-date{color:var(--text2);}
+.session-duration{font-family:var(--mono);color:var(--accent2);}
+.session-type-badge{
+  font-size:9px;padding:2px 6px;border-radius:10px;
+  background:rgba(255,209,102,0.12);color:var(--accent4);
+  border:1px solid rgba(255,209,102,0.25);margin-left:6px;
+}
+
+/* SNACK */
 #snack{
   position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(40px);
   background:var(--surface2);border:1px solid var(--border2);
@@ -375,7 +400,7 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 }
 #snack.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
-/*  SHARE STRIP  */
+/* SHARE STRIP */
 .share-strip{
   display:flex;align-items:center;gap:10px;
   background:var(--bg3);border:1px solid var(--border2);
@@ -383,8 +408,7 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 }
 .share-strip input{
   flex:1;background:transparent;border:none;
-  color:var(--accent);font-family:var(--mono);font-size:12px;
-  outline:none;
+  color:var(--accent);font-family:var(--mono);font-size:12px;outline:none;
 }
 .joined-strip{
   display:none;align-items:center;gap:8px;flex-wrap:wrap;
@@ -411,28 +435,21 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 .admin-actions{display:flex;gap:8px;flex-wrap:wrap;}
 .admin-note{font-size:11px;color:var(--text3);margin-top:10px;}
 
-/*  RESPONSIVE  */
-@media(max-width:600px){
-  .action-grid{grid-template-columns:1fr;}
-  .members-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));}
-  .room-header{flex-direction:column;align-items:flex-start;}
-  .joined-add-btn{margin-left:0;}
-  main{padding:20px 14px;}
-  .topbar{padding:12px 16px;}
-  .my-timer-display{font-size:clamp(40px,10vw,64px);}
+/* PFP UPLOAD */
+.pfp-upload-zone{
+  width:80px;height:80px;border-radius:50%;
+  border:2px dashed var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all 0.2s;margin:0 auto 16px;
+  overflow:hidden;position:relative;
 }
+.pfp-upload-zone:hover{border-color:var(--accent);}
+.pfp-upload-zone img{width:100%;height:100%;object-fit:cover;}
+.pfp-upload-zone .placeholder{font-size:32px;color:var(--text3);}
+.pfp-upload-zone input{display:none;}
+.pfp-hint{font-size:11px;color:var(--text3);text-align:center;margin-bottom:20px;}
 
-/*  COLORS for avatars  */
-.av-0{background:linear-gradient(135deg,#3b9eff,#00aaff);}
-.av-1{background:linear-gradient(135deg,#00d4aa,#00b894);}
-.av-2{background:linear-gradient(135deg,#ff6b6b,#ee5a24);}
-.av-3{background:linear-gradient(135deg,#ffd166,#f9ca24);}
-.av-4{background:linear-gradient(135deg,#c084fc,#a29bfe);}
-.av-5{background:linear-gradient(135deg,#fd79a8,#e84393);}
-.av-6{background:linear-gradient(135deg,#55efc4,#00b894);}
-.av-7{background:linear-gradient(135deg,#74b9ff,#0984e3);}
-
-/*  TABS  */
+/* TABS */
 .tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:24px;}
 .tab-btn{
   padding:10px 20px;font-size:13px;color:var(--text3);
@@ -445,32 +462,47 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 .tab-pane{display:none;}
 .tab-pane.active{display:block;animation:fadeUp 0.2s ease;}
 
-/*  EMPTY STATE  */
+/* EMPTY STATE */
 .empty-state{text-align:center;padding:60px 20px;color:var(--text3);}
 .empty-state .ei{font-size:48px;margin-bottom:12px;}
 .empty-state p{font-size:14px;margin-bottom:6px;color:var(--text2);}
 .empty-state small{font-size:12px;}
 
-/*  SETTINGS in room  */
-.setting-row{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:12px 0;border-bottom:1px solid var(--border);
+/* RESPONSIVE */
+@media(max-width:600px){
+  .action-grid{grid-template-columns:1fr;}
+  .members-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));}
+  .room-header{flex-direction:column;align-items:flex-start;}
+  .joined-add-btn{margin-left:0;}
+  main{padding:20px 14px;}
+  .topbar{padding:12px 16px;}
+  .my-timer-display{font-size:clamp(40px,10vw,64px);}
+  .stat-grid{grid-template-columns:1fr;}
+  .daily-timer-bar{gap:12px;}
 }
-.setting-row:last-child{border-bottom:none;}
-.setting-label{font-size:13px;}
-.setting-val{font-size:12px;color:var(--text3);}
+
+/* AVATAR COLORS */
+.av-0{background:linear-gradient(135deg,#3b9eff,#00aaff);}
+.av-1{background:linear-gradient(135deg,#00d4aa,#00b894);}
+.av-2{background:linear-gradient(135deg,#ff6b6b,#ee5a24);}
+.av-3{background:linear-gradient(135deg,#ffd166,#f9ca24);}
+.av-4{background:linear-gradient(135deg,#c084fc,#a29bfe);}
+.av-5{background:linear-gradient(135deg,#fd79a8,#e84393);}
+.av-6{background:linear-gradient(135deg,#55efc4,#00b894);}
+.av-7{background:linear-gradient(135deg,#74b9ff,#0984e3);}
 </style>
 </head>
 <body>
 
-<!-- TOPBAR -->
 <div id="root">
 <div class="topbar">
   <a href="index.html" class="topbar-logo">FOCUS</a>
   <div class="topbar-right">
     <button class="btn btn-secondary btn-sm main-menu-link" onclick="goHome()">Back to Home</button>
     <div id="userPill" class="user-pill" onclick="showAuthModal()">
-      <div class="avatar" id="userAvatarPill">?</div>
+      <div class="avatar" id="userAvatarPill">
+        <span id="userAvatarLetter">?</span>
+      </div>
       <span id="userNamePill">Sign In</span>
     </div>
   </div>
@@ -481,16 +513,16 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
   <div class="screen active" id="landingScreen">
     <div class="hero">
       <h1>Group Study</h1>
-      <p>Study together in real-time. Create a room, share the link  your friends join instantly, no account needed.</p>
+      <p>Study together in real-time. Create a room, share the link – your friends join instantly, no account needed.</p>
     </div>
     <div class="action-grid">
       <div class="action-card" onclick="showCreate()">
-        <div class="ac-icon"></div>
+        <div class="ac-icon">📚</div>
         <h3>Create Room</h3>
         <p>Start a new group study session and invite others</p>
       </div>
       <div class="action-card" onclick="showJoin()">
-        <div class="ac-icon"></div>
+        <div class="ac-icon">🚪</div>
         <h3>Join Room</h3>
         <p>Enter a room code or paste an invite link</p>
       </div>
@@ -502,7 +534,7 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
     <div style="max-width:700px;margin:32px auto 0;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
         <div class="card-title" style="margin-bottom:0;">Active Rooms</div>
-        <button class="btn btn-secondary btn-sm" onclick="loadPublicRooms()"> Refresh</button>
+        <button class="btn btn-secondary btn-sm" onclick="loadPublicRooms()">🔄 Refresh</button>
       </div>
       <div id="publicRoomsGrid" class="groups-grid"></div>
     </div>
@@ -510,11 +542,10 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 
   <!-- CREATE SCREEN -->
   <div class="screen" id="createScreen">
-    <div class="form-back" onclick="backFromForm()"> Back</div>
+    <div class="form-back" onclick="backFromForm()">← Back</div>
     <div class="form-wrap">
       <h2 style="font-size:22px;font-weight:700;margin-bottom:4px;">Create a Room</h2>
-      <p style="font-size:13px;color:var(--text2);margin-bottom:24px;">Share the link after creating  anyone can join instantly.</p>
-
+      <p style="font-size:13px;color:var(--text2);margin-bottom:24px;">Share the link after creating – anyone can join instantly.</p>
       <div class="form-row">
         <label>Room Name</label>
         <input class="input" id="createRoomName" placeholder="e.g. JEE 2026 Night Grind" maxlength="50">
@@ -539,18 +570,16 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
         <label>Your Display Name</label>
         <input class="input" id="createUserName" placeholder="How others see you" maxlength="24">
       </div>
-
-      <button class="btn btn-primary btn-lg" style="width:100%" onclick="createRoom()"> Create Room</button>
+      <button class="btn btn-primary btn-lg" style="width:100%" onclick="createRoom()">✨ Create Room</button>
     </div>
   </div>
 
   <!-- JOIN SCREEN -->
   <div class="screen" id="joinScreen">
-    <div class="form-back" onclick="backFromForm()"> Back</div>
+    <div class="form-back" onclick="backFromForm()">← Back</div>
     <div class="form-wrap">
       <h2 style="font-size:22px;font-weight:700;margin-bottom:4px;">Join a Room</h2>
       <p style="font-size:13px;color:var(--text2);margin-bottom:24px;">Enter a room code from a friend or paste the link.</p>
-
       <div class="form-row">
         <label>Room Code or Link</label>
         <input class="input" id="joinCode" placeholder="e.g. ABC123 or https://?room=ABC123" maxlength="200" oninput="extractCode(this)">
@@ -563,8 +592,7 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
         <label>Room Password</label>
         <input class="input" id="joinPassword" placeholder="Enter room password" type="password">
       </div>
-
-      <button class="btn btn-primary btn-lg" style="width:100%" onclick="joinRoom()"> Join Room</button>
+      <button class="btn btn-primary btn-lg" style="width:100%" onclick="joinRoom()">🚀 Join Room</button>
     </div>
   </div>
 
@@ -579,14 +607,13 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
         <button class="btn btn-secondary btn-sm main-menu-link" onclick="goHome()">Back to Home</button>
         <button class="btn btn-secondary btn-sm" onclick="toggleJoinedRoomsStrip()">My Groups</button>
         <button class="btn btn-primary btn-sm" onclick="showAddMoreRoom()">Add Group</button>
-        <button class="btn btn-warning btn-sm" id="adminBtn" onclick="toggleAdminPanel()" style="display:none;">Admin</button>
-        <button class="btn btn-secondary btn-sm" onclick="copyRoomLink()"> Copy Link</button>
-        <button class="btn btn-secondary btn-sm" onclick="toggleLeaderboard()"> Board</button>
-        <button class="btn btn-danger btn-sm" onclick="leaveRoom()"> Leave</button>
+        <button class="btn btn-warning btn-sm" id="adminBtn" onclick="toggleAdminPanel()" style="display:none;">⚙️ Admin</button>
+        <button class="btn btn-secondary btn-sm" onclick="copyRoomLink()">📋 Copy Link</button>
+        <button class="btn btn-secondary btn-sm" onclick="toggleLeaderboard()">🏆 Board</button>
+        <button class="btn btn-danger btn-sm" onclick="leaveRoom()">🚪 Leave</button>
       </div>
     </div>
 
-    <!-- Share strip -->
     <div class="share-strip">
       <span style="font-size:11px;color:var(--text3);white-space:nowrap;">Invite:</span>
       <input id="shareUrlInput" readonly onclick="this.select()">
@@ -613,30 +640,43 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
       <div class="my-timer-display" id="myTimerDisplay">00:00:00</div>
       <div class="my-status-tag" id="myStatusTag"><div class="dot"></div><span id="myStatusText">Not studying</span></div>
       <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-        <button class="btn btn-primary" id="myStartBtn" onclick="myStart()"> Start Studying</button>
-        <button class="btn btn-secondary" id="myPauseBtn" onclick="myPause()" disabled> Pause</button>
-        <button class="btn btn-success btn-sm" id="myResumeBtn" onclick="myResume()" style="display:none;"> Resume</button>
+        <button class="btn btn-primary" id="myStartBtn" onclick="myStart()">▶️ Start Studying</button>
+        <button class="btn btn-secondary" id="myPauseBtn" onclick="myPause()" disabled>⏸️ Pause</button>
+        <button class="btn btn-success btn-sm" id="myResumeBtn" onclick="myResume()" style="display:none;">▶️ Resume</button>
+      </div>
+
+      <!-- DAILY TIMER BAR — NEW -->
+      <div class="daily-timer-bar">
+        <div class="daily-stat">
+          <div class="daily-stat-label">Today's Study</div>
+          <div class="daily-stat-value today" id="dailyTimerDisplay">00:00:00</div>
+        </div>
+        <div class="daily-stat">
+          <div class="daily-stat-label">Resets In</div>
+          <div class="midnight-countdown"><span class="mc-time" id="midnightCountdown">--:--:--</span></div>
+        </div>
+        <div class="daily-stat">
+          <div class="daily-stat-label">Yesterday</div>
+          <div class="daily-stat-value" id="yesterdayDisplay" style="color:var(--text2);font-size:14px;">--:--:--</div>
+        </div>
       </div>
     </div>
 
     <!-- Tabs -->
     <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('members',this)"> Members <span id="memberCountBadge" style="font-size:11px;color:var(--text3);"></span></button>
-      <button class="tab-btn" onclick="switchTab('leaderboard',this)"> Rankings</button>
-      <button class="tab-btn" onclick="switchTab('chat',this)"> Chat</button>
+      <button class="tab-btn active" onclick="switchTab('members',this)">👥 Members <span id="memberCountBadge" style="font-size:11px;color:var(--text3);"></span></button>
+      <button class="tab-btn" onclick="switchTab('leaderboard',this)">🏆 Rankings</button>
+      <button class="tab-btn" onclick="switchTab('chat',this)">💬 Chat</button>
     </div>
 
-    <!-- Members Tab -->
     <div class="tab-pane active" id="tab-members">
       <div class="members-grid" id="membersGrid"></div>
     </div>
 
-    <!-- Leaderboard Tab -->
     <div class="tab-pane" id="tab-leaderboard">
       <div id="leaderboardList"></div>
     </div>
 
-    <!-- Chat Tab -->
     <div class="tab-pane" id="tab-chat">
       <div class="chat-panel">
         <div class="chat-header">
@@ -644,7 +684,7 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
           <span style="font-size:11px;color:var(--text3);">Messages visible to all members</span>
         </div>
         <div class="chat-messages" id="chatMessages">
-          <div class="chat-msg sys"><span class="cm-text">Welcome to the study room! Stay focused. </span></div>
+          <div class="chat-msg sys"><span class="cm-text">Welcome to the study room! Stay focused. 💪</span></div>
         </div>
         <div class="chat-input-row">
           <input id="chatInput" placeholder="Type a message" maxlength="200" onkeydown="if(event.key==='Enter')sendChatMsg()">
@@ -668,7 +708,7 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 <!-- PASSWORD MODAL -->
 <div class="modal-overlay" id="pwModal">
   <div class="modal">
-    <h3> Password Required</h3>
+    <h3>🔒 Password Required</h3>
     <p class="subtitle">This room is password protected.</p>
     <div class="form-row">
       <label>Password</label>
@@ -681,12 +721,66 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
   </div>
 </div>
 
+<!-- CONFIRM NAME MODAL -->
+<div class="modal-overlay" id="confirmNameModal">
+  <div class="modal">
+    <h3>👋 Confirm Your Name</h3>
+    <p class="subtitle">How do you want others to see you in this group?</p>
+    <div class="form-row">
+      <label>Display Name</label>
+      <input class="input" id="confirmNameInput" placeholder="Your name" maxlength="24">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeConfirmNameModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmNameAndJoin()">✅ Confirm & Join</button>
+    </div>
+  </div>
+</div>
+
+<!-- USER ANALYTICS MODAL -->
+<div class="modal-overlay" id="analyticsModal">
+  <div class="modal">
+    <div class="analytics-header">
+      <div class="analytics-avatar" id="analyticsAvatar"></div>
+      <div class="analytics-info">
+        <h4 id="analyticsName">User</h4>
+        <p id="analyticsRole">Member</p>
+      </div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-box">
+        <div class="stat-label">Total Study Time</div>
+        <div class="stat-value" id="statTotalTime">00:00:00</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Today's Study</div>
+        <div class="stat-value" id="statTodayTime" style="color:var(--accent4);">00:00:00</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Current Streak</div>
+        <div class="stat-value" id="statStreak">0 days</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Status</div>
+        <div class="stat-value" id="statStatus" style="font-size:14px;">Idle</div>
+      </div>
+    </div>
+    <div class="history-section">
+      <div class="history-title">📊 Daily Session History</div>
+      <div id="sessionHistory"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeAnalyticsModal()">Close</button>
+    </div>
+  </div>
+</div>
+
 <div id="snack"></div>
 
-<!-- Firebase SDKs (compat) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
 <script>
 /* ============================================================
@@ -703,34 +797,27 @@ const FB_CONFIG = {
 };
 
 const DEMO_MODE = FB_CONFIG.apiKey === "REPLACE_WITH_YOUR_API_KEY";
-
-let db = null, auth = null, firebaseReady = false;
+let db = null, auth = null, storage = null, firebaseReady = false;
 
 if (!DEMO_MODE) {
   try {
     firebase.initializeApp(FB_CONFIG);
     db = firebase.database();
     auth = firebase.auth();
+    storage = firebase.storage();
     firebaseReady = true;
-  } catch(e) {
-    console.warn("Firebase init failed:", e);
-  }
+  } catch(e) { console.warn("Firebase init failed:", e); }
 }
 
-/*  DEMO DATABASE (in-memory fallback)  */
+/* IN-MEMORY FALLBACK */
 const _memDB = {};
 let _memListeners = {};
-
 function memSet(path, val) {
   const parts = path.split('/');
   let obj = _memDB;
-  for(let i=0;i<parts.length-1;i++){
-    if(!obj[parts[i]])obj[parts[i]]={};
-    obj=obj[parts[i]];
-  }
+  for(let i=0;i<parts.length-1;i++){ if(!obj[parts[i]])obj[parts[i]]={};obj=obj[parts[i]]; }
   obj[parts[parts.length-1]] = val;
-  notifyListeners(path);
-  notifyParentListeners(path);
+  notifyListeners(path); notifyParentListeners(path);
 }
 function memGet(path) {
   const parts = path.split('/');
@@ -741,9 +828,7 @@ function memGet(path) {
 function memRemove(path) { memSet(path, null); }
 function notifyListeners(path) {
   for(const key in _memListeners){
-    if(path.startsWith(key)||key.startsWith(path)){
-      _memListeners[key].forEach(fn=>fn(memGet(key)));
-    }
+    if(path.startsWith(key)||key.startsWith(path)) _memListeners[key].forEach(fn=>fn(memGet(key)));
   }
 }
 function notifyParentListeners(path) {
@@ -755,29 +840,21 @@ function notifyParentListeners(path) {
 }
 function memOn(path,fn){
   if(!_memListeners[path])_memListeners[path]=[];
-  _memListeners[path].push(fn);
-  fn(memGet(path));
+  _memListeners[path].push(fn); fn(memGet(path));
   return ()=>{ _memListeners[path]=_memListeners[path].filter(f=>f!==fn); };
 }
-
-/*  DB ABSTRACTION  */
 function dbSet(path, val){ return firebaseReady ? db.ref(path).set(val) : Promise.resolve(memSet(path,val)); }
 function dbUpdate(path, val){ return firebaseReady ? db.ref(path).update(val) : Promise.resolve(Object.entries(val).forEach(([k,v])=>memSet(path+'/'+k,v))); }
 function dbGet(path){ return firebaseReady ? db.ref(path).get().then(s=>s.val()) : Promise.resolve(memGet(path)); }
 function dbRemove(path){ return firebaseReady ? db.ref(path).remove() : Promise.resolve(memRemove(path)); }
 function dbOn(path, cb){
-  if(firebaseReady){
-    const ref = db.ref(path);
-    ref.on('value', snap=>cb(snap.val()));
-    return ()=>ref.off('value');
-  } else {
-    return memOn(path, cb);
-  }
+  if(firebaseReady){ const ref=db.ref(path); ref.on('value',snap=>cb(snap.val())); return ()=>ref.off('value'); }
+  else return memOn(path, cb);
 }
 function dbPush(path){
   if(firebaseReady) return db.ref(path).push();
-  const key = '_' + Date.now() + '_' + Math.floor(Math.random() * 9999);
-  return {key, set:(v)=>Promise.resolve(memSet(path + '/' + key, v))};
+  const key = '_'+Date.now()+'_'+Math.floor(Math.random()*9999);
+  return {key, set:(v)=>Promise.resolve(memSet(path+'/'+key, v))};
 }
 
 /* ============================================================
@@ -789,9 +866,9 @@ const S = {
   del:(k)=>{ try{localStorage.removeItem(k);}catch{} }
 };
 
-let currentUser = null;   // {uid, name, colorIdx}
-let currentRoom = null;   // room id string
-let roomData = null;      // room metadata snapshot
+let currentUser = null;
+let currentRoom = null;
+let roomData = null;
 let membersUnsub = null;
 let chatUnsub = null;
 let roomUnsub = null;
@@ -801,25 +878,167 @@ let nudgeTitleTimer = null;
 
 // My timer state
 let myTimerStart = null;
-let myTimerAccum = 0;     // seconds accumulated before current start
+let myTimerAccum = 0;
 let myTimerInt = null;
 let myRunning = false;
-let memberTimerInts = {}; // {memberId: interval}
+let memberTimerInts = {};
 
-// ----- user init -----
+// Daily timer state — NEW
+let _dailyAccum = 0;         // today's saved seconds from DB
+let _midnightTimer = null;   // setTimeout handle for midnight reset
+let _midnightCountdownInt = null; // setInterval for countdown UI
+
+// Pending join
+let _pendingJoinData = null;
+let _pendingJoinCode = null;
+
+/* ============================================================
+   USER INIT
+   ============================================================ */
 function initUser() {
   const saved = S.get('gsUser', null);
   if(saved) { currentUser = saved; updateUserPill(); return; }
-  const names = ["Arjun","Priya","Rohan","Ananya","Karan","Isha","Varun","Meera","Dev","Riya"];
-  const name = names[Math.floor(Math.random()*names.length)] + Math.floor(Math.random()*900+100);
-  currentUser = { uid: 'guest_'+Date.now(), name, colorIdx: Math.floor(Math.random()*8), isGuest: true };
+  const names = ["Alex","Sam","Jordan","Casey","Morgan","Taylor","Avery","Riley","Quinn","Skylar"];
+  const name = names[Math.floor(Math.random()*names.length)];
+  currentUser = { uid:'guest_'+Date.now(), name, colorIdx:Math.floor(Math.random()*8), isGuest:true, pfpUrl:null };
   S.set('gsUser', currentUser);
   updateUserPill();
 }
+
 function updateUserPill() {
   if(!currentUser) return;
-  document.getElementById('userAvatarPill').textContent = currentUser.name[0].toUpperCase();
+  const avatarContainer = document.getElementById('userAvatarPill');
+  if(currentUser.pfpUrl) {
+    avatarContainer.innerHTML = `<img src="${esc(currentUser.pfpUrl)}" alt="Profile">`;
+  } else {
+    avatarContainer.innerHTML = `<span id="userAvatarLetter">${currentUser.name[0].toUpperCase()}</span>`;
+  }
   document.getElementById('userNamePill').textContent = currentUser.name;
+}
+
+/* ============================================================
+   DAILY TIMER HELPERS — NEW
+   ============================================================ */
+function getTodayDate() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function getMsUntilMidnight() {
+  const now = new Date();
+  const midnight = new Date();
+  midnight.setHours(24, 0, 0, 0);
+  return midnight.getTime() - now.getTime();
+}
+
+// Start countdown display updating every second
+function startMidnightCountdownUI() {
+  clearInterval(_midnightCountdownInt);
+  _midnightCountdownInt = setInterval(() => {
+    const ms = getMsUntilMidnight();
+    const h = String(Math.floor(ms / 3600000)).padStart(2,'0');
+    const m = String(Math.floor((ms % 3600000) / 60000)).padStart(2,'0');
+    const s = String(Math.floor((ms % 60000) / 1000)).padStart(2,'0');
+    const el = document.getElementById('midnightCountdown');
+    if(el) el.textContent = `${h}:${m}:${s}`;
+  }, 1000);
+}
+
+// Schedule auto-reset at midnight
+function scheduleMidnightReset() {
+  clearTimeout(_midnightTimer);
+  const ms = getMsUntilMidnight();
+  _midnightTimer = setTimeout(async () => {
+    await performMidnightReset();
+    scheduleMidnightReset(); // schedule next day
+  }, ms);
+}
+
+async function performMidnightReset() {
+  if(!currentRoom || !currentUser) return;
+
+  // If user is currently studying, pause first
+  if(myRunning) await myPause();
+
+  const memberRef = 'rooms/'+currentRoom+'/members/'+currentUser.uid;
+  const member = await dbGet(memberRef);
+  const today = getTodayDate();
+
+  const sessions = member?.sessions || [];
+
+  // Save today's daily total into history as a 'daily' type session
+  if(member?.dailyStudySec > 0) {
+    sessions.push({
+      date: member.dailyDate || today,
+      duration: member.dailyStudySec,
+      type: 'daily'
+    });
+  }
+
+  // Reset everything for new day
+  await dbUpdate(memberRef, {
+    dailyStudySec: 0,
+    dailyDate: today,
+    totalSec: 0,
+    studying: false,
+    lastStart: null,
+    sessions
+  });
+
+  // Reset local state
+  _dailyAccum = 0;
+  myTimerAccum = 0;
+  myTimerStart = null;
+  myRunning = false;
+  clearInterval(myTimerInt);
+
+  // Reset UI
+  const display = document.getElementById('myTimerDisplay');
+  const dailyEl = document.getElementById('dailyTimerDisplay');
+  const tag = document.getElementById('myStatusTag');
+  const status = document.getElementById('myStatusText');
+  const startBtn = document.getElementById('myStartBtn');
+  const pauseBtn = document.getElementById('myPauseBtn');
+  const resumeBtn = document.getElementById('myResumeBtn');
+  if(display){ display.textContent='00:00:00'; display.classList.remove('running'); }
+  if(dailyEl) dailyEl.textContent='00:00:00';
+  if(tag) tag.classList.remove('running');
+  if(status) status.textContent='Not studying';
+  if(startBtn) startBtn.disabled=false;
+  if(pauseBtn) pauseBtn.disabled=true;
+  if(resumeBtn) resumeBtn.style.display='none';
+
+  // Show yesterday in UI
+  updateYesterdayDisplay(sessions);
+
+  snack('🌙 New day started! Kal ka study data history mein save ho gaya ✅');
+}
+
+// Show yesterday's total in the daily bar
+function updateYesterdayDisplay(sessions) {
+  const el = document.getElementById('yesterdayDisplay');
+  if(!el) return;
+  // Find yesterday's date string
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  const yesterday = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const s = (sessions || []).find(s => s.date === yesterday && s.type === 'daily');
+  el.textContent = s ? fmtTime(s.duration) : '--:--:--';
+}
+
+/* ============================================================
+   PROFILE PICTURE UPLOAD
+   ============================================================ */
+async function uploadProfilePicture(file) {
+  if(!firebaseReady || !storage) { snack('Profile pictures require Firebase Storage'); return null; }
+  if(!file.type.startsWith('image/')) { snack('Please upload an image file'); return null; }
+  if(file.size > 2*1024*1024) { snack('Image too large. Max 2MB.'); return null; }
+  try {
+    const filename = `pfp_${currentUser.uid}_${Date.now()}.jpg`;
+    const ref = storage.ref('profile-pictures/'+filename);
+    await ref.put(file);
+    return await ref.getDownloadURL();
+  } catch(e) { snack('Upload failed: '+e.message); return null; }
 }
 
 /* ============================================================
@@ -828,156 +1047,103 @@ function updateUserPill() {
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.display='none';});
   const el=document.getElementById(id);
-  el.style.display='block';
-  el.classList.add('active');
+  el.style.display='block'; el.classList.add('active');
 }
-function showLanding(){
-  showScreen('landingScreen');
-  renderJoinedRooms();
-  loadPublicRooms();
-}
-function showCreate(){
-  showScreen('createScreen');
-  document.getElementById('createUserName').value = currentUser?.name || '';
-}
+function showLanding(){ showScreen('landingScreen'); renderJoinedRooms(); loadPublicRooms(); }
+function showCreate(){ showScreen('createScreen'); document.getElementById('createUserName').value=currentUser?.name||''; }
 function showJoin(){
   showScreen('joinScreen');
-  document.getElementById('joinUserName').value = currentUser?.name || '';
-  const code = new URLSearchParams(location.search).get('room');
-  if(code) document.getElementById('joinCode').value = code;
+  document.getElementById('joinUserName').value=currentUser?.name||'';
+  const code=new URLSearchParams(location.search).get('room');
+  if(code) document.getElementById('joinCode').value=code;
 }
-function goHome(){
-  if(currentRoom) S.set('gsLastRoom', currentRoom);
-  location.href = 'index.html';
-}
-function backFromForm(){
-  if(currentRoom) showScreen('roomScreen');
-  else showLanding();
-}
-function showAddMoreRoom(){
-  showLanding();
-  snack('Create or join another group. Your current groups stay joined.');
-}
+function goHome(){ if(currentRoom) S.set('gsLastRoom', currentRoom); location.href='index.html'; }
+function backFromForm(){ if(currentRoom) showScreen('roomScreen'); else showLanding(); }
+function showAddMoreRoom(){ showLanding(); snack('Create or join another group. Your current groups stay joined.'); }
 
 /* ============================================================
    OWNER / ADMIN HELPERS
    ============================================================ */
 function isRoomOwner(room=roomData, uid=currentUser?.uid) {
-  return !!(room && uid && ((room.ownerUid && room.ownerUid === uid) || room.createdBy === uid));
+  return !!(room && uid && ((room.ownerUid && room.ownerUid===uid) || room.createdBy===uid));
 }
 function isRoomManager(room=roomData, uid=currentUser?.uid) {
   return !!(room && uid && room.managers && room.managers[uid]);
 }
-function canModerate(room=roomData, uid=currentUser?.uid) {
-  return isRoomOwner(room, uid) || isRoomManager(room, uid);
-}
+function canModerate(room=roomData, uid=currentUser?.uid) { return isRoomOwner(room,uid)||isRoomManager(room,uid); }
 function getMemberRole(uid, room=roomData) {
-  if(isRoomOwner(room, uid)) return 'Owner';
-  if(isRoomManager(room, uid)) return 'Manager';
+  if(isRoomOwner(room,uid)) return 'Owner';
+  if(isRoomManager(room,uid)) return 'Manager';
   return 'Member';
 }
-function getRoleClass(role) {
-  return role === 'Owner' ? 'owner' : role === 'Manager' ? 'manager' : '';
-}
+function getRoleClass(role){ return role==='Owner'?'owner':role==='Manager'?'manager':''; }
 
 /* ============================================================
    JOINED ROOMS
    ============================================================ */
 function getJoinedRooms() {
-  const saved = S.get('gsJoinedRooms', []);
-  const list = Array.isArray(saved) ? saved : [];
+  const saved=S.get('gsJoinedRooms',[]);
+  const list=Array.isArray(saved)?saved:[];
   return [...new Set(list.map(c=>String(c).toUpperCase()).filter(c=>/^[A-Z0-9]{6}$/.test(c)))];
 }
 function setJoinedRooms(codes) {
-  const clean = [...new Set((codes||[]).map(c=>String(c).toUpperCase()).filter(c=>/^[A-Z0-9]{6}$/.test(c)))];
+  const clean=[...new Set((codes||[]).map(c=>String(c).toUpperCase()).filter(c=>/^[A-Z0-9]{6}$/.test(c)))];
   S.set('gsJoinedRooms', clean);
 }
 function rememberJoinedRoom(code) {
-  const cleanCode = String(code||'').toUpperCase();
-  if(!/^[A-Z0-9]{6}$/.test(cleanCode)) return;
-  setJoinedRooms([cleanCode, ...getJoinedRooms().filter(c=>c!==cleanCode)]);
-  S.set('gsLastRoom', cleanCode);
+  const c=String(code||'').toUpperCase();
+  if(!/^[A-Z0-9]{6}$/.test(c)) return;
+  setJoinedRooms([c,...getJoinedRooms().filter(x=>x!==c)]);
+  S.set('gsLastRoom', c);
 }
 function forgetJoinedRoom(code) {
-  const cleanCode = String(code||'').toUpperCase();
-  setJoinedRooms(getJoinedRooms().filter(c=>c!==cleanCode));
-  if(String(S.get('gsLastRoom','')).toUpperCase() === cleanCode) S.del('gsLastRoom');
+  const c=String(code||'').toUpperCase();
+  setJoinedRooms(getJoinedRooms().filter(x=>x!==c));
+  if(String(S.get('gsLastRoom','')).toUpperCase()===c) S.del('gsLastRoom');
 }
 function toggleJoinedRoomsStrip() {
-  const strip = document.getElementById('joinedRoomsStrip');
+  const strip=document.getElementById('joinedRoomsStrip');
   if(!strip) return;
-  strip.style.display = strip.style.display === 'none' || !strip.style.display ? 'flex' : 'none';
+  strip.style.display=strip.style.display==='none'||!strip.style.display?'flex':'none';
 }
 async function switchJoinedRoom(code) {
-  code = String(code||'').toUpperCase();
+  code=String(code||'').toUpperCase();
   if(!/^[A-Z0-9]{6}$/.test(code)) return;
-  if(code === currentRoom) {
-    showScreen('roomScreen');
-    return;
-  }
-
-  const room = await dbGet('rooms/'+code);
-  const member = await dbGet('rooms/'+code+'/members/'+currentUser.uid);
-  if(!room || !room.active || !member) {
-    forgetJoinedRoom(code);
-    await renderJoinedRooms();
-    snack('You are not in that group anymore.');
-    return;
-  }
-
+  if(code===currentRoom){ showScreen('roomScreen'); return; }
+  const room=await dbGet('rooms/'+code);
+  const member=await dbGet('rooms/'+code+'/members/'+currentUser.uid);
+  if(!room||!room.active||!member){ forgetJoinedRoom(code); await renderJoinedRooms(); snack('You are not in that group anymore.'); return; }
   await enterRoom(code, room);
 }
 async function renderJoinedRooms() {
-  const codes = getJoinedRooms();
-  const strip = document.getElementById('joinedRoomsStrip');
-  const homeSection = document.getElementById('joinedRoomsSection');
-  const home = document.getElementById('joinedRoomsHome');
-
-  if(!codes.length) {
-    if(strip){ strip.style.display = 'none'; strip.innerHTML = ''; }
-    if(homeSection) homeSection.style.display = 'none';
-    return;
-  }
-
-  const rooms = [];
-  for(const code of codes) {
-    const room = await dbGet('rooms/'+code);
-    const member = await dbGet('rooms/'+code+'/members/'+currentUser.uid);
-    if(room && room.active && member) rooms.push({code, ...room});
+  const codes=getJoinedRooms();
+  const strip=document.getElementById('joinedRoomsStrip');
+  const homeSection=document.getElementById('joinedRoomsSection');
+  const home=document.getElementById('joinedRoomsHome');
+  if(!codes.length){ if(strip){strip.style.display='none';strip.innerHTML='';} if(homeSection) homeSection.style.display='none'; return; }
+  const rooms=[];
+  for(const code of codes){
+    const room=await dbGet('rooms/'+code);
+    const member=await dbGet('rooms/'+code+'/members/'+currentUser.uid);
+    if(room&&room.active&&member) rooms.push({code,...room});
   }
   setJoinedRooms(rooms.map(r=>r.code));
-
-  if(!rooms.length) {
-    if(strip){ strip.style.display = 'none'; strip.innerHTML = ''; }
-    if(homeSection) homeSection.style.display = 'none';
-    return;
+  if(!rooms.length){ if(strip){strip.style.display='none';strip.innerHTML='';} if(homeSection) homeSection.style.display='none'; return; }
+  if(strip){
+    strip.innerHTML=`<span class="joined-label">My Groups</span>`+rooms.map(r=>`
+      <button class="joined-room-btn ${r.code===currentRoom?'active':''}" onclick="switchJoinedRoom('${r.code}')">${esc(r.name||r.code)}</button>
+    `).join('')+`<button class="btn btn-primary btn-sm joined-add-btn" onclick="showAddMoreRoom()">Add Group</button>`;
+    if(!strip.style.display||strip.style.display==='none') strip.style.display='flex';
   }
-
-  if(strip) {
-    strip.innerHTML = `<span class="joined-label">My Groups</span>` + rooms.map(r=>`
-      <button class="joined-room-btn ${r.code===currentRoom?'active':''}" onclick="switchJoinedRoom('${r.code}')">
-        ${esc(r.name || r.code)}
-      </button>
-    `).join('') + `<button class="btn btn-primary btn-sm joined-add-btn" onclick="showAddMoreRoom()">Add Group</button>`;
-    if(!strip.style.display || strip.style.display === 'none') strip.style.display = 'flex';
-  }
-
-  if(homeSection && home) {
-    homeSection.style.display = 'block';
-    home.innerHTML = rooms.map(r=>{
-      const members = r.members ? Object.values(r.members).filter(Boolean) : [];
-      const studying = members.filter(m=>m.studying).length;
+  if(homeSection&&home){
+    homeSection.style.display='block';
+    home.innerHTML=rooms.map(r=>{
+      const members=r.members?Object.values(r.members).filter(Boolean):[];
+      const studying=members.filter(m=>m.studying).length;
       return `<div class="group-card ${r.code===currentRoom?'is-active-room':''}" onclick="switchJoinedRoom('${r.code}')">
-        <div class="group-card-header">
-          <div class="group-name">${esc(r.name)}</div>
-          <div class="group-badge ${r.code===currentRoom?'live':''}">${r.code===currentRoom?'Current':'Joined'}</div>
-        </div>
+        <div class="group-card-header"><div class="group-name">${esc(r.name)}</div><div class="group-badge ${r.code===currentRoom?'live':''}">${r.code===currentRoom?'Current':'Joined'}</div></div>
         <div style="font-size:12px;color:var(--text3);margin-bottom:8px;">${esc(r.subject||'General')}</div>
-        <div class="group-meta">
-          <span>${members.length}/${r.maxMembers||50} members</span>
-          <span>${studying} studying</span>
-          <span>${r.code}</span>
-        </div>
+        <div class="group-meta"><span>${members.length}/${r.maxMembers||50} members</span><span>${studying} studying</span><span>${r.code}</span></div>
       </div>`;
     }).join('');
   }
@@ -987,14 +1153,13 @@ async function renderJoinedRooms() {
    CODE EXTRACTION
    ============================================================ */
 function extractCode(el) {
-  const v = el.value.trim();
-  const m = v.match(/[?&]room=([A-Z0-9]{6})/i);
-  if(m) el.value = m[1].toUpperCase();
-  else if(/^[a-zA-Z0-9]{6}$/.test(v)) el.value = v.toUpperCase();
+  const v=el.value.trim();
+  const m=v.match(/[?&]room=([A-Z0-9]{6})/i);
+  if(m) el.value=m[1].toUpperCase();
+  else if(/^[a-zA-Z0-9]{6}$/.test(v)) el.value=v.toUpperCase();
 }
-
 function genCode() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   return Array.from({length:6},()=>chars[Math.floor(Math.random()*chars.length)]).join('');
 }
 
@@ -1002,269 +1167,247 @@ function genCode() {
    CREATE ROOM
    ============================================================ */
 async function createRoom() {
-  const name = document.getElementById('createRoomName').value.trim();
-  const subject = document.getElementById('createSubject').value.trim();
-  const maxM = parseInt(document.getElementById('createMaxMembers').value);
-  const pw = document.getElementById('createPassword').value.trim();
-  const userName = document.getElementById('createUserName').value.trim();
-
+  const name=document.getElementById('createRoomName').value.trim();
+  const subject=document.getElementById('createSubject').value.trim();
+  const maxM=parseInt(document.getElementById('createMaxMembers').value);
+  const pw=document.getElementById('createPassword').value.trim();
+  const userName=document.getElementById('createUserName').value.trim();
   if(!name){ snack('Enter a room name'); return; }
   if(!userName){ snack('Enter your name'); return; }
-
-  currentUser.name = userName;
-  S.set('gsUser', currentUser);
-
-  const code = genCode();
-  const now = Date.now();
-
-  const roomObj = {
-    name, subject: subject || 'General', code,
-    maxMembers: maxM,
-    passwordHash: pw ? simpleHash(pw) : null,
-    locked: !!pw,
-    createdAt: now,
-    createdBy: currentUser.uid,
-    ownerUid: currentUser.uid,
-    managers: {},
-    chatLocked: false,
-    active: true,
+  currentUser.name=userName; S.set('gsUser', currentUser);
+  const code=genCode();
+  const roomObj={
+    name, subject:subject||'General', code, maxMembers:maxM,
+    passwordHash:pw?simpleHash(pw):null, locked:!!pw,
+    createdAt:Date.now(), createdBy:currentUser.uid, ownerUid:currentUser.uid,
+    managers:{}, chatLocked:false, active:true,
   };
-
   try {
     await dbSet('rooms/'+code, roomObj);
-    snack('Room created! ');
+    snack('Room created! 🎉');
     updateUserPill();
     enterRoom(code, roomObj);
-  } catch(e) {
-    snack('Error creating room: '+e.message);
-  }
+  } catch(e) { snack('Error creating room: '+e.message); }
 }
 
 /* ============================================================
    JOIN ROOM
    ============================================================ */
-let _pendingJoinCode = null;
-
 async function joinRoom() {
-  let code = document.getElementById('joinCode').value.trim().toUpperCase();
-  const m = code.match(/[?&]ROOM=([A-Z0-9]{6})/i);
-  if(m) code = m[1];
-  const userName = document.getElementById('joinUserName').value.trim();
-
-  if(!code || code.length !== 6){ snack('Enter a valid 6-letter room code'); return; }
+  let code=document.getElementById('joinCode').value.trim().toUpperCase();
+  const m=code.match(/[?&]ROOM=([A-Z0-9]{6})/i);
+  if(m) code=m[1];
+  const userName=document.getElementById('joinUserName').value.trim();
+  if(!code||code.length!==6){ snack('Enter a valid 6-letter room code'); return; }
   if(!userName){ snack('Enter your name'); return; }
-
-  currentUser.name = userName;
-  S.set('gsUser', currentUser);
-  updateUserPill();
-
-  const room = await dbGet('rooms/'+code);
-  if(!room || !room.active){ snack('Room not found or no longer active'); return; }
-
-  const members = await dbGet('rooms/'+code+'/members') || {};
-  const isAlreadyMember = !!members[currentUser.uid];
-  if(!isAlreadyMember && Object.keys(members).length >= (room.maxMembers||50)){ snack('Room is full!'); return; }
-
-  if(room.locked && room.passwordHash && !isAlreadyMember) {
-    _pendingJoinCode = {code, room};
+  const room=await dbGet('rooms/'+code);
+  if(!room||!room.active){ snack('Room not found or no longer active'); return; }
+  const members=await dbGet('rooms/'+code+'/members')||{};
+  const isAlreadyMember=!!members[currentUser.uid];
+  if(!isAlreadyMember&&Object.keys(members).length>=(room.maxMembers||50)){ snack('Room is full!'); return; }
+  currentUser.name=userName; S.set('gsUser', currentUser); updateUserPill();
+  if(room.locked&&room.passwordHash&&!isAlreadyMember){
+    _pendingJoinCode={code,room};
     document.getElementById('pwModalInput').value='';
     document.getElementById('pwModal').classList.add('open');
     setTimeout(()=>document.getElementById('pwModalInput').focus(),100);
     return;
   }
-
-  enterRoom(code, room);
+  _pendingJoinData={code,room};
+  document.getElementById('confirmNameInput').value=userName;
+  document.getElementById('confirmNameModal').classList.add('open');
+  setTimeout(()=>document.getElementById('confirmNameInput').focus(),100);
 }
 
+function closeConfirmNameModal(){ document.getElementById('confirmNameModal').classList.remove('open'); _pendingJoinData=null; }
+async function confirmNameAndJoin() {
+  if(!_pendingJoinData) return;
+  const finalName=document.getElementById('confirmNameInput').value.trim();
+  if(!finalName){ snack('Please enter your display name'); return; }
+  currentUser.name=finalName; S.set('gsUser', currentUser); updateUserPill();
+  closeConfirmNameModal();
+  await enterRoom(_pendingJoinData.code, _pendingJoinData.room);
+  _pendingJoinData=null;
+}
 function closePwModal(){ document.getElementById('pwModal').classList.remove('open'); }
 function confirmPwModal() {
-  const pw = document.getElementById('pwModalInput').value;
+  const pw=document.getElementById('pwModalInput').value;
   if(!_pendingJoinCode) return;
-  if(simpleHash(pw) !== _pendingJoinCode.room.passwordHash){ snack('Wrong password!'); return; }
+  if(simpleHash(pw)!==_pendingJoinCode.room.passwordHash){ snack('Wrong password!'); return; }
   closePwModal();
-  enterRoom(_pendingJoinCode.code, _pendingJoinCode.room);
-  _pendingJoinCode = null;
+  _pendingJoinData=_pendingJoinCode; _pendingJoinCode=null;
+  document.getElementById('confirmNameInput').value=currentUser.name;
+  document.getElementById('confirmNameModal').classList.add('open');
+  setTimeout(()=>document.getElementById('confirmNameInput').focus(),100);
 }
-
 async function joinRoomByCode(code) {
-  code = String(code||'').toUpperCase();
-  const room = await dbGet('rooms/'+code);
-  const member = currentUser ? await dbGet('rooms/'+code+'/members/'+currentUser.uid) : null;
-  if(room && room.active && member) {
-    await enterRoom(code, room);
-    return;
-  }
+  code=String(code||'').toUpperCase();
+  const room=await dbGet('rooms/'+code);
+  const member=currentUser?await dbGet('rooms/'+code+'/members/'+currentUser.uid):null;
+  if(room&&room.active&&member){ await enterRoom(code,room); return; }
   showScreen('joinScreen');
-  document.getElementById('joinCode').value = code;
-  document.getElementById('joinUserName').value = currentUser?.name||'';
+  document.getElementById('joinCode').value=code;
+  document.getElementById('joinUserName').value=currentUser?.name||'';
 }
 
 /* ============================================================
    ENTER ROOM
    ============================================================ */
 async function enterRoom(code, room) {
-  currentRoom = code;
-  roomData = room;
-
+  currentRoom=code; roomData=room;
   showScreen('roomScreen');
-  document.getElementById('roomTitle').textContent = room.name;
-  document.getElementById('roomMeta').textContent = (room.subject||'') + '  Code: ' + code;
-  const link = getRoomLink(code);
-  document.getElementById('shareUrlInput').value = link;
+  document.getElementById('roomTitle').textContent=room.name;
+  document.getElementById('roomMeta').textContent=(room.subject||'')+' · Code: '+code;
+  document.getElementById('shareUrlInput').value=getRoomLink(code);
 
-  const memberRef = 'rooms/'+code+'/members/'+currentUser.uid;
-  const existingMember = await dbGet(memberRef);
-  const wasAlreadyMember = !!existingMember;
+  const memberRef='rooms/'+code+'/members/'+currentUser.uid;
+  const existingMember=await dbGet(memberRef);
+  const wasAlreadyMember=!!existingMember;
+  const today=getTodayDate();
 
-  // Important: do not use onDisconnect().remove().
-  // Refresh, browser back, or app close should not remove a member.
+  // --- DAILY RESET CHECK — NEW ---
+  let dailyStudySec = existingMember?.dailyStudySec || 0;
+  let dailyDate = existingMember?.dailyDate || today;
+  let sessions = existingMember?.sessions || [];
+  let totalSec = existingMember?.totalSec || 0;
+
+  if(dailyDate !== today) {
+    // New day — save old daily data to history, then reset
+    if(dailyStudySec > 0) {
+      sessions.push({ date: dailyDate, duration: dailyStudySec, type: 'daily' });
+    }
+    dailyStudySec = 0;
+    dailyDate = today;
+    totalSec = 0; // reset daily-accumulation timer too
+  }
+
   const memberData = {
     ...(existingMember || {}),
     name: currentUser.name,
     colorIdx: currentUser.colorIdx,
+    pfpUrl: currentUser.pfpUrl || null,
     isGuest: currentUser.isGuest !== false,
     joinedAt: existingMember?.joinedAt || Date.now(),
-    studying: !!(existingMember?.studying && existingMember?.lastStart),
-    totalSec: existingMember?.totalSec || 0,
-    lastStart: existingMember?.lastStart || null,
-    lastSeen: Date.now()
+    studying: !!(existingMember?.studying && existingMember?.lastStart && dailyDate === today),
+    totalSec,
+    dailyStudySec,
+    dailyDate,
+    lastStart: (dailyDate === today && existingMember?.lastStart) ? existingMember.lastStart : null,
+    lastSeen: Date.now(),
+    sessions
   };
   await dbSet(memberRef, memberData);
   rememberJoinedRoom(code);
 
+  // Update yesterday display
+  updateYesterdayDisplay(sessions);
+
+  // Local daily accumulator
+  _dailyAccum = dailyStudySec;
+
   if(presenceInt) clearInterval(presenceInt);
-  presenceInt = setInterval(()=>{
-    if(currentRoom && currentUser) {
-      dbUpdate('rooms/'+currentRoom+'/members/'+currentUser.uid, { lastSeen: Date.now() });
-    }
-  }, 30000);
+  presenceInt=setInterval(()=>{ if(currentRoom&&currentUser) dbUpdate('rooms/'+currentRoom+'/members/'+currentUser.uid,{lastSeen:Date.now()}); },30000);
 
-  // listen members
   if(membersUnsub) membersUnsub();
-  membersUnsub = dbOn('rooms/'+code+'/members', renderMembers);
-
-  // listen room settings/admin changes
+  membersUnsub=dbOn('rooms/'+code+'/members', renderMembers);
   if(roomUnsub) roomUnsub();
-  roomUnsub = dbOn('rooms/'+code, handleRoomSnapshot);
-
-  // listen chat
+  roomUnsub=dbOn('rooms/'+code, handleRoomSnapshot);
   if(chatUnsub) chatUnsub();
-  chatUnsub = dbOn('rooms/'+code+'/chat', renderChat);
+  chatUnsub=dbOn('rooms/'+code+'/chat', renderChat);
 
-  if(!wasAlreadyMember) postSystemMsg(currentUser.name + ' joined the room ');
+  if(!wasAlreadyMember) postSystemMsg(currentUser.name+' joined the room 👋');
 
   restoreMyTimerUi(memberData);
+
+  // Start midnight systems
+  scheduleMidnightReset();
+  startMidnightCountdownUI();
+
   await renderJoinedRooms();
-
-  const url = new URL(location.href);
+  const url=new URL(location.href);
   url.searchParams.set('room', code);
-  history.replaceState({}, '', url);
-
-  snack(wasAlreadyMember ? 'Room restored ' : 'Joined room! Start studying when ready ');
+  history.replaceState({},'',url);
+  snack(wasAlreadyMember?'Room restored 💫':'Joined room! Start studying when ready 📚');
 }
 
 function handleRoomSnapshot(room) {
   if(!currentRoom) return;
-  if(!room || room.active === false) {
-    handleRoomDeleted();
-    return;
-  }
-  roomData = room;
-  document.getElementById('roomTitle').textContent = room.name || 'Room';
-  document.getElementById('roomMeta').textContent = (room.subject||'') + '  Code: ' + currentRoom;
-  updateAdminUi();
-  updateChatUi();
+  if(!room||room.active===false){ handleRoomDeleted(); return; }
+  roomData=room;
+  document.getElementById('roomTitle').textContent=room.name||'Room';
+  document.getElementById('roomMeta').textContent=(room.subject||'')+' · Code: '+currentRoom;
+  updateAdminUi(); updateChatUi();
   if(lastMembersData) renderMembers(lastMembersData);
 }
-
 function updateAdminUi() {
-  const adminBtn = document.getElementById('adminBtn');
-  const adminPanel = document.getElementById('adminPanel');
-  const adminRoleChip = document.getElementById('adminRoleChip');
-  const deleteBtn = document.getElementById('deleteRoomBtn');
-  const chatLockBtn = document.getElementById('chatLockBtn');
-  const allowed = canModerate();
-  const owner = isRoomOwner();
-
-  if(adminBtn) adminBtn.style.display = allowed ? 'inline-flex' : 'none';
-  if(adminPanel && !allowed) adminPanel.classList.remove('open');
-  if(adminRoleChip) adminRoleChip.textContent = getMemberRole(currentUser?.uid);
-  if(deleteBtn) deleteBtn.style.display = owner ? 'inline-flex' : 'none';
-  if(chatLockBtn) chatLockBtn.textContent = roomData?.chatLocked ? 'Unlock Chat' : 'Lock Chat';
+  const adminBtn=document.getElementById('adminBtn');
+  const adminPanel=document.getElementById('adminPanel');
+  const adminRoleChip=document.getElementById('adminRoleChip');
+  const deleteBtn=document.getElementById('deleteRoomBtn');
+  const chatLockBtn=document.getElementById('chatLockBtn');
+  const allowed=canModerate(), owner=isRoomOwner();
+  if(adminBtn) adminBtn.style.display=allowed?'inline-flex':'none';
+  if(adminPanel&&!allowed) adminPanel.classList.remove('open');
+  if(adminRoleChip) adminRoleChip.textContent=getMemberRole(currentUser?.uid);
+  if(deleteBtn) deleteBtn.style.display=owner?'inline-flex':'none';
+  if(chatLockBtn) chatLockBtn.textContent=roomData?.chatLocked?'Unlock Chat':'Lock Chat';
 }
-
 function updateChatUi() {
-  const inp = document.getElementById('chatInput');
-  const btn = document.getElementById('chatSendBtn');
-  const lockedForMe = !!(roomData?.chatLocked && !canModerate());
-  if(inp) {
-    inp.disabled = lockedForMe;
-    inp.placeholder = lockedForMe ? 'Chat is locked by room admin' : 'Type a message';
-  }
-  if(btn) btn.disabled = lockedForMe;
+  const inp=document.getElementById('chatInput');
+  const btn=document.getElementById('chatSendBtn');
+  const lockedForMe=!!(roomData?.chatLocked&&!canModerate());
+  if(inp){ inp.disabled=lockedForMe; inp.placeholder=lockedForMe?'Chat is locked by room admin':'Type a message'; }
+  if(btn) btn.disabled=lockedForMe;
 }
-
-function toggleAdminPanel() {
-  if(!canModerate()) return;
-  document.getElementById('adminPanel')?.classList.toggle('open');
-}
+function toggleAdminPanel(){ if(!canModerate()) return; document.getElementById('adminPanel')?.classList.toggle('open'); }
 
 async function handleRoomDeleted() {
   if(!currentRoom) return;
-  const deletedRoom = currentRoom;
-  clearInterval(myTimerInt);
-  clearInterval(presenceInt);
-  presenceInt = null;
-  if(membersUnsub){ membersUnsub(); membersUnsub=null; }
-  if(chatUnsub){ chatUnsub(); chatUnsub=null; }
-  if(roomUnsub){ roomUnsub(); roomUnsub=null; }
-  Object.values(memberTimerInts).forEach(clearInterval);
-  memberTimerInts={};
+  const deletedRoom=currentRoom;
+  clearInterval(myTimerInt); clearInterval(presenceInt); presenceInt=null;
+  clearInterval(_midnightCountdownInt); clearTimeout(_midnightTimer);
+  if(membersUnsub){membersUnsub();membersUnsub=null;}
+  if(chatUnsub){chatUnsub();chatUnsub=null;}
+  if(roomUnsub){roomUnsub();roomUnsub=null;}
+  Object.values(memberTimerInts).forEach(clearInterval); memberTimerInts={};
   if(deletedRoom) forgetJoinedRoom(deletedRoom);
   currentRoom=null; roomData=null; lastMembersData=null;
-  myTimerStart=null; myTimerAccum=0; myRunning=false;
-  const url=new URL(location.href);
-  url.searchParams.delete('room');
-  history.replaceState({},'',url);
-  await renderJoinedRooms();
-  showLanding();
+  myTimerStart=null; myTimerAccum=0; myRunning=false; _dailyAccum=0;
+  const url=new URL(location.href); url.searchParams.delete('room'); history.replaceState({},'',url);
+  await renderJoinedRooms(); showLanding();
   snack('This group was deleted by the owner.');
 }
 
 function restoreMyTimerUi(memberData) {
   clearInterval(myTimerInt);
-  myTimerAccum = memberData.totalSec || 0;
-  myTimerStart = memberData.studying && memberData.lastStart ? memberData.lastStart : null;
-  myRunning = !!myTimerStart;
+  myTimerAccum=memberData.totalSec||0;
+  myTimerStart=memberData.studying&&memberData.lastStart?memberData.lastStart:null;
+  myRunning=!!myTimerStart;
 
-  const total = calcMemberSec(memberData);
-  const display = document.getElementById('myTimerDisplay');
-  const tag = document.getElementById('myStatusTag');
-  const status = document.getElementById('myStatusText');
-  const startBtn = document.getElementById('myStartBtn');
-  const pauseBtn = document.getElementById('myPauseBtn');
-  const resumeBtn = document.getElementById('myResumeBtn');
+  const total=calcMemberSec(memberData);
+  const display=document.getElementById('myTimerDisplay');
+  const tag=document.getElementById('myStatusTag');
+  const status=document.getElementById('myStatusText');
+  const startBtn=document.getElementById('myStartBtn');
+  const pauseBtn=document.getElementById('myPauseBtn');
+  const resumeBtn=document.getElementById('myResumeBtn');
+  const dailyEl=document.getElementById('dailyTimerDisplay');
 
-  display.textContent = fmtTime(total);
+  display.textContent=fmtTime(total);
   display.classList.toggle('running', myRunning);
   tag.classList.toggle('running', myRunning);
 
-  if(myRunning) {
-    status.textContent = 'Studying';
-    startBtn.disabled = true;
-    pauseBtn.disabled = false;
-    resumeBtn.style.display = 'none';
-    myTimerInt = setInterval(tickMyTimer, 1000);
-  } else if(myTimerAccum > 0) {
-    status.textContent = 'Paused';
-    startBtn.disabled = true;
-    pauseBtn.disabled = true;
-    resumeBtn.style.display = 'inline-flex';
+  // Daily display
+  const dailyTotal = _dailyAccum + (myRunning ? Math.floor((Date.now()-(myTimerStart||Date.now()))/1000) : 0);
+  if(dailyEl) dailyEl.textContent=fmtTime(dailyTotal);
+
+  if(myRunning){
+    status.textContent='Studying'; startBtn.disabled=true; pauseBtn.disabled=false; resumeBtn.style.display='none';
+    myTimerInt=setInterval(tickMyTimer, 1000);
+  } else if(myTimerAccum>0){
+    status.textContent='Paused'; startBtn.disabled=true; pauseBtn.disabled=true; resumeBtn.style.display='inline-flex';
   } else {
-    status.textContent = 'Not studying';
-    startBtn.disabled = false;
-    pauseBtn.disabled = true;
-    resumeBtn.style.display = 'none';
+    status.textContent='Not studying'; startBtn.disabled=false; pauseBtn.disabled=true; resumeBtn.style.display='none';
   }
 }
 
@@ -1273,57 +1416,80 @@ function restoreMyTimerUi(memberData) {
    ============================================================ */
 function myStart() {
   if(myRunning) return;
-  myRunning = true;
-  myTimerStart = Date.now();
-  clearInterval(myTimerInt);
-  myTimerInt = setInterval(tickMyTimer, 1000);
+  myRunning=true; myTimerStart=Date.now();
+  clearInterval(myTimerInt); myTimerInt=setInterval(tickMyTimer, 1000);
   document.getElementById('myTimerDisplay').classList.add('running');
   document.getElementById('myStatusTag').classList.add('running');
-  document.getElementById('myStatusText').textContent = 'Studying';
-  document.getElementById('myStartBtn').disabled = true;
-  document.getElementById('myPauseBtn').disabled = false;
-  document.getElementById('myResumeBtn').style.display = 'none';
-
-  dbUpdate('rooms/'+currentRoom+'/members/'+currentUser.uid, {
-    studying: true, lastStart: myTimerStart, lastSeen: Date.now()
-  });
+  document.getElementById('myStatusText').textContent='Studying';
+  document.getElementById('myStartBtn').disabled=true;
+  document.getElementById('myPauseBtn').disabled=false;
+  document.getElementById('myResumeBtn').style.display='none';
+  dbUpdate('rooms/'+currentRoom+'/members/'+currentUser.uid, { studying:true, lastStart:myTimerStart, lastSeen:Date.now() });
 }
 
-function myPause() {
+async function myPause() {
   if(!myRunning) return;
-  myTimerAccum += Math.floor((Date.now() - myTimerStart)/1000);
-  myTimerStart = null;
-  myRunning = false;
+  const sessionDuration=Math.floor((Date.now()-myTimerStart)/1000);
+  myTimerAccum+=sessionDuration;
+  myTimerStart=null; myRunning=false;
   clearInterval(myTimerInt);
+
   document.getElementById('myTimerDisplay').classList.remove('running');
   document.getElementById('myStatusTag').classList.remove('running');
-  document.getElementById('myStatusText').textContent = 'Paused';
-  document.getElementById('myStartBtn').disabled = true;
-  document.getElementById('myPauseBtn').disabled = true;
-  document.getElementById('myResumeBtn').style.display = 'inline-flex';
+  document.getElementById('myStatusText').textContent='Paused';
+  document.getElementById('myStartBtn').disabled=true;
+  document.getElementById('myPauseBtn').disabled=true;
+  document.getElementById('myResumeBtn').style.display='inline-flex';
 
-  const savePause = dbUpdate('rooms/'+currentRoom+'/members/'+currentUser.uid, {
-    studying: false, totalSec: myTimerAccum, lastStart: null, lastSeen: Date.now()
+  // Update daily accumulator locally
+  _dailyAccum += sessionDuration;
+
+  // Save session to history
+  const member=await dbGet('rooms/'+currentRoom+'/members/'+currentUser.uid);
+  const sessions=member?.sessions||[];
+  // Save as a timed session (not daily — daily saves at midnight)
+  sessions.push({ date: Date.now(), duration: sessionDuration });
+
+  const today=getTodayDate();
+  const prevDaily=member?.dailyStudySec||0;
+
+  await dbUpdate('rooms/'+currentRoom+'/members/'+currentUser.uid, {
+    studying: false,
+    totalSec: myTimerAccum,
+    lastStart: null,
+    lastSeen: Date.now(),
+    sessions,
+    // NEW — update daily fields
+    dailyStudySec: prevDaily + sessionDuration,
+    dailyDate: today
   });
+
   tickMyTimer();
-  return savePause;
 }
 
 function myResume() {
-  document.getElementById('myStartBtn').disabled = false;
-  document.getElementById('myResumeBtn').style.display = 'none';
+  document.getElementById('myStartBtn').disabled=false;
+  document.getElementById('myResumeBtn').style.display='none';
   myStart();
 }
 
 function tickMyTimer() {
-  const elapsed = myRunning ? Math.floor((Date.now()-myTimerStart)/1000) : 0;
-  const total = myTimerAccum + elapsed;
-  document.getElementById('myTimerDisplay').textContent = fmtTime(total);
-  if(myRunning && total%15===0) {
+  const elapsed=myRunning?Math.floor((Date.now()-myTimerStart)/1000):0;
+  const total=myTimerAccum+elapsed;
+  document.getElementById('myTimerDisplay').textContent=fmtTime(total);
+
+  // Update daily display — NEW
+  const dailyEl=document.getElementById('dailyTimerDisplay');
+  if(dailyEl) dailyEl.textContent=fmtTime(_dailyAccum+elapsed);
+
+  if(myRunning&&total%15===0){
+    const today=getTodayDate();
     dbUpdate('rooms/'+currentRoom+'/members/'+currentUser.uid, {
       totalSec: total,
       lastStart: myTimerStart,
-      lastSeen: Date.now()
+      lastSeen: Date.now(),
+      dailyStudySec: _dailyAccum+elapsed,
+      dailyDate: today
     });
   }
 }
@@ -1332,41 +1498,42 @@ function tickMyTimer() {
    RENDER MEMBERS
    ============================================================ */
 function renderMembers(data) {
-  const grid = document.getElementById('membersGrid');
-  lastMembersData = data;
-  if(!data){ grid.innerHTML='<div class="empty-state"><div class="ei"></div><p>No members yet</p></div>'; return; }
-
-  const members = Object.entries(data).filter(([,m])=>m).map(([uid, m])=>({uid,...m}));
-  document.getElementById('memberCountBadge').textContent = `(${members.length})`;
-  const me = members.find(m=>m.uid === currentUser.uid);
+  const grid=document.getElementById('membersGrid');
+  lastMembersData=data;
+  if(!data){ grid.innerHTML='<div class="empty-state"><div class="ei">👥</div><p>No members yet</p></div>'; return; }
+  const members=Object.entries(data).filter(([,m])=>m).map(([uid,m])=>({uid,...m}));
+  document.getElementById('memberCountBadge').textContent=`(${members.length})`;
+  const me=members.find(m=>m.uid===currentUser.uid);
   if(me) handleNudgeForMe(me);
+  Object.values(memberTimerInts).forEach(clearInterval); memberTimerInts={};
 
-  Object.values(memberTimerInts).forEach(clearInterval);
-  memberTimerInts = {};
-
-  grid.innerHTML = members.map(m=>{
-    const isMe = m.uid === currentUser.uid;
-    const sec = calcMemberSec(m);
-    const cls = isMe ? 'me' : m.studying ? 'studying' : '';
-    const role = getMemberRole(m.uid);
-    const roleCls = getRoleClass(role);
-    return `<div class="member-tile ${cls}" id="tile-${m.uid}">
+  grid.innerHTML=members.map(m=>{
+    const isMe=m.uid===currentUser.uid;
+    const sec=calcMemberSec(m);
+    const dailySec=m.dailyStudySec||0;
+    const cls=isMe?'me':m.studying?'studying':'';
+    const role=getMemberRole(m.uid); const roleCls=getRoleClass(role);
+    const avatarHtml=m.pfpUrl?`<img src="${esc(m.pfpUrl)}" alt="${esc(m.name)}">`:`${(m.name||'?')[0].toUpperCase()}`;
+    return `<div class="member-tile ${cls}" id="tile-${m.uid}" onclick="showUserAnalytics('${m.uid}')">
       ${isMe?'<div class="member-me-badge">You</div>':''}
-      <div class="member-avatar av-${m.colorIdx||0}">${(m.name||'?')[0].toUpperCase()}</div>
+      <div class="member-avatar av-${m.colorIdx||0}">${avatarHtml}</div>
       <div class="member-name" title="${esc(m.name)}">${esc(m.name)}</div>
       <div class="member-role-badge ${roleCls}">${role}</div>
       <div class="member-time" id="mtime-${m.uid}">${fmtTime(sec)}</div>
+      <div class="member-daily-time" id="mdaily-${m.uid}" title="Today's study">📅 ${fmtTime(dailySec)}</div>
       <div class="member-status-dot"></div>
       ${renderMemberAdminActions(m)}
     </div>`;
   }).join('');
 
   members.forEach(m=>{
-    if(m.studying && m.lastStart) {
-      memberTimerInts[m.uid] = setInterval(()=>{
-        const el = document.getElementById('mtime-'+m.uid);
+    if(m.studying&&m.lastStart){
+      memberTimerInts[m.uid]=setInterval(()=>{
+        const el=document.getElementById('mtime-'+m.uid);
+        const del=document.getElementById('mdaily-'+m.uid);
         if(!el){ clearInterval(memberTimerInts[m.uid]); return; }
-        el.textContent = fmtTime(calcMemberSec(m));
+        el.textContent=fmtTime(calcMemberSec(m));
+        if(del) del.textContent='📅 '+fmtTime((m.dailyStudySec||0)+Math.floor((Date.now()-m.lastStart)/1000));
       }, 1000);
     }
   });
@@ -1375,186 +1542,240 @@ function renderMembers(data) {
 }
 
 function renderMemberAdminActions(m) {
-  if(!canModerate() || !m || m.uid === currentUser.uid) return '';
-  const role = getMemberRole(m.uid);
-  const canOwnerManage = isRoomOwner() && role !== 'Owner';
-  const managerBtn = canOwnerManage
-    ? (role === 'Manager'
-      ? `<button class="btn btn-warning btn-sm" onclick="removeManager('${m.uid}')">Remove Manager</button>`
-      : `<button class="btn btn-success btn-sm" onclick="makeManager('${m.uid}',decodeURIComponent('${encodeURIComponent(m.name||'Manager')}'))">Make Manager</button>`)
-    : '';
+  if(!canModerate()||!m||m.uid===currentUser.uid) return '';
+  const role=getMemberRole(m.uid);
+  const canOwnerManage=isRoomOwner()&&role!=='Owner';
+  const managerBtn=canOwnerManage?(role==='Manager'
+    ?`<button class="btn btn-warning btn-sm" onclick="event.stopPropagation();removeManager('${m.uid}')">Remove Manager</button>`
+    :`<button class="btn btn-success btn-sm" onclick="event.stopPropagation();makeManager('${m.uid}',decodeURIComponent('${encodeURIComponent(m.name||'Manager')}'))">Make Manager</button>`):'';
   return `<div class="member-admin-actions">
-    <button class="btn btn-secondary btn-sm" onclick="nudgeMember('${m.uid}')">Nudge</button>
+    <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();nudgeMember('${m.uid}')">Nudge</button>
     ${managerBtn}
   </div>`;
 }
 
 function calcMemberSec(m) {
-  let sec = m.totalSec || 0;
-  if(m.studying && m.lastStart) sec += Math.floor((Date.now()-m.lastStart)/1000);
+  let sec=m.totalSec||0;
+  if(m.studying&&m.lastStart) sec+=Math.floor((Date.now()-m.lastStart)/1000);
   return sec;
 }
 
 function renderLeaderboard(members) {
-  const sorted = [...members].sort((a,b)=>calcMemberSec(b)-calcMemberSec(a));
-  const el = document.getElementById('leaderboardList');
+  const sorted=[...members].sort((a,b)=>calcMemberSec(b)-calcMemberSec(a));
+  const el=document.getElementById('leaderboardList');
   if(!el) return;
-  const medals = ['','',''];
-  el.innerHTML = sorted.map((m,i)=>`
-    <div class="lb-row">
+  const medals=['🥇','🥈','🥉'];
+  el.innerHTML=sorted.map((m,i)=>{
+    const avatarHtml=m.pfpUrl
+      ?`<img src="${esc(m.pfpUrl)}" alt="${esc(m.name)}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;">`
+      :`<div class="member-avatar av-${m.colorIdx||0}" style="width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;">${(m.name||'?')[0].toUpperCase()}</div>`;
+    const dailySec=m.dailyStudySec||0;
+    return `<div class="lb-row">
       <div class="lb-rank">${medals[i]||('#'+(i+1))}</div>
-      <div class="member-avatar av-${m.colorIdx||0}" style="width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;">${(m.name||'?')[0].toUpperCase()}</div>
+      ${avatarHtml}
       <div class="lb-name">${esc(m.name)}</div>
       <div class="lb-time">${fmtTime(calcMemberSec(m))}</div>
-    </div>`).join('');
+      <div class="lb-daily" title="Today">📅${fmtTime(dailySec)}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ============================================================
+   USER ANALYTICS MODAL
+   ============================================================ */
+async function showUserAnalytics(uid) {
+  if(!currentRoom||!uid) return;
+  const member=await dbGet('rooms/'+currentRoom+'/members/'+uid);
+  if(!member) return;
+
+  const modal=document.getElementById('analyticsModal');
+  const avatar=document.getElementById('analyticsAvatar');
+  const nameEl=document.getElementById('analyticsName');
+  const roleEl=document.getElementById('analyticsRole');
+  const totalTime=document.getElementById('statTotalTime');
+  const todayTime=document.getElementById('statTodayTime');
+  const streak=document.getElementById('statStreak');
+  const statusEl=document.getElementById('statStatus');
+  const history=document.getElementById('sessionHistory');
+
+  if(member.pfpUrl){
+    avatar.innerHTML=`<img src="${esc(member.pfpUrl)}" alt="${esc(member.name)}">`;
+  } else {
+    avatar.className='analytics-avatar av-'+(member.colorIdx||0);
+    avatar.textContent=(member.name||'?')[0].toUpperCase();
+  }
+
+  nameEl.textContent=member.name||'Unknown';
+  roleEl.textContent=getMemberRole(uid)+(member.isGuest?' (Guest)':'');
+  totalTime.textContent=fmtTime(calcMemberSec(member));
+  todayTime.textContent=fmtTime(member.dailyStudySec||0);
+  statusEl.textContent=member.studying?'🟢 Studying':'⚪ Idle';
+
+  const sessions=member.sessions||[];
+  streak.textContent=calculateStreak(sessions)+' days';
+
+  // Show daily sessions in history — show 'daily' type entries prominently
+  const dailySessions=sessions.filter(s=>s.type==='daily').slice(-10).reverse();
+  const regularSessions=sessions.filter(s=>!s.type).slice(-5).reverse();
+
+  let historyHTML='';
+  if(dailySessions.length){
+    historyHTML+=`<div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Daily Totals</div>`;
+    historyHTML+=dailySessions.map(s=>{
+      return `<div class="session-item">
+        <span class="session-date">${s.date}</span>
+        <span class="session-duration">${fmtTime(s.duration)}<span class="session-type-badge">Daily</span></span>
+      </div>`;
+    }).join('');
+  }
+  if(regularSessions.length){
+    historyHTML+=`<div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin:12px 0 8px;">Recent Sessions</div>`;
+    historyHTML+=regularSessions.map(s=>{
+      const date=new Date(s.date);
+      return `<div class="session-item">
+        <span class="session-date">${date.toLocaleDateString()} ${date.toLocaleTimeString()}</span>
+        <span class="session-duration">${fmtTime(s.duration)}</span>
+      </div>`;
+    }).join('');
+  }
+  if(!historyHTML) historyHTML='<div style="text-align:center;color:var(--text3);font-size:12px;padding:20px;">No sessions yet</div>';
+  history.innerHTML=historyHTML;
+
+  modal.classList.add('open');
+}
+
+function closeAnalyticsModal(){ document.getElementById('analyticsModal').classList.remove('open'); }
+
+function calculateStreak(sessions) {
+  if(!sessions||!sessions.length) return 0;
+  // Use daily sessions for streak calculation
+  const dailySessions=sessions.filter(s=>s.type==='daily'&&s.date);
+  if(!dailySessions.length) return 0;
+  const uniqueDates=[...new Set(dailySessions.map(s=>s.date))].sort((a,b)=>b.localeCompare(a));
+  if(!uniqueDates.length) return 0;
+  const today=getTodayDate();
+  const d=new Date(); d.setDate(d.getDate()-1);
+  const yesterday=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  if(uniqueDates[0]!==today&&uniqueDates[0]!==yesterday) return 0;
+  let streak=1;
+  for(let i=1;i<uniqueDates.length;i++){
+    const prev=new Date(uniqueDates[i-1]);
+    const curr=new Date(uniqueDates[i]);
+    const diff=(prev-curr)/(24*60*60*1000);
+    if(diff===1) streak++; else break;
+  }
+  return streak;
 }
 
 /* ============================================================
    CHAT
    ============================================================ */
 function renderChat(data) {
-  const el = document.getElementById('chatMessages');
-  if(!data) {
-    el.innerHTML = '<div class="chat-msg sys"><span class="cm-text">No messages yet.</span></div>';
-    return;
-  }
-  const msgs = Object.values(data).filter(Boolean).sort((a,b)=>a.ts-b.ts).slice(-100);
-  el.innerHTML = msgs.map(m=>{
+  const el=document.getElementById('chatMessages');
+  if(!data){ el.innerHTML='<div class="chat-msg sys"><span class="cm-text">No messages yet.</span></div>'; return; }
+  const msgs=Object.values(data).filter(Boolean).sort((a,b)=>a.ts-b.ts).slice(-100);
+  el.innerHTML=msgs.map(m=>{
     if(m.sys) return `<div class="chat-msg sys"><span class="cm-text">${esc(m.text)}</span></div>`;
     return `<div class="chat-msg"><span class="cm-name">${esc(m.name)}</span><span class="cm-text">${esc(m.text)}</span></div>`;
   }).join('');
-  el.scrollTop = el.scrollHeight;
+  el.scrollTop=el.scrollHeight;
 }
-
 function sendChatMsg() {
-  if(roomData?.chatLocked && !canModerate()) { snack('Chat is locked by admin.'); return; }
-  const inp = document.getElementById('chatInput');
-  const text = inp.value.trim(); if(!text||!currentRoom) return;
-  inp.value = '';
-  const ref = dbPush('rooms/'+currentRoom+'/chat');
-  ref.set({ name: currentUser.name, text, ts: Date.now() });
+  if(roomData?.chatLocked&&!canModerate()){ snack('Chat is locked by admin.'); return; }
+  const inp=document.getElementById('chatInput');
+  const text=inp.value.trim(); if(!text||!currentRoom) return;
+  inp.value='';
+  const ref=dbPush('rooms/'+currentRoom+'/chat');
+  ref.set({name:currentUser.name, text, ts:Date.now()});
 }
-
 function postSystemMsg(text) {
   if(!currentRoom) return;
-  const ref = dbPush('rooms/'+currentRoom+'/chat');
-  ref.set({ sys: true, text, ts: Date.now() });
+  const ref=dbPush('rooms/'+currentRoom+'/chat');
+  ref.set({sys:true, text, ts:Date.now()});
 }
-
 async function toggleChatLock() {
-  if(!canModerate() || !currentRoom) return;
-  const next = !roomData?.chatLocked;
-  await dbUpdate('rooms/'+currentRoom, { chatLocked: next });
-  postSystemMsg(next ? 'Chat was locked by admin.' : 'Chat was unlocked by admin.');
+  if(!canModerate()||!currentRoom) return;
+  const next=!roomData?.chatLocked;
+  await dbUpdate('rooms/'+currentRoom, {chatLocked:next});
+  postSystemMsg(next?'Chat was locked by admin.':'Chat was unlocked by admin.');
 }
-
 async function clearRoomChat() {
-  if(!canModerate() || !currentRoom) return;
+  if(!canModerate()||!currentRoom) return;
   if(!confirm('Clear all chat messages in this group?')) return;
   await dbRemove('rooms/'+currentRoom+'/chat');
   postSystemMsg('Chat was cleared by admin.');
 }
-
 async function nudgeMember(uid) {
-  if(!canModerate() || !currentRoom || !uid || uid === currentUser.uid) return;
-  const members = lastMembersData || {};
-  const target = members[uid] || {};
-  const msg = prompt('Nudge message', 'Please come back to study.');
-  if(msg === null) return;
-  await dbSet('rooms/'+currentRoom+'/members/'+uid+'/nudge', {
-    from: currentUser.name,
-    fromUid: currentUser.uid,
-    text: msg.trim() || 'Please come back to study.',
-    ts: Date.now()
+  if(!canModerate()||!currentRoom||!uid||uid===currentUser.uid) return;
+  const members=lastMembersData||{};
+  const target=members[uid]||{};
+  const msg=prompt('Nudge message','Please come back to study.');
+  if(msg===null) return;
+  await dbSet('rooms/'+currentRoom+'/members/'+uid+'/nudge',{
+    from:currentUser.name, fromUid:currentUser.uid,
+    text:msg.trim()||'Please come back to study.', ts:Date.now()
   });
-  snack('Nudged ' + (target.name || 'member'));
+  snack('Nudged '+(target.name||'member'));
 }
-
 async function nudgeAllMembers() {
-  if(!canModerate() || !currentRoom) return;
-  const members = lastMembersData || {};
-  const targets = Object.entries(members).filter(([uid,m])=>uid !== currentUser.uid && m);
+  if(!canModerate()||!currentRoom) return;
+  const members=lastMembersData||{};
+  const targets=Object.entries(members).filter(([uid,m])=>uid!==currentUser.uid&&m);
   if(!targets.length){ snack('No other members to nudge.'); return; }
-  const msg = prompt('Nudge message for everyone', 'Please come back to study.');
-  if(msg === null) return;
-  const payload = {
-    from: currentUser.name,
-    fromUid: currentUser.uid,
-    text: msg.trim() || 'Please come back to study.',
-    ts: Date.now()
-  };
+  const msg=prompt('Nudge message for everyone','Please come back to study.');
+  if(msg===null) return;
+  const payload={from:currentUser.name, fromUid:currentUser.uid, text:msg.trim()||'Please come back to study.', ts:Date.now()};
   await Promise.all(targets.map(([uid])=>dbSet('rooms/'+currentRoom+'/members/'+uid+'/nudge', payload)));
-  postSystemMsg(currentUser.name + ' nudged the group.');
-  snack('Nudged ' + targets.length + ' members.');
+  postSystemMsg(currentUser.name+' nudged the group.');
+  snack('Nudged '+targets.length+' members.');
 }
-
 async function makeManager(uid, name) {
-  if(!isRoomOwner() || !currentRoom || !uid || uid === currentUser.uid) return;
-  await dbSet('rooms/'+currentRoom+'/managers/'+uid, {
-    name: name || 'Manager',
-    addedBy: currentUser.uid,
-    addedAt: Date.now()
-  });
-  postSystemMsg((name || 'A member') + ' is now a manager.');
+  if(!isRoomOwner()||!currentRoom||!uid||uid===currentUser.uid) return;
+  await dbSet('rooms/'+currentRoom+'/managers/'+uid,{name:name||'Manager', addedBy:currentUser.uid, addedAt:Date.now()});
+  postSystemMsg((name||'A member')+' is now a manager.');
   snack('Manager added.');
 }
-
 async function removeManager(uid) {
-  if(!isRoomOwner() || !currentRoom || !uid || uid === currentUser.uid) return;
-  const members = lastMembersData || {};
+  if(!isRoomOwner()||!currentRoom||!uid||uid===currentUser.uid) return;
+  const members=lastMembersData||{};
   await dbRemove('rooms/'+currentRoom+'/managers/'+uid);
-  postSystemMsg((members[uid]?.name || 'A member') + ' is no longer a manager.');
+  postSystemMsg((members[uid]?.name||'A member')+' is no longer a manager.');
   snack('Manager removed.');
 }
-
 async function deleteCurrentRoom() {
-  if(!isRoomOwner() || !currentRoom) return;
-  const code = currentRoom;
-  const label = roomData?.name || code;
-  if(!confirm('Delete group "' + label + '" permanently?')) return;
+  if(!isRoomOwner()||!currentRoom) return;
+  const code=currentRoom; const label=roomData?.name||code;
+  if(!confirm('Delete group "'+label+'" permanently?')) return;
   if(!confirm('This removes the group for every member. Continue?')) return;
   await dbRemove('rooms/'+code);
   forgetJoinedRoom(code);
   await handleRoomDeleted();
 }
-
 function handleNudgeForMe(member) {
-  const nudge = member && member.nudge;
-  if(!nudge || !nudge.ts) return;
-  const key = 'gsLastNudge_' + currentRoom + '_' + currentUser.uid;
-  const seen = S.get(key, 0);
-  if(nudge.ts <= seen) return;
+  const nudge=member&&member.nudge;
+  if(!nudge||!nudge.ts) return;
+  const key='gsLastNudge_'+currentRoom+'_'+currentUser.uid;
+  const seen=S.get(key,0);
+  if(nudge.ts<=seen) return;
   S.set(key, nudge.ts);
-  const msg = (nudge.from || 'Admin') + ': ' + (nudge.text || 'Please come back to study.');
-  snack('Nudge - ' + msg);
+  const msg=(nudge.from||'Admin')+': '+(nudge.text||'Please come back to study.');
+  snack('👋 Nudge - '+msg);
   showBrowserNotification('Focus Lab nudge', msg);
-  flashTitle('Nudge from ' + (nudge.from || 'Admin'));
+  flashTitle('👋 Nudge from '+(nudge.from||'Admin'));
 }
-
 function showBrowserNotification(title, body) {
   try {
     if(!('Notification' in window)) return;
-    if(Notification.permission === 'granted') {
-      new Notification(title, { body });
-    } else if(Notification.permission === 'default') {
-      Notification.requestPermission().then(permission=>{
-        if(permission === 'granted') new Notification(title, { body });
-      });
-    }
-  } catch(e) {}
+    if(Notification.permission==='granted') new Notification(title,{body});
+    else if(Notification.permission==='default') Notification.requestPermission().then(p=>{if(p==='granted') new Notification(title,{body});});
+  } catch(e){}
 }
-
 function flashTitle(text) {
-  const original = document.title;
-  let count = 0;
+  const original=document.title; let count=0;
   clearInterval(nudgeTitleTimer);
-  nudgeTitleTimer = setInterval(()=>{
-    document.title = count % 2 ? original : text;
-    count++;
-    if(count > 8) {
-      clearInterval(nudgeTitleTimer);
-      document.title = original;
-    }
+  nudgeTitleTimer=setInterval(()=>{
+    document.title=count%2?original:text; count++;
+    if(count>8){ clearInterval(nudgeTitleTimer); document.title=original; }
   }, 800);
 }
 
@@ -1562,33 +1783,32 @@ function flashTitle(text) {
    PUBLIC ROOMS
    ============================================================ */
 async function loadPublicRooms() {
-  const el = document.getElementById('publicRoomsGrid');
-  el.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:12px;">Loading rooms</div>';
+  const el=document.getElementById('publicRoomsGrid');
+  el.innerHTML='<div style="color:var(--text3);font-size:13px;padding:12px;">Loading rooms...</div>';
   try {
-    const all = await dbGet('rooms');
-    if(!all){ el.innerHTML='<div class="empty-state"><div class="ei"></div><p>No active rooms</p><small>Create one and invite friends!</small></div>'; return; }
-    const rooms = Object.entries(all).filter(([code,r])=>r&&r.active).map(([code,r])=>({code,...r}));
-    if(!rooms.length){ el.innerHTML='<div class="empty-state"><div class="ei"></div><p>No active rooms</p><small>Create one and invite friends!</small></div>'; return; }
-    el.innerHTML = rooms.map(r=>{
-      const members = r.members ? Object.values(r.members).filter(Boolean) : [];
-      const studying = members.filter(m=>m.studying).length;
-      const avatars = members.slice(0,5).map(m=>`<div class="mini-avatar av-${m.colorIdx||0}">${(m.name||'?')[0].toUpperCase()}</div>`).join('');
+    const all=await dbGet('rooms');
+    if(!all){ el.innerHTML='<div class="empty-state"><div class="ei">📚</div><p>No active rooms</p><small>Create one and invite friends!</small></div>'; return; }
+    const rooms=Object.entries(all).filter(([code,r])=>r&&r.active).map(([code,r])=>({code,...r}));
+    if(!rooms.length){ el.innerHTML='<div class="empty-state"><div class="ei">📚</div><p>No active rooms</p><small>Create one and invite friends!</small></div>'; return; }
+    el.innerHTML=rooms.map(r=>{
+      const members=r.members?Object.values(r.members).filter(Boolean):[];
+      const studying=members.filter(m=>m.studying).length;
+      const avatars=members.slice(0,5).map(m=>{
+        const avatarContent=m.pfpUrl?`<img src="${esc(m.pfpUrl)}" alt="${esc(m.name)}">`:`${(m.name||'?')[0].toUpperCase()}`;
+        return `<div class="mini-avatar av-${m.colorIdx||0}">${avatarContent}</div>`;
+      }).join('');
       return `<div class="group-card" onclick="joinRoomByCode('${r.code}')">
         <div class="group-card-header">
           <div class="group-name">${esc(r.name)}</div>
-          <div class="group-badge ${studying>0?'live':''}">${studying>0?' LIVE':r.locked?' Private':'Public'}</div>
+          <div class="group-badge ${studying>0?'live':''}">${studying>0?'🔴 LIVE':r.locked?'🔒 Private':'🌐 Public'}</div>
         </div>
         <div style="font-size:12px;color:var(--text3);margin-bottom:8px;">${esc(r.subject||'General')}</div>
-        <div class="group-meta">
-          <span> ${members.length}/${r.maxMembers||50}</span>
-          <span> ${studying} studying</span>
-          <span> ${r.code}</span>
-        </div>
+        <div class="group-meta"><span>👥 ${members.length}/${r.maxMembers||50}</span><span>📚 ${studying} studying</span><span>🔑 ${r.code}</span></div>
         <div class="member-pile" style="margin-top:10px;">${avatars}</div>
       </div>`;
     }).join('');
   } catch(e) {
-    el.innerHTML='<div style="color:var(--accent3);font-size:12px;padding:12px;">Could not load rooms. '+(DEMO_MODE?'Demo mode  create a room to test!':'Check Firebase config.')+'</div>';
+    el.innerHTML='<div style="color:var(--accent3);font-size:12px;padding:12px;">Could not load rooms. '+(DEMO_MODE?'Demo mode – create a room to test!':'Check Firebase config.')+'</div>';
   }
 }
 
@@ -1597,40 +1817,28 @@ async function loadPublicRooms() {
    ============================================================ */
 async function leaveRoom() {
   if(!currentRoom) return;
-  const leavingRoom = currentRoom;
+  const leavingRoom=currentRoom;
   if(myRunning) await myPause();
-  postSystemMsg(currentUser.name + ' left the room');
+  postSystemMsg(currentUser.name+' left the room 👋');
   await dbRemove('rooms/'+leavingRoom+'/members/'+currentUser.uid);
   forgetJoinedRoom(leavingRoom);
-  clearInterval(myTimerInt);
-  clearInterval(presenceInt);
-  presenceInt = null;
-  if(membersUnsub){ membersUnsub(); membersUnsub=null; }
-  if(chatUnsub){ chatUnsub(); chatUnsub=null; }
-  if(roomUnsub){ roomUnsub(); roomUnsub=null; }
-  Object.values(memberTimerInts).forEach(clearInterval);
-  memberTimerInts={};
+  clearInterval(myTimerInt); clearInterval(presenceInt); presenceInt=null;
+  clearInterval(_midnightCountdownInt); clearTimeout(_midnightTimer);
+  if(membersUnsub){membersUnsub();membersUnsub=null;}
+  if(chatUnsub){chatUnsub();chatUnsub=null;}
+  if(roomUnsub){roomUnsub();roomUnsub=null;}
+  Object.values(memberTimerInts).forEach(clearInterval); memberTimerInts={};
   currentRoom=null; roomData=null; lastMembersData=null;
-  myTimerStart=null; myTimerAccum=0; myRunning=false;
-  const url=new URL(location.href);
-  url.searchParams.delete('room');
-  history.replaceState({},'',url);
-
-  const remainingRooms = getJoinedRooms();
-  for(const code of remainingRooms) {
-    const room = await dbGet('rooms/'+code);
-    const member = await dbGet('rooms/'+code+'/members/'+currentUser.uid);
-    if(room && room.active && member) {
-      await enterRoom(code, room);
-      snack('Left that group. Switched to another joined group.');
-      return;
-    }
+  myTimerStart=null; myTimerAccum=0; myRunning=false; _dailyAccum=0;
+  const url=new URL(location.href); url.searchParams.delete('room'); history.replaceState({},'',url);
+  const remainingRooms=getJoinedRooms();
+  for(const code of remainingRooms){
+    const room=await dbGet('rooms/'+code);
+    const member=await dbGet('rooms/'+code+'/members/'+currentUser.uid);
+    if(room&&room.active&&member){ await enterRoom(code,room); snack('Left that group. Switched to another joined group.'); return; }
     forgetJoinedRoom(code);
   }
-
-  await renderJoinedRooms();
-  showLanding();
-  snack('Left the room');
+  await renderJoinedRooms(); showLanding(); snack('Left the room 👋');
 }
 
 /* ============================================================
@@ -1638,36 +1846,52 @@ async function leaveRoom() {
    ============================================================ */
 function getRoomLink(code){ return location.origin+location.pathname+'?room='+code; }
 function copyRoomLink() {
-  const link = getRoomLink(currentRoom);
-  navigator.clipboard.writeText(link).then(()=>snack('Link copied! ')).catch(()=>{ document.getElementById('shareUrlInput').select(); document.execCommand('copy'); snack('Link copied!'); });
+  const link=getRoomLink(currentRoom);
+  navigator.clipboard.writeText(link).then(()=>snack('Link copied! 📋')).catch(()=>{ document.getElementById('shareUrlInput').select(); document.execCommand('copy'); snack('Link copied!'); });
 }
 
 /* ============================================================
-   AUTH MODAL (email + guest)
+   AUTH MODAL
    ============================================================ */
 function showAuthModal() {
-  const modal = document.getElementById('authModal');
-  const content = document.getElementById('authModalContent');
-  if(currentUser && !currentUser.isGuest) {
-    content.innerHTML = `
+  const modal=document.getElementById('authModal');
+  const content=document.getElementById('authModalContent');
+  if(currentUser&&!currentUser.isGuest){
+    content.innerHTML=`
       <div style="font-size:14px;color:var(--text2);margin-bottom:16px;">Signed in as <strong style="color:var(--text);">${esc(currentUser.name)}</strong></div>
+      <div class="form-row">
+        <label>Profile Picture</label>
+        <div class="pfp-upload-zone" onclick="document.getElementById('authPfpInput').click()">
+          ${currentUser.pfpUrl?`<img src="${esc(currentUser.pfpUrl)}" alt="Profile">`:`<div class="placeholder">📷</div>`}
+          <input type="file" id="authPfpInput" accept="image/*" onchange="handleAuthPfpUpload(this)">
+        </div>
+        <div class="pfp-hint">Click to upload a new profile picture (max 2MB)</div>
+      </div>
       <div class="form-row"><label>Change Display Name</label><input class="input" id="authChangeName" value="${esc(currentUser.name)}" maxlength="24"></div>
       <div class="modal-footer">
         <button class="btn btn-danger btn-sm" onclick="signOut()">Sign Out</button>
         <button class="btn btn-secondary" onclick="closeAuthModal()">Close</button>
-        <button class="btn btn-primary" onclick="saveName()">Save Name</button>
+        <button class="btn btn-primary" onclick="saveName()">Save Changes</button>
       </div>`;
   } else {
-    content.innerHTML = `
+    content.innerHTML=`
+      <div class="form-row">
+        <label>Profile Picture (Optional)</label>
+        <div class="pfp-upload-zone" onclick="document.getElementById('guestPfpInput').click()">
+          ${currentUser?.pfpUrl?`<img src="${esc(currentUser.pfpUrl)}" alt="Profile">`:`<div class="placeholder">📷</div>`}
+          <input type="file" id="guestPfpInput" accept="image/*" onchange="handleGuestPfpUpload(this)">
+        </div>
+        <div class="pfp-hint">Click to upload a profile picture (max 2MB)</div>
+      </div>
       <div class="form-row"><label>Display Name</label><input class="input" id="authName" value="${esc(currentUser?.name||'')}" placeholder="Your name" maxlength="24"></div>
-      ${firebaseReady ? `
+      ${firebaseReady?`
       <div class="divider">or sign in with email</div>
       <div class="form-row"><label>Email</label><input class="input" id="authEmail" type="email" placeholder="you@email.com"></div>
       <div class="form-row"><label>Password</label><input class="input" id="authPw" type="password" placeholder="Password (min 6 chars)"></div>
       <div style="display:flex;gap:8px;margin-bottom:8px;">
         <button class="btn btn-primary" style="flex:1" onclick="signUp()">Sign Up</button>
         <button class="btn btn-secondary" style="flex:1" onclick="signIn()">Sign In</button>
-      </div>` : ''}
+      </div>`:''}
       <div class="divider">continue as guest</div>
       <div class="modal-footer" style="margin-top:0;">
         <button class="btn btn-secondary" onclick="closeAuthModal()">Cancel</button>
@@ -1676,47 +1900,56 @@ function showAuthModal() {
   }
   modal.classList.add('open');
 }
+
+async function handleGuestPfpUpload(input) {
+  const file=input.files[0]; if(!file) return;
+  const url=await uploadProfilePicture(file);
+  if(url){ currentUser.pfpUrl=url; S.set('gsUser',currentUser); const zone=input.parentElement; zone.innerHTML=`<img src="${esc(url)}" alt="Profile"><input type="file" id="guestPfpInput" accept="image/*" onchange="handleGuestPfpUpload(this)">`; snack('Profile picture uploaded! 📸'); }
+}
+async function handleAuthPfpUpload(input) {
+  const file=input.files[0]; if(!file) return;
+  const url=await uploadProfilePicture(file);
+  if(url){ currentUser.pfpUrl=url; S.set('gsUser',currentUser); getJoinedRooms().forEach(code=>dbUpdate('rooms/'+code+'/members/'+currentUser.uid,{pfpUrl:url})); const zone=input.parentElement; zone.innerHTML=`<img src="${esc(url)}" alt="Profile"><input type="file" id="authPfpInput" accept="image/*" onchange="handleAuthPfpUpload(this)">`; updateUserPill(); snack('Profile picture updated! 📸'); }
+}
 function closeAuthModal(){ document.getElementById('authModal').classList.remove('open'); }
 function saveAsGuest(){
   const name=(document.getElementById('authName')?.value||'').trim();
   if(!name){snack('Enter your name');return;}
   currentUser.name=name; currentUser.isGuest=true; S.set('gsUser',currentUser);
-  updateUserPill(); closeAuthModal(); snack('Saved as guest ');
+  updateUserPill(); closeAuthModal(); snack('Saved as guest ✅');
 }
 function saveName(){
   const name=(document.getElementById('authChangeName')?.value||'').trim();
   if(!name){snack('Enter a name');return;}
   currentUser.name=name; S.set('gsUser',currentUser);
-  getJoinedRooms().forEach(code=>dbUpdate('rooms/'+code+'/members/'+currentUser.uid, { name }));
-  updateUserPill(); closeAuthModal(); snack('Name updated ');
+  getJoinedRooms().forEach(code=>dbUpdate('rooms/'+code+'/members/'+currentUser.uid,{name}));
+  updateUserPill(); closeAuthModal(); snack('Name updated ✅');
 }
 async function signUp(){
-  if(!firebaseReady)return;
+  if(!firebaseReady) return;
   const email=document.getElementById('authEmail').value;
   const pw=document.getElementById('authPw').value;
   const name=document.getElementById('authName').value.trim();
   try{
     const cred=await auth.createUserWithEmailAndPassword(email,pw);
-    currentUser={uid:cred.user.uid,name:name||email.split('@')[0],colorIdx:currentUser?.colorIdx||0,isGuest:false};
-    S.set('gsUser',currentUser); updateUserPill(); closeAuthModal(); snack('Account created! ');
+    currentUser={uid:cred.user.uid, name:name||email.split('@')[0], colorIdx:currentUser?.colorIdx||0, pfpUrl:currentUser?.pfpUrl||null, isGuest:false};
+    S.set('gsUser',currentUser); updateUserPill(); closeAuthModal(); snack('Account created! 🎉');
   }catch(e){snack(e.message);}
 }
 async function signIn(){
-  if(!firebaseReady)return;
+  if(!firebaseReady) return;
   const email=document.getElementById('authEmail').value;
   const pw=document.getElementById('authPw').value;
   try{
     const cred=await auth.signInWithEmailAndPassword(email,pw);
-    currentUser={uid:cred.user.uid,name:currentUser?.name||email.split('@')[0],colorIdx:currentUser?.colorIdx||0,isGuest:false};
-    S.set('gsUser',currentUser); updateUserPill(); closeAuthModal(); snack('Signed in ');
+    currentUser={uid:cred.user.uid, name:currentUser?.name||email.split('@')[0], colorIdx:currentUser?.colorIdx||0, pfpUrl:currentUser?.pfpUrl||null, isGuest:false};
+    S.set('gsUser',currentUser); updateUserPill(); closeAuthModal(); snack('Signed in ✅');
   }catch(e){snack(e.message);}
 }
 async function signOut(){
   if(firebaseReady) await auth.signOut();
-  S.del('gsUser');
-  S.del('gsLastRoom');
-  S.del('gsJoinedRooms');
-  initUser(); closeAuthModal(); snack('Signed out');
+  S.del('gsUser'); S.del('gsLastRoom'); S.del('gsJoinedRooms');
+  initUser(); closeAuthModal(); snack('Signed out 👋');
 }
 
 /* ============================================================
@@ -1740,13 +1973,8 @@ function fmtTime(sec){
   return `${h}:${m}:${s}`;
 }
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function simpleHash(str){
-  let h=0;for(let i=0;i<str.length;i++){h=((h<<5)-h)+str.charCodeAt(i);h|=0;}return h.toString(36);
-}
-function snack(msg){
-  const el=document.getElementById('snack');el.textContent=msg;
-  el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500);
-}
+function simpleHash(str){ let h=0;for(let i=0;i<str.length;i++){h=((h<<5)-h)+str.charCodeAt(i);h|=0;}return h.toString(36); }
+function snack(msg){ const el=document.getElementById('snack');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500); }
 function toggleLeaderboard(){ switchTab('leaderboard', document.querySelector('.tab-btn:nth-child(2)')); }
 
 /* ============================================================
@@ -1754,50 +1982,30 @@ function toggleLeaderboard(){ switchTab('leaderboard', document.querySelector('.
    ============================================================ */
 async function initApp() {
   initUser();
+  const urlCodeRaw=new URLSearchParams(location.search).get('room');
+  const urlCode=urlCodeRaw?urlCodeRaw.toUpperCase():null;
+  const savedCodeRaw=S.get('gsLastRoom',null);
+  const savedCode=savedCodeRaw?String(savedCodeRaw).toUpperCase():null;
+  const joinedCodes=getJoinedRooms();
+  const code=urlCode||savedCode||joinedCodes[0];
 
-  const urlCodeRaw = new URLSearchParams(location.search).get('room');
-  const urlCode = urlCodeRaw ? urlCodeRaw.toUpperCase() : null;
-  const savedCodeRaw = S.get('gsLastRoom', null);
-  const savedCode = savedCodeRaw ? String(savedCodeRaw).toUpperCase() : null;
-  const joinedCodes = getJoinedRooms();
-  const code = urlCode || savedCode || joinedCodes[0];
-
-  if(code) {
-    const room = await dbGet('rooms/'+code);
-    if(room && room.active) {
-      const existingMember = await dbGet('rooms/'+code+'/members/'+currentUser.uid);
-      const cameFromSavedRoom = savedCode === code;
-
-      if(existingMember || (cameFromSavedRoom && !room.locked)) {
-        await enterRoom(code, room);
-        return;
-      }
-
-      if(urlCode) {
-        showScreen('joinScreen');
-        document.getElementById('joinCode').value = code;
-        document.getElementById('joinUserName').value = currentUser?.name||'';
-        return;
-      }
-    } else {
-      S.del('gsLastRoom');
-      forgetJoinedRoom(code);
-    }
+  if(code){
+    const room=await dbGet('rooms/'+code);
+    if(room&&room.active){
+      const existingMember=await dbGet('rooms/'+code+'/members/'+currentUser.uid);
+      const cameFromSavedRoom=savedCode===code;
+      if(existingMember||(cameFromSavedRoom&&!room.locked)){ await enterRoom(code,room); return; }
+      if(urlCode){ showScreen('joinScreen'); document.getElementById('joinCode').value=code; document.getElementById('joinUserName').value=currentUser?.name||''; return; }
+    } else { S.del('gsLastRoom'); forgetJoinedRoom(code); }
   }
-
   showLanding();
 }
 
 initApp();
 
 if(DEMO_MODE){
-  snack(' Demo mode  add your Firebase config to enable real-time sync');
-  console.log('%cFOCUS LAB GROUP STUDY', 'color:#3b9eff;font-size:18px;font-weight:bold');
-  console.log('%cReplace FB_CONFIG at the top of the script with your Firebase project credentials.', 'color:#8ba3c7');
-  console.log('Get them at: https://console.firebase.google.com');
+  snack('⚠️ Demo mode – add your Firebase config to enable real-time sync');
 }
 </script>
 </body>
 </html>
-
-

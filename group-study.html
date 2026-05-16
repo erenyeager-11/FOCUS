@@ -107,6 +107,7 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 .btn-danger{background:rgba(255,107,107,0.15);color:var(--accent3);border:1px solid rgba(255,107,107,0.2);}
 .btn-danger:hover{background:rgba(255,107,107,0.25);}
 .btn-success{background:rgba(0,212,170,0.15);color:var(--accent2);border:1px solid rgba(0,212,170,0.2);}
+.btn-warning{background:rgba(255,209,102,0.15);color:var(--accent4);border:1px solid rgba(255,209,102,0.2);}
 .btn-lg{padding:12px 28px;font-size:15px;border-radius:10px;}
 .btn-sm{padding:5px 12px;font-size:12px;}
 .btn:disabled{opacity:0.4;cursor:not-allowed;}
@@ -293,6 +294,17 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
   background:rgba(59,158,255,0.15);color:var(--accent);
   border:1px solid rgba(59,158,255,0.3);
 }
+.member-role-badge{
+  display:inline-flex;margin-top:6px;font-size:9px;padding:2px 7px;border-radius:10px;
+  background:rgba(139,163,199,0.10);color:var(--text2);
+  border:1px solid rgba(139,163,199,0.16);
+}
+.member-role-badge.owner{background:rgba(255,209,102,0.13);color:var(--accent4);border-color:rgba(255,209,102,0.28);}
+.member-role-badge.manager{background:rgba(192,132,252,0.13);color:var(--accent5);border-color:rgba(192,132,252,0.28);}
+.member-admin-actions{
+  display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin-top:10px;
+}
+.member-admin-actions .btn{padding:4px 8px;font-size:10px;}
 
 /*  CHAT  */
 .chat-panel{
@@ -388,6 +400,16 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 .joined-room-btn:hover{border-color:var(--accent);color:var(--accent);}
 .joined-room-btn.active{border-color:rgba(0,212,170,0.4);color:var(--accent2);background:rgba(0,212,170,0.08);}
 .joined-add-btn{margin-left:auto;}
+.admin-panel{
+  display:none;background:var(--surface);border:1px solid var(--border2);
+  border-radius:10px;padding:14px;margin-top:12px;
+}
+.admin-panel.open{display:block;}
+.admin-panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap;}
+.admin-panel-title{font-size:11px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;}
+.admin-role-chip{font-size:11px;padding:4px 10px;border-radius:20px;background:rgba(59,158,255,0.12);color:var(--accent);border:1px solid rgba(59,158,255,0.24);}
+.admin-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.admin-note{font-size:11px;color:var(--text3);margin-top:10px;}
 
 /*  RESPONSIVE  */
 @media(max-width:600px){
@@ -557,6 +579,7 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
         <button class="btn btn-secondary btn-sm main-menu-link" onclick="goHome()">Back to Home</button>
         <button class="btn btn-secondary btn-sm" onclick="toggleJoinedRoomsStrip()">My Groups</button>
         <button class="btn btn-primary btn-sm" onclick="showAddMoreRoom()">Add Group</button>
+        <button class="btn btn-warning btn-sm" id="adminBtn" onclick="toggleAdminPanel()" style="display:none;">Admin</button>
         <button class="btn btn-secondary btn-sm" onclick="copyRoomLink()"> Copy Link</button>
         <button class="btn btn-secondary btn-sm" onclick="toggleLeaderboard()"> Board</button>
         <button class="btn btn-danger btn-sm" onclick="leaveRoom()"> Leave</button>
@@ -570,6 +593,19 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
       <button class="btn btn-sm btn-secondary" onclick="copyRoomLink()">Copy</button>
     </div>
     <div class="joined-strip" id="joinedRoomsStrip"></div>
+    <div class="admin-panel" id="adminPanel">
+      <div class="admin-panel-head">
+        <div class="admin-panel-title">Room Controls</div>
+        <div class="admin-role-chip" id="adminRoleChip">Member</div>
+      </div>
+      <div class="admin-actions">
+        <button class="btn btn-warning btn-sm" id="chatLockBtn" onclick="toggleChatLock()">Lock Chat</button>
+        <button class="btn btn-secondary btn-sm" onclick="clearRoomChat()">Clear Chat</button>
+        <button class="btn btn-secondary btn-sm" onclick="nudgeAllMembers()">Nudge All</button>
+        <button class="btn btn-danger btn-sm" id="deleteRoomBtn" onclick="deleteCurrentRoom()" style="display:none;">Delete Group</button>
+      </div>
+      <div class="admin-note" id="adminNote">Managers can lock chat, clear chat, and nudge members. Only the owner can delete the group or manage managers.</div>
+    </div>
 
     <!-- My Timer -->
     <div class="my-timer-card" style="margin-top:20px;">
@@ -612,7 +648,7 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
         </div>
         <div class="chat-input-row">
           <input id="chatInput" placeholder="Type a message" maxlength="200" onkeydown="if(event.key==='Enter')sendChatMsg()">
-          <button class="btn btn-primary btn-sm" onclick="sendChatMsg()">Send</button>
+          <button class="btn btn-primary btn-sm" id="chatSendBtn" onclick="sendChatMsg()">Send</button>
         </div>
       </div>
     </div>
@@ -760,6 +796,8 @@ let membersUnsub = null;
 let chatUnsub = null;
 let roomUnsub = null;
 let presenceInt = null;
+let lastMembersData = null;
+let nudgeTitleTimer = null;
 
 // My timer state
 let myTimerStart = null;
@@ -819,6 +857,27 @@ function backFromForm(){
 function showAddMoreRoom(){
   showLanding();
   snack('Create or join another group. Your current groups stay joined.');
+}
+
+/* ============================================================
+   OWNER / ADMIN HELPERS
+   ============================================================ */
+function isRoomOwner(room=roomData, uid=currentUser?.uid) {
+  return !!(room && uid && ((room.ownerUid && room.ownerUid === uid) || room.createdBy === uid));
+}
+function isRoomManager(room=roomData, uid=currentUser?.uid) {
+  return !!(room && uid && room.managers && room.managers[uid]);
+}
+function canModerate(room=roomData, uid=currentUser?.uid) {
+  return isRoomOwner(room, uid) || isRoomManager(room, uid);
+}
+function getMemberRole(uid, room=roomData) {
+  if(isRoomOwner(room, uid)) return 'Owner';
+  if(isRoomManager(room, uid)) return 'Manager';
+  return 'Member';
+}
+function getRoleClass(role) {
+  return role === 'Owner' ? 'owner' : role === 'Manager' ? 'manager' : '';
 }
 
 /* ============================================================
@@ -965,6 +1024,9 @@ async function createRoom() {
     locked: !!pw,
     createdAt: now,
     createdBy: currentUser.uid,
+    ownerUid: currentUser.uid,
+    managers: {},
+    chatLocked: false,
     active: true,
   };
 
@@ -1081,6 +1143,10 @@ async function enterRoom(code, room) {
   if(membersUnsub) membersUnsub();
   membersUnsub = dbOn('rooms/'+code+'/members', renderMembers);
 
+  // listen room settings/admin changes
+  if(roomUnsub) roomUnsub();
+  roomUnsub = dbOn('rooms/'+code, handleRoomSnapshot);
+
   // listen chat
   if(chatUnsub) chatUnsub();
   chatUnsub = dbOn('rooms/'+code+'/chat', renderChat);
@@ -1095,6 +1161,74 @@ async function enterRoom(code, room) {
   history.replaceState({}, '', url);
 
   snack(wasAlreadyMember ? 'Room restored ' : 'Joined room! Start studying when ready ');
+}
+
+function handleRoomSnapshot(room) {
+  if(!currentRoom) return;
+  if(!room || room.active === false) {
+    handleRoomDeleted();
+    return;
+  }
+  roomData = room;
+  document.getElementById('roomTitle').textContent = room.name || 'Room';
+  document.getElementById('roomMeta').textContent = (room.subject||'') + '  Code: ' + currentRoom;
+  updateAdminUi();
+  updateChatUi();
+  if(lastMembersData) renderMembers(lastMembersData);
+}
+
+function updateAdminUi() {
+  const adminBtn = document.getElementById('adminBtn');
+  const adminPanel = document.getElementById('adminPanel');
+  const adminRoleChip = document.getElementById('adminRoleChip');
+  const deleteBtn = document.getElementById('deleteRoomBtn');
+  const chatLockBtn = document.getElementById('chatLockBtn');
+  const allowed = canModerate();
+  const owner = isRoomOwner();
+
+  if(adminBtn) adminBtn.style.display = allowed ? 'inline-flex' : 'none';
+  if(adminPanel && !allowed) adminPanel.classList.remove('open');
+  if(adminRoleChip) adminRoleChip.textContent = getMemberRole(currentUser?.uid);
+  if(deleteBtn) deleteBtn.style.display = owner ? 'inline-flex' : 'none';
+  if(chatLockBtn) chatLockBtn.textContent = roomData?.chatLocked ? 'Unlock Chat' : 'Lock Chat';
+}
+
+function updateChatUi() {
+  const inp = document.getElementById('chatInput');
+  const btn = document.getElementById('chatSendBtn');
+  const lockedForMe = !!(roomData?.chatLocked && !canModerate());
+  if(inp) {
+    inp.disabled = lockedForMe;
+    inp.placeholder = lockedForMe ? 'Chat is locked by room admin' : 'Type a message';
+  }
+  if(btn) btn.disabled = lockedForMe;
+}
+
+function toggleAdminPanel() {
+  if(!canModerate()) return;
+  document.getElementById('adminPanel')?.classList.toggle('open');
+}
+
+async function handleRoomDeleted() {
+  if(!currentRoom) return;
+  const deletedRoom = currentRoom;
+  clearInterval(myTimerInt);
+  clearInterval(presenceInt);
+  presenceInt = null;
+  if(membersUnsub){ membersUnsub(); membersUnsub=null; }
+  if(chatUnsub){ chatUnsub(); chatUnsub=null; }
+  if(roomUnsub){ roomUnsub(); roomUnsub=null; }
+  Object.values(memberTimerInts).forEach(clearInterval);
+  memberTimerInts={};
+  if(deletedRoom) forgetJoinedRoom(deletedRoom);
+  currentRoom=null; roomData=null; lastMembersData=null;
+  myTimerStart=null; myTimerAccum=0; myRunning=false;
+  const url=new URL(location.href);
+  url.searchParams.delete('room');
+  history.replaceState({},'',url);
+  await renderJoinedRooms();
+  showLanding();
+  snack('This group was deleted by the owner.');
 }
 
 function restoreMyTimerUi(memberData) {
@@ -1199,10 +1333,13 @@ function tickMyTimer() {
    ============================================================ */
 function renderMembers(data) {
   const grid = document.getElementById('membersGrid');
+  lastMembersData = data;
   if(!data){ grid.innerHTML='<div class="empty-state"><div class="ei"></div><p>No members yet</p></div>'; return; }
 
   const members = Object.entries(data).filter(([,m])=>m).map(([uid, m])=>({uid,...m}));
   document.getElementById('memberCountBadge').textContent = `(${members.length})`;
+  const me = members.find(m=>m.uid === currentUser.uid);
+  if(me) handleNudgeForMe(me);
 
   Object.values(memberTimerInts).forEach(clearInterval);
   memberTimerInts = {};
@@ -1211,12 +1348,16 @@ function renderMembers(data) {
     const isMe = m.uid === currentUser.uid;
     const sec = calcMemberSec(m);
     const cls = isMe ? 'me' : m.studying ? 'studying' : '';
+    const role = getMemberRole(m.uid);
+    const roleCls = getRoleClass(role);
     return `<div class="member-tile ${cls}" id="tile-${m.uid}">
       ${isMe?'<div class="member-me-badge">You</div>':''}
       <div class="member-avatar av-${m.colorIdx||0}">${(m.name||'?')[0].toUpperCase()}</div>
       <div class="member-name" title="${esc(m.name)}">${esc(m.name)}</div>
+      <div class="member-role-badge ${roleCls}">${role}</div>
       <div class="member-time" id="mtime-${m.uid}">${fmtTime(sec)}</div>
       <div class="member-status-dot"></div>
+      ${renderMemberAdminActions(m)}
     </div>`;
   }).join('');
 
@@ -1231,6 +1372,21 @@ function renderMembers(data) {
   });
 
   renderLeaderboard(members);
+}
+
+function renderMemberAdminActions(m) {
+  if(!canModerate() || !m || m.uid === currentUser.uid) return '';
+  const role = getMemberRole(m.uid);
+  const canOwnerManage = isRoomOwner() && role !== 'Owner';
+  const managerBtn = canOwnerManage
+    ? (role === 'Manager'
+      ? `<button class="btn btn-warning btn-sm" onclick="removeManager('${m.uid}')">Remove Manager</button>`
+      : `<button class="btn btn-success btn-sm" onclick="makeManager('${m.uid}',decodeURIComponent('${encodeURIComponent(m.name||'Manager')}'))">Make Manager</button>`)
+    : '';
+  return `<div class="member-admin-actions">
+    <button class="btn btn-secondary btn-sm" onclick="nudgeMember('${m.uid}')">Nudge</button>
+    ${managerBtn}
+  </div>`;
 }
 
 function calcMemberSec(m) {
@@ -1258,7 +1414,10 @@ function renderLeaderboard(members) {
    ============================================================ */
 function renderChat(data) {
   const el = document.getElementById('chatMessages');
-  if(!data) return;
+  if(!data) {
+    el.innerHTML = '<div class="chat-msg sys"><span class="cm-text">No messages yet.</span></div>';
+    return;
+  }
   const msgs = Object.values(data).filter(Boolean).sort((a,b)=>a.ts-b.ts).slice(-100);
   el.innerHTML = msgs.map(m=>{
     if(m.sys) return `<div class="chat-msg sys"><span class="cm-text">${esc(m.text)}</span></div>`;
@@ -1268,6 +1427,7 @@ function renderChat(data) {
 }
 
 function sendChatMsg() {
+  if(roomData?.chatLocked && !canModerate()) { snack('Chat is locked by admin.'); return; }
   const inp = document.getElementById('chatInput');
   const text = inp.value.trim(); if(!text||!currentRoom) return;
   inp.value = '';
@@ -1279,6 +1439,123 @@ function postSystemMsg(text) {
   if(!currentRoom) return;
   const ref = dbPush('rooms/'+currentRoom+'/chat');
   ref.set({ sys: true, text, ts: Date.now() });
+}
+
+async function toggleChatLock() {
+  if(!canModerate() || !currentRoom) return;
+  const next = !roomData?.chatLocked;
+  await dbUpdate('rooms/'+currentRoom, { chatLocked: next });
+  postSystemMsg(next ? 'Chat was locked by admin.' : 'Chat was unlocked by admin.');
+}
+
+async function clearRoomChat() {
+  if(!canModerate() || !currentRoom) return;
+  if(!confirm('Clear all chat messages in this group?')) return;
+  await dbRemove('rooms/'+currentRoom+'/chat');
+  postSystemMsg('Chat was cleared by admin.');
+}
+
+async function nudgeMember(uid) {
+  if(!canModerate() || !currentRoom || !uid || uid === currentUser.uid) return;
+  const members = lastMembersData || {};
+  const target = members[uid] || {};
+  const msg = prompt('Nudge message', 'Please come back to study.');
+  if(msg === null) return;
+  await dbSet('rooms/'+currentRoom+'/members/'+uid+'/nudge', {
+    from: currentUser.name,
+    fromUid: currentUser.uid,
+    text: msg.trim() || 'Please come back to study.',
+    ts: Date.now()
+  });
+  snack('Nudged ' + (target.name || 'member'));
+}
+
+async function nudgeAllMembers() {
+  if(!canModerate() || !currentRoom) return;
+  const members = lastMembersData || {};
+  const targets = Object.entries(members).filter(([uid,m])=>uid !== currentUser.uid && m);
+  if(!targets.length){ snack('No other members to nudge.'); return; }
+  const msg = prompt('Nudge message for everyone', 'Please come back to study.');
+  if(msg === null) return;
+  const payload = {
+    from: currentUser.name,
+    fromUid: currentUser.uid,
+    text: msg.trim() || 'Please come back to study.',
+    ts: Date.now()
+  };
+  await Promise.all(targets.map(([uid])=>dbSet('rooms/'+currentRoom+'/members/'+uid+'/nudge', payload)));
+  postSystemMsg(currentUser.name + ' nudged the group.');
+  snack('Nudged ' + targets.length + ' members.');
+}
+
+async function makeManager(uid, name) {
+  if(!isRoomOwner() || !currentRoom || !uid || uid === currentUser.uid) return;
+  await dbSet('rooms/'+currentRoom+'/managers/'+uid, {
+    name: name || 'Manager',
+    addedBy: currentUser.uid,
+    addedAt: Date.now()
+  });
+  postSystemMsg((name || 'A member') + ' is now a manager.');
+  snack('Manager added.');
+}
+
+async function removeManager(uid) {
+  if(!isRoomOwner() || !currentRoom || !uid || uid === currentUser.uid) return;
+  const members = lastMembersData || {};
+  await dbRemove('rooms/'+currentRoom+'/managers/'+uid);
+  postSystemMsg((members[uid]?.name || 'A member') + ' is no longer a manager.');
+  snack('Manager removed.');
+}
+
+async function deleteCurrentRoom() {
+  if(!isRoomOwner() || !currentRoom) return;
+  const code = currentRoom;
+  const label = roomData?.name || code;
+  if(!confirm('Delete group "' + label + '" permanently?')) return;
+  if(!confirm('This removes the group for every member. Continue?')) return;
+  await dbRemove('rooms/'+code);
+  forgetJoinedRoom(code);
+  await handleRoomDeleted();
+}
+
+function handleNudgeForMe(member) {
+  const nudge = member && member.nudge;
+  if(!nudge || !nudge.ts) return;
+  const key = 'gsLastNudge_' + currentRoom + '_' + currentUser.uid;
+  const seen = S.get(key, 0);
+  if(nudge.ts <= seen) return;
+  S.set(key, nudge.ts);
+  const msg = (nudge.from || 'Admin') + ': ' + (nudge.text || 'Please come back to study.');
+  snack('Nudge - ' + msg);
+  showBrowserNotification('Focus Lab nudge', msg);
+  flashTitle('Nudge from ' + (nudge.from || 'Admin'));
+}
+
+function showBrowserNotification(title, body) {
+  try {
+    if(!('Notification' in window)) return;
+    if(Notification.permission === 'granted') {
+      new Notification(title, { body });
+    } else if(Notification.permission === 'default') {
+      Notification.requestPermission().then(permission=>{
+        if(permission === 'granted') new Notification(title, { body });
+      });
+    }
+  } catch(e) {}
+}
+
+function flashTitle(text) {
+  const original = document.title;
+  let count = 0;
+  clearInterval(nudgeTitleTimer);
+  nudgeTitleTimer = setInterval(()=>{
+    document.title = count % 2 ? original : text;
+    count++;
+    if(count > 8) {
+      clearInterval(nudgeTitleTimer);
+      document.title = original;
+    }
+  }, 800);
 }
 
 /* ============================================================
@@ -1330,9 +1607,10 @@ async function leaveRoom() {
   presenceInt = null;
   if(membersUnsub){ membersUnsub(); membersUnsub=null; }
   if(chatUnsub){ chatUnsub(); chatUnsub=null; }
+  if(roomUnsub){ roomUnsub(); roomUnsub=null; }
   Object.values(memberTimerInts).forEach(clearInterval);
   memberTimerInts={};
-  currentRoom=null; roomData=null;
+  currentRoom=null; roomData=null; lastMembersData=null;
   myTimerStart=null; myTimerAccum=0; myRunning=false;
   const url=new URL(location.href);
   url.searchParams.delete('room');
@@ -1521,4 +1799,5 @@ if(DEMO_MODE){
 </script>
 </body>
 </html>
+
 

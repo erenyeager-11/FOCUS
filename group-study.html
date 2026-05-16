@@ -644,7 +644,7 @@ const FB_CONFIG = {
 /* ── DEMO MODE: runs without Firebase until you replace the config above ─────
    In demo mode data lives in memory only (single tab, no real-time sync).
    Everything works: create/join/timers/chat/leaderboard — just not persisted.
-   ────────────────────────────────────────────────────────────────────────── */
+   ────────────────────────────────────────────────────────────────[...]
 const DEMO_MODE = FB_CONFIG.apiKey === "REPLACE_WITH_YOUR_API_KEY";
 
 let db = null, auth = null, firebaseReady = false;
@@ -725,7 +725,8 @@ function dbPush(path){ return firebaseReady ? db.ref(path).push() : {key: '_'+Da
    ============================================================ */
 const S = {
   get:(k,d)=>{ try{const v=localStorage.getItem(k);return v!==null?JSON.parse(v):d;}catch{return d;}},
-  set:(k,v)=>{ try{localStorage.setItem(k,JSON.stringify(v));}catch{} }
+  set:(k,v)=>{ try{localStorage.setItem(k,JSON.stringify(v));}catch{} },
+  del:(k)=>{ try{localStorage.removeItem(k);}catch{} }
 };
 
 let currentUser = null;   // {uid, name, colorIdx}
@@ -900,6 +901,9 @@ async function enterRoom(code, room) {
   const link = getRoomLink(code);
   document.getElementById('shareUrlInput').value = link;
 
+  // ✅ AUTO-REJOIN: Save room info for auto-rejoin on page reload
+  S.set('lastRoom', { code, room });
+
   // register myself as member
   const memberRef = 'rooms/'+code+'/members/'+currentUser.uid;
   const memberData = {
@@ -1007,14 +1011,10 @@ function tickMyTimer() {
 function renderMembers(data) {
   const grid = document.getElementById('membersGrid');
   if(!data){ grid.innerHTML='<div class="empty-state"><div class="ei">👥</div><p>No members yet</p></div>'; return; }
-
-  const members = Object.entries(data).map(([uid, m])=>({uid,...m}));
+  const members = Object.entries(data).map(([uid,m])=>({uid,...m}));
   document.getElementById('memberCountBadge').textContent = `(${members.length})`;
-
-  // Clear old intervals
   Object.values(memberTimerInts).forEach(clearInterval);
   memberTimerInts = {};
-
   grid.innerHTML = members.map(m=>{
     const isMe = m.uid === currentUser.uid;
     const sec = calcMemberSec(m);
@@ -1027,34 +1027,25 @@ function renderMembers(data) {
       <div class="member-status-dot"></div>
     </div>`;
   }).join('');
-
-  // Start live tick for studying members
   members.forEach(m=>{
     if(m.studying && m.lastStart) {
       memberTimerInts[m.uid] = setInterval(()=>{
         const el = document.getElementById('mtime-'+m.uid);
         if(!el){ clearInterval(memberTimerInts[m.uid]); return; }
-        const sec = calcMemberSec(m);
-        const extra = Math.floor((Date.now()-m.lastStart)/1000);
-        el.textContent = fmtTime(sec+extra);
+        el.textContent = fmtTime(calcMemberSec(m) + Math.floor((Date.now()-m.lastStart)/1000));
       }, 1000);
     }
   });
-
-  // Leaderboard
   renderLeaderboard(members);
 }
-
 function calcMemberSec(m) {
   let sec = m.totalSec || 0;
   if(m.studying && m.lastStart) sec += Math.floor((Date.now()-m.lastStart)/1000);
   return sec;
 }
-
 function renderLeaderboard(members) {
   const sorted = [...members].sort((a,b)=>calcMemberSec(b)-calcMemberSec(a));
-  const el = document.getElementById('leaderboardList');
-  if(!el) return;
+  const el = document.getElementById('leaderboardList'); if(!el) return;
   const medals = ['🥇','🥈','🥉'];
   el.innerHTML = sorted.map((m,i)=>`
     <div class="lb-row">
@@ -1069,8 +1060,7 @@ function renderLeaderboard(members) {
    CHAT
    ============================================================ */
 function renderChat(data) {
-  const el = document.getElementById('chatMessages');
-  if(!data) return;
+  const el = document.getElementById('chatMessages'); if(!data) return;
   const msgs = Object.values(data).sort((a,b)=>a.ts-b.ts).slice(-100);
   el.innerHTML = msgs.map(m=>{
     if(m.sys) return `<div class="chat-msg sys"><span class="cm-text">${esc(m.text)}</span></div>`;
@@ -1078,7 +1068,6 @@ function renderChat(data) {
   }).join('');
   el.scrollTop = el.scrollHeight;
 }
-
 function sendChatMsg() {
   const inp = document.getElementById('chatInput');
   const text = inp.value.trim(); if(!text||!currentRoom) return;
@@ -1086,7 +1075,6 @@ function sendChatMsg() {
   const ref = dbPush('rooms/'+currentRoom+'/chat');
   ref.set({ name: currentUser.name, text, ts: Date.now() });
 }
-
 function postSystemMsg(text) {
   if(!currentRoom) return;
   const ref = dbPush('rooms/'+currentRoom+'/chat');
@@ -1094,7 +1082,7 @@ function postSystemMsg(text) {
 }
 
 /* ============================================================
-   PUBLIC ROOMS
+   PUBLIC ROOMS LIST
    ============================================================ */
 async function loadPublicRooms() {
   const el = document.getElementById('publicRoomsGrid');
@@ -1102,20 +1090,27 @@ async function loadPublicRooms() {
   try {
     const all = await dbGet('rooms');
     if(!all){ el.innerHTML='<div class="empty-state"><div class="ei">🚀</div><p>No active rooms</p><small>Create one and invite friends!</small></div>'; return; }
-    const rooms = Object.entries(all).filter(([code,r])=>r&&r.active).map(([code,r])=>({code,...r}));
+
+    const rooms = Object.entries(all)
+      .filter(([code,r]) => r && r.active)
+      .map(([code,r]) => ({code,...r}))
+      .sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
+
     if(!rooms.length){ el.innerHTML='<div class="empty-state"><div class="ei">🚀</div><p>No active rooms</p><small>Create one and invite friends!</small></div>'; return; }
+
     el.innerHTML = rooms.map(r=>{
       const members = r.members ? Object.values(r.members) : [];
       const studying = members.filter(m=>m.studying).length;
       const avatars = members.slice(0,5).map(m=>`<div class="mini-avatar av-${m.colorIdx||0}">${(m.name||'?')[0].toUpperCase()}</div>`).join('');
-      return `<div class="group-card" onclick="${r.locked?"joinRoomByCode('"+r.code+"')":`joinRoomByCode('${r.code}')`}">
+      const maxLabel = r.maxMembers >= 999999 ? '∞' : r.maxMembers;
+      return `<div class="group-card" onclick="joinRoomByCode('${r.code}')">
         <div class="group-card-header">
           <div class="group-name">${esc(r.name)}</div>
-          <div class="group-badge ${studying>0?'live':''}">${studying>0?'● LIVE':r.locked?'🔐 Private':'Public'}</div>
+          <div class="group-badge ${studying>0?'live':''}">${studying>0?'● LIVE':'Active'}</div>
         </div>
         <div style="font-size:12px;color:var(--text3);margin-bottom:8px;">${esc(r.subject||'General')}</div>
         <div class="group-meta">
-          <span>👥 ${members.length}/${r.maxMembers||50}</span>
+          <span>👥 ${members.length}/${maxLabel}</span>
           <span>📖 ${studying} studying</span>
           <span>🔑 ${r.code}</span>
         </div>
@@ -1123,7 +1118,7 @@ async function loadPublicRooms() {
       </div>`;
     }).join('');
   } catch(e) {
-    el.innerHTML='<div style="color:var(--accent3);font-size:12px;padding:12px;">Could not load rooms. '+(DEMO_MODE?'Demo mode — create a room to test!':'Check Firebase config.')+'</div>';
+    el.innerHTML='<div style="color:var(--accent3);font-size:12px;padding:12px;">Could not load rooms.</div>';
   }
 }
 
@@ -1139,7 +1134,12 @@ async function leaveRoom() {
   if(chatUnsub){ chatUnsub(); chatUnsub=null; }
   Object.values(memberTimerInts).forEach(clearInterval);
   memberTimerInts={};
-  currentRoom=null; roomData=null;
+
+  // ✅ AUTO-REJOIN: Clear saved room on intentional leave
+  S.del('lastRoom');
+
+  currentRoom=null;
+  roomData=null;
   const url=new URL(location.href);
   url.searchParams.delete('room');
   history.replaceState({},'',url);
@@ -1148,7 +1148,7 @@ async function leaveRoom() {
 }
 
 /* ============================================================
-   SHARE / LINK
+   SHARE / COPY
    ============================================================ */
 function getRoomLink(code){ return location.origin+location.pathname+'?room='+code; }
 function copyRoomLink() {
@@ -1157,7 +1157,7 @@ function copyRoomLink() {
 }
 
 /* ============================================================
-   AUTH MODAL (email + guest)
+   AUTH
    ============================================================ */
 function showAuthModal() {
   const modal = document.getElementById('authModal');
@@ -1165,11 +1165,11 @@ function showAuthModal() {
   if(currentUser && !currentUser.isGuest) {
     content.innerHTML = `
       <div style="font-size:14px;color:var(--text2);margin-bottom:16px;">Signed in as <strong style="color:var(--text);">${esc(currentUser.name)}</strong></div>
-      <div class="form-row"><label>Change Display Name</label><input class="input" id="authChangeName" value="${esc(currentUser.name)}" maxlength="24"></div>
+      <div class="form-row"><label>Change Name</label><input class="input" id="authChangeName" value="${esc(currentUser.name)}" maxlength="24"></div>
       <div class="modal-footer">
         <button class="btn btn-danger btn-sm" onclick="signOut()">Sign Out</button>
         <button class="btn btn-secondary" onclick="closeAuthModal()">Close</button>
-        <button class="btn btn-primary" onclick="saveName()">Save Name</button>
+        <button class="btn btn-primary" onclick="saveName()">Save</button>
       </div>`;
   } else {
     content.innerHTML = `
@@ -1177,7 +1177,7 @@ function showAuthModal() {
       ${firebaseReady ? `
       <div class="divider">or sign in with email</div>
       <div class="form-row"><label>Email</label><input class="input" id="authEmail" type="email" placeholder="you@email.com"></div>
-      <div class="form-row"><label>Password</label><input class="input" id="authPw" type="password" placeholder="Password (min 6 chars)"></div>
+      <div class="form-row"><label>Password</label><input class="input" id="authPw" type="password" placeholder="Min 6 chars"></div>
       <div style="display:flex;gap:8px;margin-bottom:8px;">
         <button class="btn btn-primary" style="flex:1" onclick="signUp()">Sign Up</button>
         <button class="btn btn-secondary" style="flex:1" onclick="signIn()">Sign In</button>
@@ -1195,7 +1195,7 @@ function saveAsGuest(){
   const name=(document.getElementById('authName')?.value||'').trim();
   if(!name){snack('Enter your name');return;}
   currentUser.name=name; currentUser.isGuest=true; S.set('gsUser',currentUser);
-  updateUserPill(); closeAuthModal(); snack('Saved as guest ✓');
+  updateUserPill(); closeAuthModal(); snack('Saved ✓');
 }
 function saveName(){
   const name=(document.getElementById('authChangeName')?.value||'').trim();
@@ -1239,47 +1239,62 @@ function switchTab(id, btn) {
   document.getElementById('tab-'+id).classList.add('active');
 }
 
+function toggleLeaderboard() {
+  document.querySelector('[onclick*="switchTab(\'leaderboard\'"]').click();
+}
+
 /* ============================================================
    UTILS
    ============================================================ */
 function fmtTime(sec){
   if(sec<0)sec=0;
-  const h=String(Math.floor(sec/3600)).padStart(2,'0');
-  const m=String(Math.floor((sec%3600)/60)).padStart(2,'0');
-  const s=String(sec%60).padStart(2,'0');
-  return `${h}:${m}:${s}`;
+  return `${String(Math.floor(sec/3600)).padStart(2,'0')}:${String(Math.floor((sec%3600)/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;
 }
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function simpleHash(str){
-  let h=0;for(let i=0;i<str.length;i++){h=((h<<5)-h)+str.charCodeAt(i);h|=0;}return h.toString(36);
-}
-function snack(msg){
-  const el=document.getElementById('snack');el.textContent=msg;
-  el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500);
-}
-function toggleLeaderboard(){ switchTab('leaderboard', document.querySelector('.tab-btn:nth-child(2)')); }
+function simpleHash(str){ let h=0;for(let i=0;i<str.length;i++){h=((h<<5)-h)+str.charCodeAt(i);h|=0;}return h.toString(36); }
+function snack(msg){ const el=document.getElementById('snack');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500); }
 
 /* ============================================================
-   INIT
+   AUTO-REJOIN ON PAGE LOAD/REFRESH
+   ============================================================ */
+async function checkAutoRejoin() {
+  const saved = S.get('lastRoom', null);
+  const urlCode = new URLSearchParams(location.search).get('room');
+
+  // If we have a saved room, try to rejoin it
+  if(saved && saved.code) {
+    const room = await dbGet('rooms/'+saved.code);
+    if(room && room.active) {
+      enterRoom(saved.code, room);
+      snack('Welcome back! 🎉 Rejoining your room…');
+      return;
+    } else {
+      // Room no longer exists, clear saved data
+      S.del('lastRoom');
+    }
+  }
+
+  // If URL has a room code (direct link), show join screen
+  if(urlCode) {
+    const room = await dbGet('rooms/'+urlCode);
+    if(room && room.active) {
+      showScreen('joinScreen');
+      document.getElementById('joinCode').value = urlCode;
+      document.getElementById('joinUserName').value = currentUser?.name||'';
+      snack('Room link detected… 🔄');
+    } else {
+      showLanding();
+    }
+  } else {
+    showLanding();
+  }
+}
+
+/* ============================================================
+   INIT ON PAGE LOAD
    ============================================================ */
 initUser();
-
-// Check URL for room code
-const urlCode = new URLSearchParams(location.search).get('room');
-if(urlCode) {
-  showScreen('joinScreen');
-  document.getElementById('joinCode').value = urlCode;
-  document.getElementById('joinUserName').value = currentUser?.name||'';
-} else {
-  showLanding();
-}
-
-if(DEMO_MODE){
-  snack('🔧 Demo mode — add your Firebase config to enable real-time sync');
-  console.log('%cFOCUS LAB GROUP STUDY', 'color:#3b9eff;font-size:18px;font-weight:bold');
-  console.log('%cReplace FB_CONFIG at the top of the script with your Firebase project credentials.', 'color:#8ba3c7');
-  console.log('Get them at: https://console.firebase.google.com');
-}
+checkAutoRejoin();
 </script>
 </body>
 </html>

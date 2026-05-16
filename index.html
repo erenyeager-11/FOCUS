@@ -1217,6 +1217,7 @@ const pages = [
   { id:'notebook',  label:'Smart Notebook',   icon:'📚' },
   { id:'revision',  label:'Revision Tracker', icon:'🔄' },
   { id:'habits',    label:'Habits',           icon:'🔥' },
+  { id:'groupstudy', label:'Group Study', icon:'👥', external:'group-study.html' },
   { id:'analytics', label:'Analytics',        icon:'📊' },
   { id:'settings',  label:'Settings',         icon:'⚙' },
 ];
@@ -1241,6 +1242,7 @@ function buildNav() {
 }
 
 function navigate(id) {
+if(id === 'groupstudy') { location.href = 'group-study.html'; return; }
   currentPage = id;
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');

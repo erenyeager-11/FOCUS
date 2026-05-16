@@ -62,6 +62,7 @@ body::after{
 }
 .topbar-logo{font-family:var(--mono);font-size:18px;color:var(--accent);letter-spacing:4px;text-decoration:none;}
 .topbar-right{display:flex;align-items:center;gap:10px;}
+.main-menu-link{text-decoration:none;}
 .user-pill{
   display:flex;align-items:center;gap:8px;
   padding:6px 14px;border-radius:20px;
@@ -160,6 +161,8 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 }
 .group-card:hover{border-color:var(--border2);transform:translateY(-1px);}
 .group-card:hover::before{opacity:1;}
+.group-card.is-active-room{border-color:rgba(0,212,170,0.35);box-shadow:0 0 18px rgba(0,212,170,0.08);}
+.group-card.is-active-room::before{opacity:1;background:var(--accent2);}
 .group-card-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;}
 .group-name{font-size:16px;font-weight:600;}
 .group-badge{
@@ -371,12 +374,27 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
   color:var(--accent);font-family:var(--mono);font-size:12px;
   outline:none;
 }
+.joined-strip{
+  display:none;align-items:center;gap:8px;flex-wrap:wrap;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:10px;padding:10px 14px;margin-top:12px;
+}
+.joined-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-right:4px;}
+.joined-room-btn{
+  background:var(--bg3);border:1px solid var(--border2);
+  color:var(--text2);border-radius:8px;padding:7px 10px;
+  font-family:var(--sans);font-size:12px;cursor:pointer;
+}
+.joined-room-btn:hover{border-color:var(--accent);color:var(--accent);}
+.joined-room-btn.active{border-color:rgba(0,212,170,0.4);color:var(--accent2);background:rgba(0,212,170,0.08);}
+.joined-add-btn{margin-left:auto;}
 
 /*  RESPONSIVE  */
 @media(max-width:600px){
   .action-grid{grid-template-columns:1fr;}
   .members-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));}
   .room-header{flex-direction:column;align-items:flex-start;}
+  .joined-add-btn{margin-left:0;}
   main{padding:20px 14px;}
   .topbar{padding:12px 16px;}
   .my-timer-display{font-size:clamp(40px,10vw,64px);}
@@ -428,6 +446,7 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 <div class="topbar">
   <a href="index.html" class="topbar-logo">FOCUS</a>
   <div class="topbar-right">
+    <button class="btn btn-secondary btn-sm main-menu-link" onclick="goHome()">Back to Home</button>
     <div id="userPill" class="user-pill" onclick="showAuthModal()">
       <div class="avatar" id="userAvatarPill">?</div>
       <span id="userNamePill">Sign In</span>
@@ -454,6 +473,10 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
         <p>Enter a room code or paste an invite link</p>
       </div>
     </div>
+    <div id="joinedRoomsSection" style="max-width:700px;margin:32px auto 0;display:none;">
+      <div class="card-title">My Joined Groups</div>
+      <div id="joinedRoomsHome" class="groups-grid"></div>
+    </div>
     <div style="max-width:700px;margin:32px auto 0;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
         <div class="card-title" style="margin-bottom:0;">Active Rooms</div>
@@ -465,7 +488,7 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 
   <!-- CREATE SCREEN -->
   <div class="screen" id="createScreen">
-    <div class="form-back" onclick="showLanding()"> Back</div>
+    <div class="form-back" onclick="backFromForm()"> Back</div>
     <div class="form-wrap">
       <h2 style="font-size:22px;font-weight:700;margin-bottom:4px;">Create a Room</h2>
       <p style="font-size:13px;color:var(--text2);margin-bottom:24px;">Share the link after creating  anyone can join instantly.</p>
@@ -501,7 +524,7 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 
   <!-- JOIN SCREEN -->
   <div class="screen" id="joinScreen">
-    <div class="form-back" onclick="showLanding()"> Back</div>
+    <div class="form-back" onclick="backFromForm()"> Back</div>
     <div class="form-wrap">
       <h2 style="font-size:22px;font-weight:700;margin-bottom:4px;">Join a Room</h2>
       <p style="font-size:13px;color:var(--text2);margin-bottom:24px;">Enter a room code from a friend or paste the link.</p>
@@ -531,6 +554,9 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
         <div class="room-meta" id="roomMeta"></div>
       </div>
       <div class="room-actions">
+        <button class="btn btn-secondary btn-sm main-menu-link" onclick="goHome()">Back to Home</button>
+        <button class="btn btn-secondary btn-sm" onclick="toggleJoinedRoomsStrip()">My Groups</button>
+        <button class="btn btn-primary btn-sm" onclick="showAddMoreRoom()">Add Group</button>
         <button class="btn btn-secondary btn-sm" onclick="copyRoomLink()"> Copy Link</button>
         <button class="btn btn-secondary btn-sm" onclick="toggleLeaderboard()"> Board</button>
         <button class="btn btn-danger btn-sm" onclick="leaveRoom()"> Leave</button>
@@ -543,6 +569,7 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
       <input id="shareUrlInput" readonly onclick="this.select()">
       <button class="btn btn-sm btn-secondary" onclick="copyRoomLink()">Copy</button>
     </div>
+    <div class="joined-strip" id="joinedRoomsStrip"></div>
 
     <!-- My Timer -->
     <div class="my-timer-card" style="margin-top:20px;">
@@ -766,7 +793,11 @@ function showScreen(id) {
   el.style.display='block';
   el.classList.add('active');
 }
-function showLanding(){ showScreen('landingScreen'); loadPublicRooms(); }
+function showLanding(){
+  showScreen('landingScreen');
+  renderJoinedRooms();
+  loadPublicRooms();
+}
 function showCreate(){
   showScreen('createScreen');
   document.getElementById('createUserName').value = currentUser?.name || '';
@@ -776,6 +807,121 @@ function showJoin(){
   document.getElementById('joinUserName').value = currentUser?.name || '';
   const code = new URLSearchParams(location.search).get('room');
   if(code) document.getElementById('joinCode').value = code;
+}
+function goHome(){
+  if(currentRoom) S.set('gsLastRoom', currentRoom);
+  location.href = 'index.html';
+}
+function backFromForm(){
+  if(currentRoom) showScreen('roomScreen');
+  else showLanding();
+}
+function showAddMoreRoom(){
+  showLanding();
+  snack('Create or join another group. Your current groups stay joined.');
+}
+
+/* ============================================================
+   JOINED ROOMS
+   ============================================================ */
+function getJoinedRooms() {
+  const saved = S.get('gsJoinedRooms', []);
+  const list = Array.isArray(saved) ? saved : [];
+  return [...new Set(list.map(c=>String(c).toUpperCase()).filter(c=>/^[A-Z0-9]{6}$/.test(c)))];
+}
+function setJoinedRooms(codes) {
+  const clean = [...new Set((codes||[]).map(c=>String(c).toUpperCase()).filter(c=>/^[A-Z0-9]{6}$/.test(c)))];
+  S.set('gsJoinedRooms', clean);
+}
+function rememberJoinedRoom(code) {
+  const cleanCode = String(code||'').toUpperCase();
+  if(!/^[A-Z0-9]{6}$/.test(cleanCode)) return;
+  setJoinedRooms([cleanCode, ...getJoinedRooms().filter(c=>c!==cleanCode)]);
+  S.set('gsLastRoom', cleanCode);
+}
+function forgetJoinedRoom(code) {
+  const cleanCode = String(code||'').toUpperCase();
+  setJoinedRooms(getJoinedRooms().filter(c=>c!==cleanCode));
+  if(String(S.get('gsLastRoom','')).toUpperCase() === cleanCode) S.del('gsLastRoom');
+}
+function toggleJoinedRoomsStrip() {
+  const strip = document.getElementById('joinedRoomsStrip');
+  if(!strip) return;
+  strip.style.display = strip.style.display === 'none' || !strip.style.display ? 'flex' : 'none';
+}
+async function switchJoinedRoom(code) {
+  code = String(code||'').toUpperCase();
+  if(!/^[A-Z0-9]{6}$/.test(code)) return;
+  if(code === currentRoom) {
+    showScreen('roomScreen');
+    return;
+  }
+
+  const room = await dbGet('rooms/'+code);
+  const member = await dbGet('rooms/'+code+'/members/'+currentUser.uid);
+  if(!room || !room.active || !member) {
+    forgetJoinedRoom(code);
+    await renderJoinedRooms();
+    snack('You are not in that group anymore.');
+    return;
+  }
+
+  await enterRoom(code, room);
+}
+async function renderJoinedRooms() {
+  const codes = getJoinedRooms();
+  const strip = document.getElementById('joinedRoomsStrip');
+  const homeSection = document.getElementById('joinedRoomsSection');
+  const home = document.getElementById('joinedRoomsHome');
+
+  if(!codes.length) {
+    if(strip){ strip.style.display = 'none'; strip.innerHTML = ''; }
+    if(homeSection) homeSection.style.display = 'none';
+    return;
+  }
+
+  const rooms = [];
+  for(const code of codes) {
+    const room = await dbGet('rooms/'+code);
+    const member = await dbGet('rooms/'+code+'/members/'+currentUser.uid);
+    if(room && room.active && member) rooms.push({code, ...room});
+  }
+  setJoinedRooms(rooms.map(r=>r.code));
+
+  if(!rooms.length) {
+    if(strip){ strip.style.display = 'none'; strip.innerHTML = ''; }
+    if(homeSection) homeSection.style.display = 'none';
+    return;
+  }
+
+  if(strip) {
+    strip.innerHTML = `<span class="joined-label">My Groups</span>` + rooms.map(r=>`
+      <button class="joined-room-btn ${r.code===currentRoom?'active':''}" onclick="switchJoinedRoom('${r.code}')">
+        ${esc(r.name || r.code)}
+      </button>
+    `).join('') + `<button class="btn btn-primary btn-sm joined-add-btn" onclick="showAddMoreRoom()">Add Group</button>`;
+    if(!strip.style.display || strip.style.display === 'none') strip.style.display = 'flex';
+  }
+
+  if(homeSection && home) {
+    homeSection.style.display = 'block';
+    home.innerHTML = rooms.map(r=>{
+      const members = r.members ? Object.values(r.members).filter(Boolean) : [];
+      const studying = members.filter(m=>m.studying).length;
+      return `<div class="group-card ${r.code===currentRoom?'is-active-room':''}" onclick="switchJoinedRoom('${r.code}')">
+        <div class="group-card-header">
+          <div class="group-name">${esc(r.name)}</div>
+          <div class="group-badge ${r.code===currentRoom?'live':''}">${r.code===currentRoom?'Current':'Joined'}</div>
+        </div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:8px;">${esc(r.subject||'General')}</div>
+        <div class="group-meta">
+          <span>${members.length}/${r.maxMembers||50} members</span>
+          <span>${studying} studying</span>
+          <span>${r.code}</span>
+        </div>
+      </div>`;
+    }).join('');
+  }
 }
 
 /* ============================================================
@@ -879,6 +1025,13 @@ function confirmPwModal() {
 }
 
 async function joinRoomByCode(code) {
+  code = String(code||'').toUpperCase();
+  const room = await dbGet('rooms/'+code);
+  const member = currentUser ? await dbGet('rooms/'+code+'/members/'+currentUser.uid) : null;
+  if(room && room.active && member) {
+    await enterRoom(code, room);
+    return;
+  }
   showScreen('joinScreen');
   document.getElementById('joinCode').value = code;
   document.getElementById('joinUserName').value = currentUser?.name||'';
@@ -915,7 +1068,7 @@ async function enterRoom(code, room) {
     lastSeen: Date.now()
   };
   await dbSet(memberRef, memberData);
-  S.set('gsLastRoom', code);
+  rememberJoinedRoom(code);
 
   if(presenceInt) clearInterval(presenceInt);
   presenceInt = setInterval(()=>{
@@ -935,6 +1088,7 @@ async function enterRoom(code, room) {
   if(!wasAlreadyMember) postSystemMsg(currentUser.name + ' joined the room ');
 
   restoreMyTimerUi(memberData);
+  await renderJoinedRooms();
 
   const url = new URL(location.href);
   url.searchParams.set('room', code);
@@ -1014,10 +1168,11 @@ function myPause() {
   document.getElementById('myPauseBtn').disabled = true;
   document.getElementById('myResumeBtn').style.display = 'inline-flex';
 
-  dbUpdate('rooms/'+currentRoom+'/members/'+currentUser.uid, {
+  const savePause = dbUpdate('rooms/'+currentRoom+'/members/'+currentUser.uid, {
     studying: false, totalSec: myTimerAccum, lastStart: null, lastSeen: Date.now()
   });
   tickMyTimer();
+  return savePause;
 }
 
 function myResume() {
@@ -1166,10 +1321,10 @@ async function loadPublicRooms() {
 async function leaveRoom() {
   if(!currentRoom) return;
   const leavingRoom = currentRoom;
-  if(myRunning) myPause();
+  if(myRunning) await myPause();
   postSystemMsg(currentUser.name + ' left the room');
   await dbRemove('rooms/'+leavingRoom+'/members/'+currentUser.uid);
-  S.del('gsLastRoom');
+  forgetJoinedRoom(leavingRoom);
   clearInterval(myTimerInt);
   clearInterval(presenceInt);
   presenceInt = null;
@@ -1182,6 +1337,20 @@ async function leaveRoom() {
   const url=new URL(location.href);
   url.searchParams.delete('room');
   history.replaceState({},'',url);
+
+  const remainingRooms = getJoinedRooms();
+  for(const code of remainingRooms) {
+    const room = await dbGet('rooms/'+code);
+    const member = await dbGet('rooms/'+code+'/members/'+currentUser.uid);
+    if(room && room.active && member) {
+      await enterRoom(code, room);
+      snack('Left that group. Switched to another joined group.');
+      return;
+    }
+    forgetJoinedRoom(code);
+  }
+
+  await renderJoinedRooms();
   showLanding();
   snack('Left the room');
 }
@@ -1240,7 +1409,7 @@ function saveName(){
   const name=(document.getElementById('authChangeName')?.value||'').trim();
   if(!name){snack('Enter a name');return;}
   currentUser.name=name; S.set('gsUser',currentUser);
-  if(currentRoom) dbUpdate('rooms/'+currentRoom+'/members/'+currentUser.uid, { name });
+  getJoinedRooms().forEach(code=>dbUpdate('rooms/'+code+'/members/'+currentUser.uid, { name }));
   updateUserPill(); closeAuthModal(); snack('Name updated ');
 }
 async function signUp(){
@@ -1268,6 +1437,7 @@ async function signOut(){
   if(firebaseReady) await auth.signOut();
   S.del('gsUser');
   S.del('gsLastRoom');
+  S.del('gsJoinedRooms');
   initUser(); closeAuthModal(); snack('Signed out');
 }
 
@@ -1311,7 +1481,8 @@ async function initApp() {
   const urlCode = urlCodeRaw ? urlCodeRaw.toUpperCase() : null;
   const savedCodeRaw = S.get('gsLastRoom', null);
   const savedCode = savedCodeRaw ? String(savedCodeRaw).toUpperCase() : null;
-  const code = urlCode || savedCode;
+  const joinedCodes = getJoinedRooms();
+  const code = urlCode || savedCode || joinedCodes[0];
 
   if(code) {
     const room = await dbGet('rooms/'+code);
@@ -1332,6 +1503,7 @@ async function initApp() {
       }
     } else {
       S.del('gsLastRoom');
+      forgetJoinedRoom(code);
     }
   }
 

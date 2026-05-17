@@ -316,10 +316,19 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 }
 .chat-messages::-webkit-scrollbar{width:4px;}
 .chat-messages::-webkit-scrollbar-thumb{background:var(--surface2);border-radius:2px;}
-.chat-msg{font-size:13px;}
+.chat-msg{font-size:13px;position:relative;padding-right:30px;}
 .chat-msg .cm-name{font-weight:600;color:var(--accent);margin-right:6px;}
 .chat-msg .cm-text{color:var(--text2);}
 .chat-msg.sys .cm-text{color:var(--text3);font-style:italic;}
+.chat-msg.sys{padding-right:0;}
+.chat-delete-btn{
+  position:absolute;right:0;top:50%;transform:translateY(-50%);
+  background:rgba(255,107,107,0.1);border:1px solid rgba(255,107,107,0.2);
+  color:var(--accent3);border-radius:4px;padding:2px 6px;
+  font-size:11px;cursor:pointer;opacity:0;transition:all 0.2s;
+}
+.chat-msg:hover .chat-delete-btn{opacity:1;}
+.chat-delete-btn:hover{background:rgba(255,107,107,0.2);border-color:rgba(255,107,107,0.4);}
 .chat-input-row{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--border);}
 .chat-input-row input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--sans);font-size:13px;padding:8px 12px;outline:none;}
 .chat-input-row input:focus{border-color:var(--accent);}
@@ -1691,10 +1700,19 @@ function calculateStreak(sessions) {
 function renderChat(data) {
   const el=document.getElementById('chatMessages');
   if(!data){ el.innerHTML='<div class="chat-msg sys"><span class="cm-text">No messages yet.</span></div>'; return; }
-  const msgs=Object.values(data).filter(Boolean).sort((a,b)=>a.ts-b.ts).slice(-100);
+  const msgs=Object.entries(data).filter(([,m])=>m).map(([id,m])=>({id,...m})).sort((a,b)=>a.ts-b.ts).slice(-100);
   el.innerHTML=msgs.map(m=>{
     if(m.sys) return `<div class="chat-msg sys"><span class="cm-text">${esc(m.text)}</span></div>`;
-    return `<div class="chat-msg"><span class="cm-name">${esc(m.name)}</span><span class="cm-text">${esc(m.text)}</span></div>`;
+    
+    // Show delete button if: current user is sender, OR current user is owner/manager
+    const canDelete = m.fromUid === currentUser.uid || canModerate();
+    const deleteBtn = canDelete ? `<button class="chat-delete-btn" onclick="deleteChatMsg('${m.id}')" title="Delete message">🗑️</button>` : '';
+    
+    return `<div class="chat-msg" data-msg-id="${m.id}">
+      <span class="cm-name">${esc(m.name)}</span>
+      <span class="cm-text">${esc(m.text)}</span>
+      ${deleteBtn}
+    </div>`;
   }).join('');
   el.scrollTop=el.scrollHeight;
 }
@@ -1704,7 +1722,15 @@ function sendChatMsg() {
   const text=inp.value.trim(); if(!text||!currentRoom) return;
   inp.value='';
   const ref=dbPush('rooms/'+currentRoom+'/chat');
-  ref.set({name:currentUser.name, text, ts:Date.now()});
+  ref.set({name:currentUser.name, text, ts:Date.now(), fromUid:currentUser.uid});
+}
+async function deleteChatMsg(msgId) {
+  if(!currentRoom || !msgId) return;
+  try {
+    await dbRemove('rooms/'+currentRoom+'/chat/'+msgId);
+  } catch(e) {
+    snack('Failed to delete message');
+  }
 }
 function postSystemMsg(text) {
   if(!currentRoom) return;

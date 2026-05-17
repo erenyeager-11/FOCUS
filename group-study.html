@@ -496,9 +496,9 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
 
 <div id="root">
 <div class="topbar">
-  <a href="#" class="topbar-logo" onclick="goHome();return false;">FOCUS</a>
+  <a href="https://focus-sigma-ruby.vercel.app/" class="topbar-logo">FOCUS</a>
   <div class="topbar-right">
-    <button class="btn btn-secondary btn-sm main-menu-link" onclick="goHome()">Back to Home</button>
+    <a href="https://focus-sigma-ruby.vercel.app/" class="btn btn-secondary btn-sm main-menu-link" style="text-decoration:none;">Back to Home</a>
     <div id="userPill" class="user-pill" onclick="showAuthModal()">
       <div class="avatar" id="userAvatarPill">
         <span id="userAvatarLetter">?</span>
@@ -604,7 +604,7 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
         <div class="room-meta" id="roomMeta"></div>
       </div>
       <div class="room-actions">
-        <button class="btn btn-secondary btn-sm main-menu-link" onclick="goHome()">Back to Home</button>
+        <a href="https://focus-sigma-ruby.vercel.app/" class="btn btn-secondary btn-sm main-menu-link" style="text-decoration:none;">Back to Home</a>
         <button class="btn btn-secondary btn-sm" onclick="toggleJoinedRoomsStrip()">My Groups</button>
         <button class="btn btn-primary btn-sm" onclick="showAddMoreRoom()">Add Group</button>
         <button class="btn btn-warning btn-sm" id="adminBtn" onclick="toggleAdminPanel()" style="display:none;">⚙️ Admin</button>
@@ -645,7 +645,7 @@ main{flex:1;padding:32px 24px;max-width:1100px;margin:0 auto;width:100%;}
         <button class="btn btn-success btn-sm" id="myResumeBtn" onclick="myResume()" style="display:none;">▶️ Resume</button>
       </div>
 
-      <!-- DAILY TIMER BAR — NEW -->
+      <!-- DAILY TIMER BAR -->
       <div class="daily-timer-bar">
         <div class="daily-stat">
           <div class="daily-stat-label">Today's Study</div>
@@ -799,14 +799,21 @@ const FB_CONFIG = {
 const DEMO_MODE = FB_CONFIG.apiKey === "REPLACE_WITH_YOUR_API_KEY";
 let db = null, auth = null, storage = null, firebaseReady = false;
 
-if (!DEMO_MODE) {
-  try {
-    firebase.initializeApp(FB_CONFIG);
-    db = firebase.database();
-    auth = firebase.auth();
-    storage = firebase.storage();
-    firebaseReady = true;
-  } catch(e) { console.warn("Firebase init failed:", e); }
+function initFirebase() {
+  if (!DEMO_MODE && typeof firebase !== 'undefined') {
+    try {
+      firebase.initializeApp(FB_CONFIG);
+      db = firebase.database();
+      auth = firebase.auth();
+      storage = firebase.storage();
+      firebaseReady = true;
+      console.log('Firebase initialized successfully');
+    } catch(e) { 
+      console.warn("Firebase init failed:", e); 
+    }
+  } else if (typeof firebase === 'undefined') {
+    console.warn("Firebase SDK not loaded");
+  }
 }
 
 /* IN-MEMORY FALLBACK */
@@ -883,10 +890,10 @@ let myTimerInt = null;
 let myRunning = false;
 let memberTimerInts = {};
 
-// Daily timer state — NEW
-let _dailyAccum = 0;         // today's saved seconds from DB
-let _midnightTimer = null;   // setTimeout handle for midnight reset
-let _midnightCountdownInt = null; // setInterval for countdown UI
+// Daily timer state
+let _dailyAccum = 0;
+let _midnightTimer = null;
+let _midnightCountdownInt = null;
 
 // Pending join
 let _pendingJoinData = null;
@@ -917,7 +924,7 @@ function updateUserPill() {
 }
 
 /* ============================================================
-   DAILY TIMER HELPERS — NEW
+   DAILY TIMER HELPERS
    ============================================================ */
 function getTodayDate() {
   const d = new Date();
@@ -931,7 +938,6 @@ function getMsUntilMidnight() {
   return midnight.getTime() - now.getTime();
 }
 
-// Start countdown display updating every second
 function startMidnightCountdownUI() {
   clearInterval(_midnightCountdownInt);
   _midnightCountdownInt = setInterval(() => {
@@ -944,29 +950,22 @@ function startMidnightCountdownUI() {
   }, 1000);
 }
 
-// Schedule auto-reset at midnight
 function scheduleMidnightReset() {
   clearTimeout(_midnightTimer);
   const ms = getMsUntilMidnight();
   _midnightTimer = setTimeout(async () => {
     await performMidnightReset();
-    scheduleMidnightReset(); // schedule next day
+    scheduleMidnightReset();
   }, ms);
 }
 
 async function performMidnightReset() {
   if(!currentRoom || !currentUser) return;
-
-  // If user is currently studying, pause first
   if(myRunning) await myPause();
-
   const memberRef = 'rooms/'+currentRoom+'/members/'+currentUser.uid;
   const member = await dbGet(memberRef);
   const today = getTodayDate();
-
   const sessions = member?.sessions || [];
-
-  // Save today's daily total into history as a 'daily' type session
   if(member?.dailyStudySec > 0) {
     sessions.push({
       date: member.dailyDate || today,
@@ -974,8 +973,6 @@ async function performMidnightReset() {
       type: 'daily'
     });
   }
-
-  // Reset everything for new day
   await dbUpdate(memberRef, {
     dailyStudySec: 0,
     dailyDate: today,
@@ -984,15 +981,11 @@ async function performMidnightReset() {
     lastStart: null,
     sessions
   });
-
-  // Reset local state
   _dailyAccum = 0;
   myTimerAccum = 0;
   myTimerStart = null;
   myRunning = false;
   clearInterval(myTimerInt);
-
-  // Reset UI
   const display = document.getElementById('myTimerDisplay');
   const dailyEl = document.getElementById('dailyTimerDisplay');
   const tag = document.getElementById('myStatusTag');
@@ -1007,18 +1000,13 @@ async function performMidnightReset() {
   if(startBtn) startBtn.disabled=false;
   if(pauseBtn) pauseBtn.disabled=true;
   if(resumeBtn) resumeBtn.style.display='none';
-
-  // Show yesterday in UI
   updateYesterdayDisplay(sessions);
-
   snack('🌙 New day started! Kal ka study data history mein save ho gaya ✅');
 }
 
-// Show yesterday's total in the daily bar
 function updateYesterdayDisplay(sessions) {
   const el = document.getElementById('yesterdayDisplay');
   if(!el) return;
-  // Find yesterday's date string
   const d = new Date();
   d.setDate(d.getDate() - 1);
   const yesterday = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -1027,18 +1015,32 @@ function updateYesterdayDisplay(sessions) {
 }
 
 /* ============================================================
-   PROFILE PICTURE UPLOAD
+   PROFILE PICTURE UPLOAD - FIXED
    ============================================================ */
 async function uploadProfilePicture(file) {
-  if(!firebaseReady || !storage) { snack('Profile pictures require Firebase Storage'); return null; }
-  if(!file.type.startsWith('image/')) { snack('Please upload an image file'); return null; }
-  if(file.size > 2*1024*1024) { snack('Image too large. Max 2MB.'); return null; }
+  if(!firebaseReady || !storage) { 
+    snack('Profile pictures require Firebase Storage'); 
+    return null; 
+  }
+  if(!file || !file.type.startsWith('image/')) { 
+    snack('Please upload an image file'); 
+    return null; 
+  }
+  if(file.size > 2*1024*1024) { 
+    snack('Image too large. Max 2MB.'); 
+    return null; 
+  }
   try {
     const filename = `pfp_${currentUser.uid}_${Date.now()}.jpg`;
     const ref = storage.ref('profile-pictures/'+filename);
-    await ref.put(file);
-    return await ref.getDownloadURL();
-  } catch(e) { snack('Upload failed: '+e.message); return null; }
+    const snapshot = await ref.put(file);
+    const url = await snapshot.ref.getDownloadURL();
+    return url;
+  } catch(e) { 
+    console.error('Upload error:', e);
+    snack('Upload failed: '+e.message); 
+    return null; 
+  }
 }
 
 /* ============================================================
@@ -1057,7 +1059,9 @@ function showJoin(){
   const code=new URLSearchParams(location.search).get('room');
   if(code) document.getElementById('joinCode').value=code;
 }
-function goHome(){ showLanding(); }
+function goHome(){ 
+  window.location.href = 'https://focus-sigma-ruby.vercel.app/';
+}
 function backFromForm(){ if(currentRoom) showScreen('roomScreen'); else showLanding(); }
 function showAddMoreRoom(){ showLanding(); snack('Create or join another group. Your current groups stay joined.'); }
 
@@ -1225,7 +1229,6 @@ async function confirmNameAndJoin() {
   const finalName=document.getElementById('confirmNameInput').value.trim();
   if(!finalName){ snack('Please enter your display name'); return; }
   currentUser.name=finalName; S.set('gsUser', currentUser); updateUserPill();
-  // Capture BEFORE closeConfirmNameModal nulls _pendingJoinData
   const joinCode = _pendingJoinData.code;
   const joinRoom = _pendingJoinData.room;
   closeConfirmNameModal();
@@ -1267,20 +1270,18 @@ async function enterRoom(code, room) {
   const wasAlreadyMember=!!existingMember;
   const today=getTodayDate();
 
-  // --- DAILY RESET CHECK — NEW ---
   let dailyStudySec = existingMember?.dailyStudySec || 0;
   let dailyDate = existingMember?.dailyDate || today;
   let sessions = existingMember?.sessions || [];
   let totalSec = existingMember?.totalSec || 0;
 
   if(dailyDate !== today) {
-    // New day — save old daily data to history, then reset
     if(dailyStudySec > 0) {
       sessions.push({ date: dailyDate, duration: dailyStudySec, type: 'daily' });
     }
     dailyStudySec = 0;
     dailyDate = today;
-    totalSec = 0; // reset daily-accumulation timer too
+    totalSec = 0;
   }
 
   const memberData = {
@@ -1301,10 +1302,7 @@ async function enterRoom(code, room) {
   await dbSet(memberRef, memberData);
   rememberJoinedRoom(code);
 
-  // Update yesterday display
   updateYesterdayDisplay(sessions);
-
-  // Local daily accumulator
   _dailyAccum = dailyStudySec;
 
   if(presenceInt) clearInterval(presenceInt);
@@ -1320,8 +1318,6 @@ async function enterRoom(code, room) {
   if(!wasAlreadyMember) postSystemMsg(currentUser.name+' joined the room 👋');
 
   restoreMyTimerUi(memberData);
-
-  // Start midnight systems
   scheduleMidnightReset();
   startMidnightCountdownUI();
 
@@ -1399,7 +1395,6 @@ function restoreMyTimerUi(memberData) {
   display.classList.toggle('running', myRunning);
   tag.classList.toggle('running', myRunning);
 
-  // Daily display
   const dailyTotal = _dailyAccum + (myRunning ? Math.floor((Date.now()-(myTimerStart||Date.now()))/1000) : 0);
   if(dailyEl) dailyEl.textContent=fmtTime(dailyTotal);
 
@@ -1431,7 +1426,7 @@ function myStart() {
 
 async function myPause() {
   if(!myRunning) return;
-  const pauseRoom = currentRoom; // capture before any async op
+  const pauseRoom = currentRoom;
   const sessionDuration=Math.floor((Date.now()-myTimerStart)/1000);
   myTimerAccum+=sessionDuration;
   myTimerStart=null; myRunning=false;
@@ -1444,15 +1439,12 @@ async function myPause() {
   document.getElementById('myPauseBtn').disabled=true;
   document.getElementById('myResumeBtn').style.display='inline-flex';
 
-  // Update daily accumulator locally
   _dailyAccum += sessionDuration;
 
   if(!pauseRoom || !currentUser) { tickMyTimer(); return; }
 
-  // Save session to history
   const member=await dbGet('rooms/'+pauseRoom+'/members/'+currentUser.uid);
   const sessions=member?.sessions||[];
-  // Save as a timed session (not daily — daily saves at midnight)
   sessions.push({ date: Date.now(), duration: sessionDuration });
 
   const today=getTodayDate();
@@ -1463,7 +1455,6 @@ async function myPause() {
     lastStart: null,
     lastSeen: Date.now(),
     sessions,
-    // Use local _dailyAccum to avoid stale DB reads / double-counting
     dailyStudySec: _dailyAccum,
     dailyDate: today
   });
@@ -1482,7 +1473,6 @@ function tickMyTimer() {
   const total=myTimerAccum+elapsed;
   document.getElementById('myTimerDisplay').textContent=fmtTime(total);
 
-  // Update daily display — NEW
   const dailyEl=document.getElementById('dailyTimerDisplay');
   if(dailyEl) dailyEl.textContent=fmtTime(_dailyAccum+elapsed);
 
@@ -1499,7 +1489,7 @@ function tickMyTimer() {
 }
 
 /* ============================================================
-   RENDER MEMBERS
+   RENDER MEMBERS - FIXED MEMBER REMOVAL
    ============================================================ */
 function renderMembers(data) {
   const grid=document.getElementById('membersGrid');
@@ -1549,13 +1539,39 @@ function renderMemberAdminActions(m) {
   if(!canModerate()||!m||m.uid===currentUser.uid) return '';
   const role=getMemberRole(m.uid);
   const canOwnerManage=isRoomOwner()&&role!=='Owner';
+  
+  // FIXED: Owner and Manager can remove any non-owner member
+  const canRemove = canModerate() && role !== 'Owner';
+  
   const managerBtn=canOwnerManage?(role==='Manager'
     ?`<button class="btn btn-warning btn-sm" onclick="event.stopPropagation();removeManager('${m.uid}')">Remove Manager</button>`
-    :`<button class="btn btn-success btn-sm" onclick="event.stopPropagation();makeManager('${m.uid}',decodeURIComponent('${encodeURIComponent(m.name||'Manager')}'))">Make Manager</button>`):'';
+    :`<button class="btn btn-success btn-sm" onclick="event.stopPropagation();makeManager('${m.uid}','${esc(m.name||'Manager')}')">Make Manager</button>`):'';
+  
+  const removeBtn=canRemove?`<button class="btn btn-danger btn-sm" onclick="event.stopPropagation();removeMember('${m.uid}','${esc(m.name||'Member')}')">Remove</button>`:'';
+  
   return `<div class="member-admin-actions">
     <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();nudgeMember('${m.uid}')">Nudge</button>
     ${managerBtn}
+    ${removeBtn}
   </div>`;
+}
+
+// NEW FUNCTION: Remove member from room
+async function removeMember(uid, name) {
+  if(!canModerate()||!currentRoom||!uid||uid===currentUser.uid) return;
+  if(isRoomOwner(roomData, uid)) {
+    snack('Cannot remove the room owner');
+    return;
+  }
+  if(!confirm(`Remove ${name} from the room?`)) return;
+  
+  try {
+    await dbRemove('rooms/'+currentRoom+'/members/'+uid);
+    postSystemMsg(`${name} was removed from the room by ${currentUser.name}`);
+    snack('Member removed');
+  } catch(e) {
+    snack('Failed to remove member: '+e.message);
+  }
 }
 
 function calcMemberSec(m) {
@@ -1618,7 +1634,6 @@ async function showUserAnalytics(uid) {
   const sessions=member.sessions||[];
   streak.textContent=calculateStreak(sessions)+' days';
 
-  // Show daily sessions in history — show 'daily' type entries prominently
   const dailySessions=sessions.filter(s=>s.type==='daily').slice(-10).reverse();
   const regularSessions=sessions.filter(s=>!s.type).slice(-5).reverse();
 
@@ -1652,7 +1667,6 @@ function closeAnalyticsModal(){ document.getElementById('analyticsModal').classL
 
 function calculateStreak(sessions) {
   if(!sessions||!sessions.length) return 0;
-  // Use daily sessions for streak calculation
   const dailySessions=sessions.filter(s=>s.type==='daily'&&s.date);
   if(!dailySessions.length) return 0;
   const uniqueDates=[...new Set(dailySessions.map(s=>s.date))].sort((a,b)=>b.localeCompare(a));
@@ -1855,7 +1869,7 @@ function copyRoomLink() {
 }
 
 /* ============================================================
-   AUTH MODAL
+   AUTH MODAL - FIXED PFP UPLOAD
    ============================================================ */
 function showAuthModal() {
   const modal=document.getElementById('authModal');
@@ -1865,10 +1879,10 @@ function showAuthModal() {
       <div style="font-size:14px;color:var(--text2);margin-bottom:16px;">Signed in as <strong style="color:var(--text);">${esc(currentUser.name)}</strong></div>
       <div class="form-row">
         <label>Profile Picture</label>
-        <div class="pfp-upload-zone" onclick="document.getElementById('authPfpInput').click()">
+        <div class="pfp-upload-zone" id="authPfpZone" onclick="document.getElementById('authPfpInput').click()">
           ${currentUser.pfpUrl?`<img src="${esc(currentUser.pfpUrl)}" alt="Profile">`:`<div class="placeholder">📷</div>`}
-          <input type="file" id="authPfpInput" accept="image/*" onchange="handleAuthPfpUpload(this)">
         </div>
+        <input type="file" id="authPfpInput" accept="image/*" style="display:none;" onchange="handleAuthPfpUpload(this)">
         <div class="pfp-hint">Click to upload a new profile picture (max 2MB)</div>
       </div>
       <div class="form-row"><label>Change Display Name</label><input class="input" id="authChangeName" value="${esc(currentUser.name)}" maxlength="24"></div>
@@ -1881,10 +1895,10 @@ function showAuthModal() {
     content.innerHTML=`
       <div class="form-row">
         <label>Profile Picture (Optional)</label>
-        <div class="pfp-upload-zone" onclick="document.getElementById('guestPfpInput').click()">
+        <div class="pfp-upload-zone" id="guestPfpZone" onclick="document.getElementById('guestPfpInput').click()">
           ${currentUser?.pfpUrl?`<img src="${esc(currentUser.pfpUrl)}" alt="Profile">`:`<div class="placeholder">📷</div>`}
-          <input type="file" id="guestPfpInput" accept="image/*" onchange="handleGuestPfpUpload(this)">
         </div>
+        <input type="file" id="guestPfpInput" accept="image/*" style="display:none;" onchange="handleGuestPfpUpload(this)">
         <div class="pfp-hint">Click to upload a profile picture (max 2MB)</div>
       </div>
       <div class="form-row"><label>Display Name</label><input class="input" id="authName" value="${esc(currentUser?.name||'')}" placeholder="Your name" maxlength="24"></div>
@@ -1906,15 +1920,39 @@ function showAuthModal() {
 }
 
 async function handleGuestPfpUpload(input) {
-  const file=input.files[0]; if(!file) return;
+  const file=input.files[0]; 
+  if(!file) return;
+  
   const url=await uploadProfilePicture(file);
-  if(url){ currentUser.pfpUrl=url; S.set('gsUser',currentUser); const zone=input.parentElement; zone.innerHTML=`<img src="${esc(url)}" alt="Profile"><input type="file" id="guestPfpInput" accept="image/*" onchange="handleGuestPfpUpload(this)">`; snack('Profile picture uploaded! 📸'); }
+  if(url){ 
+    currentUser.pfpUrl=url; 
+    S.set('gsUser',currentUser); 
+    const zone=document.getElementById('guestPfpZone');
+    if(zone) zone.innerHTML=`<img src="${esc(url)}" alt="Profile">`;
+    snack('Profile picture uploaded! 📸'); 
+  }
 }
+
 async function handleAuthPfpUpload(input) {
-  const file=input.files[0]; if(!file) return;
+  const file=input.files[0]; 
+  if(!file) return;
+  
   const url=await uploadProfilePicture(file);
-  if(url){ currentUser.pfpUrl=url; S.set('gsUser',currentUser); getJoinedRooms().forEach(code=>dbUpdate('rooms/'+code+'/members/'+currentUser.uid,{pfpUrl:url})); const zone=input.parentElement; zone.innerHTML=`<img src="${esc(url)}" alt="Profile"><input type="file" id="authPfpInput" accept="image/*" onchange="handleAuthPfpUpload(this)">`; updateUserPill(); snack('Profile picture updated! 📸'); }
+  if(url){ 
+    currentUser.pfpUrl=url; 
+    S.set('gsUser',currentUser); 
+    
+    // Update in all joined rooms
+    getJoinedRooms().forEach(code=>dbUpdate('rooms/'+code+'/members/'+currentUser.uid,{pfpUrl:url})); 
+    
+    const zone=document.getElementById('authPfpZone');
+    if(zone) zone.innerHTML=`<img src="${esc(url)}" alt="Profile">`;
+    
+    updateUserPill(); 
+    snack('Profile picture updated! 📸'); 
+  }
 }
+
 function closeAuthModal(){ document.getElementById('authModal').classList.remove('open'); }
 function saveAsGuest(){
   const name=(document.getElementById('authName')?.value||'').trim();
@@ -1976,7 +2014,7 @@ function fmtTime(sec){
   const s=String(sec%60).padStart(2,'0');
   return `${h}:${m}:${s}`;
 }
-function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 function simpleHash(str){ let h=0;for(let i=0;i<str.length;i++){h=((h<<5)-h)+str.charCodeAt(i);h|=0;}return h.toString(36); }
 function snack(msg){ const el=document.getElementById('snack');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500); }
 function toggleLeaderboard(){ switchTab('leaderboard', document.querySelector('.tab-btn:nth-child(2)')); }
@@ -2005,11 +2043,15 @@ async function initApp() {
   showLanding();
 }
 
-initApp();
-
-if(DEMO_MODE){
-  snack('⚠️ Demo mode – add your Firebase config to enable real-time sync');
-}
+// Initialize after a small delay to ensure Firebase is loaded
+setTimeout(function() {
+  initFirebase();
+  initApp();
+  
+  if(DEMO_MODE){
+    snack('⚠️ Demo mode – add your Firebase config to enable real-time sync');
+  }
+}, 300);
 </script>
 </body>
 </html>

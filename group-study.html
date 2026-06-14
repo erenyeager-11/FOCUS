@@ -982,18 +982,19 @@ async function performMidnightReset() {
       type: 'daily'
     });
   }
-  await dbUpdate(memberRef, {
+await dbUpdate(memberRef, {
     dailyStudySec: 0,
     dailyDate: today,
-    totalSec: 0,
+    // totalSec NOT reset — keeps accumulating lifetime  ✅
     studying: false,
     lastStart: null,
     sessions
   });
-  _dailyAccum = 0;
-  myTimerAccum = 0;
-  myTimerStart = null;
-  myRunning = false;
+_dailyAccum = 0;
+const updatedMember = await dbGet(memberRef);
+myTimerAccum = updatedMember?.totalSec || 0;
+myTimerStart = null;
+myRunning = false;
   clearInterval(myTimerInt);
   const display = document.getElementById('myTimerDisplay');
   const dailyEl = document.getElementById('dailyTimerDisplay');
@@ -1002,7 +1003,7 @@ async function performMidnightReset() {
   const startBtn = document.getElementById('myStartBtn');
   const pauseBtn = document.getElementById('myPauseBtn');
   const resumeBtn = document.getElementById('myResumeBtn');
-  if(display){ display.textContent='00:00:00'; display.classList.remove('running'); }
+if(display){ display.textContent=fmtTime(myTimerAccum); display.classList.remove('running'); }
   if(dailyEl) dailyEl.textContent='00:00:00';
   if(tag) tag.classList.remove('running');
   if(status) status.textContent='Not studying';
@@ -1284,15 +1285,16 @@ async function enterRoom(code, room) {
   let sessions = existingMember?.sessions || [];
   let totalSec = existingMember?.totalSec || 0;
 
-  if(dailyDate !== today) {
+// AFTER
+if(dailyDate !== today) {
     if(dailyStudySec > 0) {
       sessions.push({ date: dailyDate, duration: dailyStudySec, type: 'daily' });
     }
     dailyStudySec = 0;
     dailyDate = today;
-    totalSec = 0;
+    // totalSec stays — it's the lifetime total, not daily  ✅
   }
-
+  
   const memberData = {
     ...(existingMember || {}),
     name: currentUser.name,

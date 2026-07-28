@@ -1,77 +1,60 @@
-/* ============================================================
-   Focus Lab — Service Worker v4
-============================================================ */
-
-const CACHE_VERSION = 'focuslab-v4';
-
-const ASSETS = [
-  './index.html',
-  './manifest.json',
-  './focuslab-icon-192-v2.png',
-  './focuslab-icon-512-v2.png',
-  './focuslab-icon-512-maskable-v2.png'
-];
-
-/* Install */
-self.addEventListener('install', event => {
-  self.skipWaiting();
-
-  event.waitUntil(
-    caches.open(CACHE_VERSION).then(cache => cache.addAll(ASSETS))
-  );
-});
-
-/* Activate */
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
-        keys
-          .filter(key => key !== CACHE_VERSION)
-          .map(key => caches.delete(key))
-      )
-    ).then(() => self.clients.claim())
-  );
-});
-
-/* Fetch */
-self.addEventListener('fetch', event => {
-  if (event.request.method !== 'GET') return;
-
-  const url = new URL(event.request.url);
-  const isHTML =
-    event.request.destination === 'document' ||
-    url.pathname.endsWith('.html');
-
-  if (isHTML) {
-    event.respondWith(
-      fetch(event.request)
-        .then(response => {
-          if (response.ok) {
-            const clone = response.clone();
-            caches.open(CACHE_VERSION).then(cache => {
-              cache.put(event.request, clone);
-            });
-          }
-          return response;
-        })
-        .catch(() => caches.match('./index.html'))
-    );
-  } else {
-    event.respondWith(
-      caches.match(event.request).then(cached => {
-        if (cached) return cached;
-
-        return fetch(event.request).then(response => {
-          if (response.ok) {
-            const clone = response.clone();
-            caches.open(CACHE_VERSION).then(cache => {
-              cache.put(event.request, clone);
-            });
-          }
-          return response;
-        });
-      })
-    );
-  }
-});
+{
+  "name": "Focus Lab",
+  "short_name": "Focus Lab",
+  "description": "A focused study dashboard with timers, tasks, notes, habits, revision tracking, analytics, and offline support.",
+  "id": "./",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "portrait-primary",
+  "background_color": "#080c12",
+  "theme_color": "#3b9eff",
+  "categories": ["education", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "./focuslab-icon-192-v2.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./focuslab-icon-512-v2.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./focuslab-icon-512-maskable-v2.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Focus Timers",
+      "short_name": "Timers",
+      "url": "./index.html#focus",
+      "icons": [
+        {
+          "src": "./focuslab-icon-192-v2.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Smart Notebook",
+      "short_name": "Notebook",
+      "url": "./index.html#notebook",
+      "icons": [
+        {
+          "src": "./focuslab-icon-192-v2.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}

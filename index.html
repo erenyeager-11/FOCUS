@@ -113,13 +113,14 @@ body::after {
 
 /* SIDEBAR */
 #sidebar {
-  width: 220px; min-height: 100vh;
+  width: 220px; min-height: 100vh; height: 100vh;
   background: rgba(13,17,23,0.85);
   border-right: 1px solid var(--border);
   backdrop-filter: blur(20px);
   padding: 24px 0;
   position: fixed; top: 0; left: 0; bottom: 0;
   display: flex; flex-direction: column;
+  overflow: hidden;
   z-index: 100;
 }
 .sidebar-logo {
@@ -141,7 +142,28 @@ body::after {
   70%  { box-shadow: 0 0 0 6px rgba(0,212,170,0); }
   100% { box-shadow: 0 0 0 0 rgba(0,212,170,0); }
 }
-.nav-group { padding: 8px 12px; margin-bottom: 4px; }
+.sidebar-logo,
+.nav-label,
+.sidebar-footer { flex-shrink: 0; }
+.nav-group {
+  padding: 8px 12px; margin-bottom: 4px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(139,163,199,0.35) transparent;
+}
+#nav-desktop {
+  flex: 1;
+  min-height: 0;
+  padding-bottom: 14px;
+}
+.nav-group::-webkit-scrollbar { width: 4px; }
+.nav-group::-webkit-scrollbar-track { background: transparent; }
+.nav-group::-webkit-scrollbar-thumb {
+  background: rgba(139,163,199,0.28);
+  border-radius: 999px;
+}
 .nav-label {
   font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
   color: var(--text3); padding: 0 12px; margin: 12px 0 4px;
@@ -506,9 +528,22 @@ body::after {
 #mobile-nav {
   display: none; position: fixed; top: 56px; left: 0; right: 0; bottom: 0;
   background: rgba(8,12,18,0.97); backdrop-filter: blur(20px);
-  z-index: 150; flex-direction: column; padding: 24px; overflow-y: auto;
+  z-index: 150; flex-direction: column;
+  max-height: calc(100dvh - 56px);
+  padding: 24px 24px max(24px, env(safe-area-inset-bottom));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(139,163,199,0.35) transparent;
 }
 #mobile-nav.open { display: flex; }
+#mobile-nav::-webkit-scrollbar { width: 4px; }
+#mobile-nav::-webkit-scrollbar-track { background: transparent; }
+#mobile-nav::-webkit-scrollbar-thumb {
+  background: rgba(139,163,199,0.28);
+  border-radius: 999px;
+}
 .mnav-btn {
   display: flex; align-items: center; gap: 14px; padding: 14px 16px;
   border-radius: 999px; border: none; background: transparent;
@@ -2542,4 +2577,3 @@ bgRestoreAll();
 </script>
 </body>
 </html>
-

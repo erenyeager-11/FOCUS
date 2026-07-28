@@ -10,8 +10,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Focus Lab">
-<link rel="apple-touch-icon" href="icon-192.png">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⌬</text></svg>">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+<link rel="shortcut icon" href="favicon.ico">
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -123,6 +125,20 @@ body::after {
   font-family: var(--mono); font-size: 18px; color: var(--accent);
   letter-spacing: 4px; padding: 0 24px 24px;
   border-bottom: 1px solid var(--border); margin-bottom: 16px;
+  display: flex; align-items: center; gap: 8px; justify-content: space-between;
+}
+.sidebar-logo-text { display:flex; align-items:center; gap:8px; }
+.status-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent2);
+  box-shadow: 0 0 0 0 rgba(0,212,170,0.6);
+  animation: statusPulse 2s infinite;
+  flex-shrink: 0;
+}
+@keyframes statusPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(0,212,170,0.55); }
+  70%  { box-shadow: 0 0 0 6px rgba(0,212,170,0); }
+  100% { box-shadow: 0 0 0 0 rgba(0,212,170,0); }
 }
 .nav-group { padding: 8px 12px; margin-bottom: 4px; }
 .nav-label {
@@ -131,13 +147,18 @@ body::after {
 }
 .nav-btn {
   width: 100%; display: flex; align-items: center; gap: 12px;
-  padding: 10px 12px; border-radius: var(--radius); border: none;
+  padding: 10px 16px; border-radius: 999px; border: none;
   background: transparent; color: var(--text2);
-  font-family: var(--sans); font-size: 13px; cursor: pointer;
-  transition: all 0.2s; text-align: left;
+  font-family: var(--sans); font-size: 13px; font-weight: 500; cursor: pointer;
+  transition: all 0.2s; text-align: left; margin-bottom: 2px;
 }
 .nav-btn:hover { background: var(--surface); color: var(--text); }
-.nav-btn.active { background: rgba(59,158,255,0.12); color: var(--accent); }
+.nav-btn.active {
+  background: var(--accent);
+  color: var(--nav-active-text, #06131f);
+  font-weight: 700;
+  box-shadow: 0 0 0 1px var(--accent), 0 4px 18px -4px var(--accent);
+}
 .nav-btn .icon { font-size: 16px; width: 20px; }
 .sidebar-footer {
   margin-top: auto; padding: 16px 24px;
@@ -433,7 +454,7 @@ body::after {
   border-bottom: 1px solid var(--border); padding: 14px 20px;
   z-index: 200; align-items: center; justify-content: space-between;
 }
-.topbar-logo { font-family: var(--mono); font-size: 16px; color: var(--accent); letter-spacing: 4px; }
+.topbar-logo { font-family: var(--mono); font-size: 16px; color: var(--accent); letter-spacing: 4px; display:flex; align-items:center; gap:8px; }
 #hamburger { background: none; border: none; color: var(--text); font-size: 22px; cursor: pointer; }
 #mobile-nav {
   display: none; position: fixed; top: 56px; left: 0; right: 0; bottom: 0;
@@ -442,12 +463,13 @@ body::after {
 }
 #mobile-nav.open { display: flex; }
 .mnav-btn {
-  display: flex; align-items: center; gap: 14px; padding: 16px 12px;
-  border-radius: var(--radius); border: none; background: transparent;
+  display: flex; align-items: center; gap: 14px; padding: 14px 16px;
+  border-radius: 999px; border: none; background: transparent;
   color: var(--text2); font-family: var(--sans); font-size: 15px;
-  cursor: pointer; text-align: left; border-bottom: 1px solid var(--border);
+  cursor: pointer; text-align: left; margin-bottom: 6px;
 }
-.mnav-btn:hover, .mnav-btn.active { color: var(--accent); }
+.mnav-btn:hover { color: var(--text); background: var(--surface); }
+.mnav-btn.active { color: var(--nav-active-text, #06131f); background: var(--accent); font-weight: 700; }
 .mnav-btn .icon { font-size: 20px; }
 
 /* SMART NOTEBOOK */
@@ -689,79 +711,129 @@ body::after {
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 
-/* =============================================
-   MOBILE LAYOUT FIX - Comprehensive Override
-   Fixes grid-2 not stacking on phone screens
-   ============================================= */
+/* =====================================================================
+   THEME PICKER (Settings)
+===================================================================== */
+.theme-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+.theme-swatch {
+  position: relative; border-radius: 12px; padding: 14px 14px 12px;
+  border: 2px solid var(--border2); cursor: pointer; transition: all 0.2s;
+  overflow: hidden; text-align: left;
+}
+.theme-swatch:hover { transform: translateY(-2px); }
+.theme-swatch.selected { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 6px 20px -4px var(--accent); }
+.theme-swatch-dots { display: flex; gap: 6px; margin-bottom: 10px; }
+.theme-swatch-dots span { width: 16px; height: 16px; border-radius: 50%; display: inline-block; border: 1px solid rgba(255,255,255,0.15); }
+.theme-swatch-name { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.theme-swatch-desc { font-size: 11px; color: var(--text3); margin-top: 3px; }
+.theme-check { position: absolute; top: 10px; right: 10px; font-size: 13px; color: var(--accent); opacity: 0; transition: opacity 0.15s; }
+.theme-swatch.selected .theme-check { opacity: 1; }
+
+/* --- Forest theme --- */
+html[data-theme="forest"] {
+  --bg: #07120c; --bg2: #0a170f; --bg3: #0e1f14;
+  --surface: #102416; --surface2: #163420;
+  --border: rgba(120,200,140,0.10); --border2: rgba(120,200,140,0.20);
+  --accent: #4caf7d; --accent2: #a3d977; --accent3: #ff8a65; --accent4: #d4a373; --accent5: #7ec4a0;
+  --text: #e9f5ec; --text2: #8fb89c; --text3: #4f7a5d;
+  --nav-active-text: #06170d;
+  --glow: 0 0 30px rgba(76,175,125,0.14); --glow2: 0 0 20px rgba(163,217,119,0.1);
+}
+html[data-theme="forest"] body::before {
+  background-image:
+    linear-gradient(rgba(76,175,125,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(76,175,125,0.05) 1px, transparent 1px);
+}
+html[data-theme="forest"] body::after {
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(76,175,125,0.09) 0%, transparent 70%);
+}
+
+/* --- Kawaii pink/blue theme --- */
+html[data-theme="kawaii"] {
+  --bg: #fdf3fa; --bg2: #fff0f7; --bg3: #ffe6f2;
+  --surface: #ffffff; --surface2: #ffeef6;
+  --border: rgba(255,140,200,0.18); --border2: rgba(255,140,200,0.3);
+  --accent: #ff8fc7; --accent2: #7dd3fc; --accent3: #ff9a8b; --accent4: #ffd166; --accent5: #b592f6;
+  --text: #5a3a52; --text2: #9c7595; --text3: #c9a8c3;
+  --nav-active-text: #48122f;
+  --glow: 0 0 24px rgba(255,143,199,0.18); --glow2: 0 0 18px rgba(125,211,252,0.16);
+}
+html[data-theme="kawaii"] body::before {
+  background-image:
+    linear-gradient(rgba(255,143,199,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(125,211,252,0.06) 1px, transparent 1px);
+}
+html[data-theme="kawaii"] body::after {
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,143,199,0.14) 0%, transparent 70%);
+}
+html[data-theme="kawaii"] #sidebar,
+html[data-theme="kawaii"] #topbar,
+html[data-theme="kawaii"] #mobile-nav { background: rgba(255,255,255,0.85); }
+html[data-theme="kawaii"] .intro-logo,
+html[data-theme="kawaii"] .timer-display { text-shadow: 0 0 24px rgba(255,143,199,0.35); }
+
+/* --- Sunset theme --- */
+html[data-theme="sunset"] {
+  --bg: #140a0d; --bg2: #1a0e10; --bg3: #221216;
+  --surface: #26141a; --surface2: #331a22;
+  --border: rgba(255,150,110,0.10); --border2: rgba(255,150,110,0.2);
+  --accent: #ff8a5c; --accent2: #ffd166; --accent3: #ff5c7a; --accent4: #ffb84c; --accent5: #c084fc;
+  --text: #fbe9e4; --text2: #cb9a8d; --text3: #7a4f47;
+  --nav-active-text: #250f08;
+  --glow: 0 0 30px rgba(255,138,92,0.14); --glow2: 0 0 20px rgba(255,209,102,0.1);
+}
+html[data-theme="sunset"] body::before {
+  background-image:
+    linear-gradient(rgba(255,138,92,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,138,92,0.05) 1px, transparent 1px);
+}
+html[data-theme="sunset"] body::after {
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,138,92,0.1) 0%, transparent 70%);
+}
+
+/* Themed logo emoji swap (shown via ::after using data attr on logo elements) */
+.theme-emoji { margin-left: 2px; }
+
+/* Mobile layout fix - Comprehensive Override */
 @media (max-width: 768px) {
   #sidebar { display: none; }
   #topbar { display: flex; }
   #main { margin-left: 0; padding: 80px 16px 24px; }
 
-  /* CRITICAL: Force all 2-col grids to single column */
   .grid-2 { grid-template-columns: 1fr !important; gap: 16px; }
-
-  /* 3-col grids: stats stay 3-col */
   .grid-3 { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-
-  /* Notebook & notes - single column */
   .nb-entries { grid-template-columns: 1fr !important; }
   .note-grid { grid-template-columns: 1fr !important; }
-
-  /* Pomo settings: 2-col */
   .pomo-settings { grid-template-columns: 1fr 1fr; }
-
-  /* Card padding */
   .card { padding: 16px; }
   .page-header h1 { font-size: 22px; }
-
-  /* Timers */
   .timer-display { font-size: clamp(32px, 8vw, 50px) !important; }
-
-  /* Pomodoro ring shrink */
   .pomo-ring { width: 180px !important; height: 180px !important; }
   .pomo-ring svg { width: 180px !important; height: 180px !important; }
   .pomo-time .big { font-size: 36px; }
-
-  /* Buttons compact */
   .btn { padding: 8px 14px; font-size: 12px; }
   .btn-group { gap: 6px; }
-
-  /* Stat cards compact */
   .stat-card { padding: 12px 8px; }
   .stat-value { font-size: 20px; }
   .stat-label { font-size: 9px; letter-spacing: 0; }
-
-  /* Habits */
   .habit-dots { flex-wrap: wrap; max-width: 200px; }
   .habit-dot { width: 20px; height: 20px; font-size: 9px; }
   .habit-row { flex-wrap: wrap; }
-
-  /* Revision tracker */
   .rv-subject-header { flex-wrap: wrap; gap: 8px; }
   .rv-progress-bar { width: 60px; }
   .rv-revisions { flex-wrap: wrap; gap: 3px; }
   .rv-rev-dot { width: 20px; height: 20px; font-size: 9px; }
   .rv-topic-row { flex-wrap: wrap; gap: 6px; }
   .rv-topic-actions { opacity: 1; }
-
-  /* Filters */
   .filter-bar { gap: 6px; }
   .filter-btn { padding: 4px 10px; font-size: 11px; }
-
-  /* Todo input row - wrap on small screens */
   .todo-input-row { flex-wrap: wrap; }
-
-  /* Quick capture */
   .quick-capture { bottom: 16px; right: 16px; }
-
-  /* Pomo phases wrap */
   .pomo-phases { flex-wrap: wrap; gap: 6px; }
   .phase-btn { font-size: 11px; padding: 5px 12px; }
 }
 
 @media (max-width: 480px) {
-  /* Very small phones */
   .grid-3 { grid-template-columns: 1fr !important; }
   .stat-value { font-size: 22px; }
   .pomo-settings { grid-template-columns: 1fr !important; }
@@ -782,7 +854,7 @@ body::after {
 
 <!-- MOBILE -->
 <div id="topbar">
-  <span class="topbar-logo">FOCUS</span>
+  <span class="topbar-logo"><span class="status-dot"></span>FOCUS</span>
   <button id="hamburger" onclick="toggleMobileNav()">☰</button>
 </div>
 <div id="mobile-nav"></div>
@@ -803,7 +875,9 @@ body::after {
 <!-- APP -->
 <div id="app">
   <nav id="sidebar">
-    <div class="sidebar-logo">FOCUS</div>
+    <div class="sidebar-logo">
+      <span class="sidebar-logo-text"><span class="status-dot"></span>FOCUS</span>
+    </div>
     <div class="nav-label">Overview</div>
     <div class="nav-group" id="nav-desktop"></div>
     <div class="sidebar-footer">Focus Lab v2 · PWA</div>
@@ -1126,6 +1200,12 @@ body::after {
       <div class="page-header"><h1>Settings</h1><p>Preferences &amp; Data Management</p></div>
 
       <div class="card" style="margin-bottom:20px;">
+        <div class="card-title"><span class="card-title-text">Theme</span></div>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:14px;">Pick the look that fits your mood. Applies instantly across the whole app.</p>
+        <div class="theme-grid" id="themeGrid"></div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px;">
         <div class="card-title"><span class="card-title-text">Install App</span></div>
         <p style="font-size:13px;color:var(--text2);margin-bottom:14px;">Install Focus Lab on your device for offline access and a native app experience.</p>
         <div id="pwaStatus" style="font-size:13px;color:var(--text3);margin-bottom:12px;">Checking install status…</div>
@@ -1254,6 +1334,7 @@ if(id === 'groupstudy') { location.href = 'group-study.html'; return; }
   if(id==='settings') {
     document.getElementById('dailyGoalInput').value = S.get('dailyGoal', 4);
     updatePWAStatus();
+    renderThemeGrid();
   }
 }
 
@@ -1281,6 +1362,47 @@ const S = {
   set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
   del: (k) => { try { localStorage.removeItem(k); } catch {} }
 };
+
+/* ===================== THEMES ===================== */
+const THEMES = [
+  { id:'default', name:'Cyber Focus', emoji:'⌬', desc:'Deep blue & teal — the original',
+    dots:['#3b9eff','#00d4aa','#080c12'] },
+  { id:'forest',  name:'Forest',      emoji:'🌲', desc:'Calm greens for nature lovers',
+    dots:['#4caf7d','#a3d977','#07120c'] },
+  { id:'kawaii',  name:'Kawaii',      emoji:'🎀', desc:'Cute pink & blue pastels',
+    dots:['#ff8fc7','#7dd3fc','#fdf3fa'] },
+  { id:'sunset',  name:'Sunset',      emoji:'🌅', desc:'Warm amber & coral glow',
+    dots:['#ff8a5c','#ffd166','#140a0d'] },
+];
+
+function applyTheme(id, save=true) {
+  if (id === 'default') document.documentElement.removeAttribute('data-theme');
+  else document.documentElement.setAttribute('data-theme', id);
+  if (save) S.set('theme', id);
+  const meta = document.querySelector('meta[name="theme-color"]');
+  const t = THEMES.find(t=>t.id===id) || THEMES[0];
+  if (meta) meta.setAttribute('content', t.dots[0]);
+}
+
+function renderThemeGrid() {
+  const el = document.getElementById('themeGrid'); if (!el) return;
+  const current = S.get('theme', 'default');
+  el.innerHTML = THEMES.map(t => `
+    <button class="theme-swatch${t.id===current?' selected':''}" onclick="chooseTheme('${t.id}')">
+      <span class="theme-check">✓</span>
+      <div class="theme-swatch-dots">${t.dots.map(c=>`<span style="background:${c}"></span>`).join('')}</div>
+      <div class="theme-swatch-name">${t.emoji} ${t.name}</div>
+      <div class="theme-swatch-desc">${t.desc}</div>
+    </button>`).join('');
+}
+function chooseTheme(id) {
+  applyTheme(id);
+  renderThemeGrid();
+  const t = THEMES.find(t=>t.id===id);
+  snack(`${t.emoji} ${t.name} theme applied`);
+}
+// Apply saved theme immediately on load (before paint-affecting scripts below)
+applyTheme(S.get('theme','default'), false);
 
 /* ===================== PWA / SERVICE WORKER ===================== */
 let deferredInstallPrompt = null;
@@ -1902,7 +2024,7 @@ function renderNB() {
         <span class="nb-entry-type ${entry.type}">${meta.icon} ${meta.label}</span>
         <input class="nb-entry-title" value="${escHtml(entry.title)}" placeholder="Untitled…" oninput="updateNBField(${entry.id},'title',this.value)">
         <button class="nb-pin-btn" onclick="toggleNBPin(${entry.id})" title="${entry.pinned?'Unpin':'Pin'}">📌</button>
-        <button onclick="deleteNBEntry(${entry.id})" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:2px 4px;">✕</button>
+        <button onclick="deleteNBEntry(${entry.id})" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;">✕</button>
       </div>
       <div class="nb-entry-body">
         <textarea class="nb-note-textarea ${meta.textareaClass}" placeholder="${escHtml(entry.placeholder||'Write here…')}"

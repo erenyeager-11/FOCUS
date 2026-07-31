@@ -16,6 +16,9 @@
 <link rel="icon" type="image/png" href="./favicon.png">
 <link rel="shortcut icon" type="image/png" href="./favicon.png">
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<!-- Calculator engines: math.js (numeric/scientific) + nerdamer (symbolic algebra & calculus) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/all.min.js"></script>
 <style>
 :root {
   --bg: #080c12;
@@ -898,8 +901,43 @@ html[data-theme="sunset"] body::after {
 .pwa-diag-item .ok { color: var(--accent2); }
 .pwa-diag-item .fail { color: var(--accent3); }
 
+/* CALCULATOR */
+.calc-tabs { display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
+.calc-display-wrap { background:var(--bg3); border:1px solid var(--border); border-radius:10px; padding:16px; margin-bottom:14px; }
+.calc-expr { font-family:var(--mono); font-size:13px; color:var(--text2); min-height:18px; word-break:break-all; }
+.calc-result { font-family:var(--mono); font-size:32px; color:var(--accent); margin-top:6px; word-break:break-all; }
+.calc-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+.calc-grid.sci { grid-template-columns:repeat(6,1fr); }
+.calc-key { padding:14px 0; border-radius:10px; border:1px solid var(--border2); background:var(--surface2); color:var(--text); font-family:var(--mono); font-size:14px; cursor:pointer; transition:all 0.15s; }
+.calc-key:hover { background:var(--bg3); border-color:var(--accent); }
+.calc-key.op { background:rgba(59,158,255,0.12); color:var(--accent); }
+.calc-key.fn { background:rgba(192,132,252,0.1); color:var(--accent5); font-size:12px; }
+.calc-key.eq { background:var(--accent); color:#fff; font-weight:700; }
+.calc-key.clear { background:rgba(255,107,107,0.12); color:var(--accent3); }
+.calc-history { max-height:150px; overflow-y:auto; margin-top:14px; }
+.calc-hist-item { font-family:var(--mono); font-size:12px; padding:6px 10px; border-bottom:1px solid var(--border); color:var(--text2); cursor:pointer; display:flex; justify-content:space-between; gap:10px; }
+.calc-hist-item:hover { color:var(--accent); }
+.calc-cas-row { display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap; }
+.calc-cas-result { background:var(--bg3); border:1px solid var(--border); border-radius:8px; padding:14px; font-family:var(--mono); font-size:16px; color:var(--accent2); min-height:26px; word-break:break-all; margin-top:10px; }
+.calc-cas-steps { font-size:12px; color:var(--text3); margin-top:8px; line-height:1.8; }
+
+/* SPOTIFY / SONG SEGMENT — no login needed, embeds Spotify's own themed player */
+.spot-preset-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:12px; }
+.spot-preset-btn { background:var(--bg3); border:1px solid rgba(29,185,84,0.2); border-radius:12px; padding:18px 12px; text-align:center; cursor:pointer; transition:all 0.2s; }
+.spot-preset-btn:hover { border-color:#1DB954; transform:translateY(-2px); box-shadow:0 8px 24px rgba(29,185,84,0.16); }
+.spot-preset-emoji { font-size:26px; margin-bottom:6px; }
+.spot-preset-name { font-size:12px; font-weight:600; color:var(--text); }
+#card-spotify-player { border-color:rgba(29,185,84,0.35); box-shadow:0 0 40px rgba(29,185,84,0.15); }
+#spotEmbedWrap iframe { display:block; }
+
 /* Mobile layout fix - Comprehensive Override */
 @media (max-width: 768px) {
+  .calc-grid { grid-template-columns:repeat(4,1fr); }
+  .calc-grid.sci { grid-template-columns:repeat(5,1fr); }
+  .calc-key { padding:12px 0; font-size:13px; }
+  .spot-preset-grid { grid-template-columns:repeat(2,1fr); }
+  .calc-cas-row { flex-direction:column; }
+  .calc-cas-row .input { width:100% !important; }
   #sidebar { display: none; }
   #topbar { display: flex; }
   #main { margin-left: 0; padding: 80px 16px 24px; }
@@ -1305,6 +1343,78 @@ html[data-theme="sunset"] body::after {
       </div>
     </div>
 
+    <!-- CALCULATOR -->
+    <div class="page" id="page-calculator">
+      <div class="page-header"><h1>Calculator</h1><p>Scientific &amp; symbolic math — simplification, derivatives, integrals, solving</p></div>
+      <div class="card">
+        <div class="calc-tabs">
+          <button class="filter-btn active" onclick="setCalcMode('standard',this)">Standard</button>
+          <button class="filter-btn" onclick="setCalcMode('scientific',this)">Scientific</button>
+          <button class="filter-btn" onclick="setCalcMode('cas',this)">Algebra &amp; Calculus</button>
+        </div>
+
+        <!-- Standard / Scientific arithmetic calculator -->
+        <div id="calcArith">
+          <div class="calc-display-wrap">
+            <div class="calc-expr" id="calcExpr">&nbsp;</div>
+            <div class="calc-result" id="calcResult">0</div>
+          </div>
+          <div class="calc-grid" id="calcGrid"></div>
+          <div class="calc-history" id="calcHistory"></div>
+        </div>
+
+        <!-- Algebra / Calculus (CAS) mode -->
+        <div id="calcCAS" style="display:none;">
+          <div class="form-row">
+            <label>Expression (e.g. sqrt(72), x^3+2*x^2-x, (x^2-1)/(x-1), sin(x)*x^2)</label>
+            <input class="input input-full" id="casExpr" placeholder="type an expression…" style="width:100%;">
+          </div>
+          <div class="calc-cas-row">
+            <label style="font-size:11px;color:var(--text3);align-self:center;">variable</label>
+            <input class="input" id="casVar" value="x" style="width:60px;">
+            <input class="input" id="casLow" placeholder="lower bound (optional)" style="width:170px;">
+            <input class="input" id="casHigh" placeholder="upper bound (optional)" style="width:170px;">
+          </div>
+          <div class="btn-group" style="justify-content:flex-start;">
+            <button class="btn btn-primary btn-sm" onclick="casRun('simplify')">√ Simplify / Reduce</button>
+            <button class="btn btn-secondary btn-sm" onclick="casRun('expand')">Expand</button>
+            <button class="btn btn-secondary btn-sm" onclick="casRun('factor')">Factor</button>
+            <button class="btn btn-purple btn-sm" onclick="casRun('derivative')">Derivative d/dx</button>
+            <button class="btn btn-success btn-sm" onclick="casRun('integral')">Integrate ∫</button>
+            <button class="btn btn-warning btn-sm" onclick="casRun('solve')">Solve = 0</button>
+          </div>
+          <div class="calc-cas-result" id="casResult">Result appears here…</div>
+          <div class="calc-cas-steps" id="casSteps"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STUDY MUSIC (SPOTIFY) -->
+    <div class="page" id="page-spotify">
+      <div class="page-header"><h1>Study Music</h1><p>Tap a mood or paste any Spotify link — plays right here, no login or setup needed</p></div>
+
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-title"><span class="card-title-text">🎧 Quick Start</span></div>
+        <div class="spot-preset-grid" id="spotPresetGrid"></div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-title"><span class="card-title-text">Or Paste Any Spotify Link</span></div>
+        <p style="font-size:12px;color:var(--text2);margin-bottom:12px;">Playlist, album, track, or artist link from the Spotify app's Share button — works instantly.</p>
+        <div class="todo-input-row">
+          <input class="input input-full" id="spotLinkInput" placeholder="Paste a Spotify link…" onkeydown="if(event.key==='Enter')spotifyLoadFromInput()">
+          <button class="btn btn-primary" onclick="spotifyLoadFromInput()">▶ Load</button>
+        </div>
+      </div>
+
+      <div class="card" id="card-spotify-player" style="display:none;">
+        <div class="card-title"><span class="card-title-text" id="spotPlayerTitle">🎵 Now Playing</span>
+          <button class="bg-set-btn" onclick="spotifyClearPlayer()">✕ Clear</button>
+        </div>
+        <div id="spotEmbedWrap"></div>
+      </div>
+    </div>
+
     <!-- SETTINGS -->
     <div class="page" id="page-settings">
       <div class="page-header"><h1>Settings</h1><p>Preferences &amp; Data Management</p></div>
@@ -1418,7 +1528,9 @@ const ICONS = {
   revision: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21 12a9 9 0 0 1-15.3 6.4"></path><path d="M3 12A9 9 0 0 1 18.3 5.6"></path><path d="M18 2v5h5"></path><path d="M6 22v-5H1"></path></svg>',
   habits: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 21s7-4.2 7-10a7 7 0 1 0-14 0c0 5.8 7 10 7 10z"></path><circle cx="12" cy="11" r="2.5"></circle></svg>',
   analytics: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 19V5"></path><path d="M4 19h16"></path><rect x="7" y="11" width="3" height="5" rx="1"></rect><rect x="12" y="8" width="3" height="8" rx="1"></rect><rect x="17" y="4" width="3" height="12" rx="1"></rect></svg>',
-  settings: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.6-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.6V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1A1.7 1.7 0 0 0 19.4 9c.2.6.8 1 1.6 1h.1a2 2 0 1 1 0 4H21c-.8 0-1.4.4-1.6 1z"></path></svg>'
+  settings: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.6-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.6V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1A1.7 1.7 0 0 0 19.4 9c.2.6.8 1 1.6 1h.1a2 2 0 1 1 0 4H21c-.8 0-1.4.4-1.6 1z"></path></svg>',
+  calculator: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="2" width="16" height="20" rx="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="8" y1="11" x2="8" y2="11.01"></line><line x1="12" y1="11" x2="12" y2="11.01"></line><line x1="16" y1="11" x2="16" y2="11.01"></line><line x1="8" y1="15" x2="8" y2="15.01"></line><line x1="12" y1="15" x2="12" y2="15.01"></line><line x1="16" y1="15" x2="16" y2="15.01"></line><line x1="8" y1="19" x2="8" y2="19.01"></line><line x1="12" y1="19" x2="12" y2="19.01"></line><line x1="16" y1="19" x2="16" y2="19.01"></line></svg>',
+  spotify: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"></circle><path d="M7 10.7c3-.9 6.6-.7 9.2.9"></path><path d="M7.5 13.6c2.4-.7 5.3-.5 7.4.7"></path><path d="M8 16.4c1.9-.5 4.1-.4 5.8.6"></path></svg>'
 };
 
 const pages = [
@@ -1430,6 +1542,8 @@ const pages = [
   { id:'revision',  label:'Revision Tracker', icon:'revision' },
   { id:'habits',    label:'Habits',           icon:'habits' },
   { id:'analytics', label:'Analytics',        icon:'analytics' },
+  { id:'calculator',label:'Calculator',       icon:'calculator' },
+  { id:'spotify',   label:'Study Music',      icon:'spotify' },
   { id:'settings',  label:'Settings',         icon:'settings' },
 ];
 let currentPage = 'dashboard';
@@ -1462,6 +1576,8 @@ if(id === 'groupstudy') { location.href = 'group-study.html'; return; }
   if(id==='dashboard') { updateStats(); buildChart(); buildGoalWidget(); }
   if(id==='revision') renderRevision();
   if(id==='notebook') renderNB();
+  if(id==='calculator') { buildCalcGrid(); renderCalcHistory(); }
+  if(id==='spotify') renderSpotPresets();
   if(id==='settings') {
     document.getElementById('dailyGoalInput').value = S.get('dailyGoal', 4);
     updatePWAStatus();
@@ -2565,6 +2681,197 @@ function exportData(){
   snack('Data exported');
 }
 
+/* ===================== CALCULATOR ===================== */
+let calcMode = 'standard';
+let calcExprStr = '';
+let calcHistory = S.get('calcHistory', []);
+let calcAns = 0;
+
+function setCalcMode(mode, btn) {
+  calcMode = mode;
+  document.querySelectorAll('.calc-tabs .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('calcArith').style.display = mode === 'cas' ? 'none' : 'block';
+  document.getElementById('calcCAS').style.display = mode === 'cas' ? 'block' : 'none';
+  if (mode !== 'cas') buildCalcGrid();
+}
+
+const CALC_KEYS_STD = [
+  ['C','clear'],['(','op'],[')','op'],['DEL','clear'],['÷','op'],
+  ['7','num'],['8','num'],['9','num'],['×','op'],['√','fn'],
+  ['4','num'],['5','num'],['6','num'],['-','op'],['^','op'],
+  ['1','num'],['2','num'],['3','num'],['+','op'],['%','op'],
+  ['0','num'],['.','num'],['Ans','num'],['π','num'],['=','eq'],
+];
+const CALC_KEYS_SCI = [
+  ['C','clear'],['(','op'],[')','op'],['DEL','clear'],['÷','op'],['sin','fn'],
+  ['7','num'],['8','num'],['9','num'],['×','op'],['cos','fn'],['tan','fn'],
+  ['4','num'],['5','num'],['6','num'],['-','op'],['ln','fn'],['log','fn'],
+  ['1','num'],['2','num'],['3','num'],['+','op'],['√','fn'],['^','op'],
+  ['0','num'],['.','num'],['Ans','num'],['π','num'],['e','num'],['=','eq'],
+];
+
+function buildCalcGrid() {
+  const grid = document.getElementById('calcGrid'); if (!grid) return;
+  const keys = calcMode === 'scientific' ? CALC_KEYS_SCI : CALC_KEYS_STD;
+  grid.className = 'calc-grid' + (calcMode === 'scientific' ? ' sci' : '');
+  grid.innerHTML = keys.map(([label, type]) =>
+    `<button class="calc-key ${type}" onclick="calcPress('${label.replace(/'/g,"\\'")}')">${label}</button>`
+  ).join('');
+}
+
+function calcPress(label) {
+  if (label === 'C') { calcExprStr = ''; renderCalcDisplay(); return; }
+  if (label === 'DEL') { calcExprStr = calcExprStr.slice(0, -1); renderCalcDisplay(); return; }
+  if (label === '=') { calcEvaluate(); return; }
+  const map = { '×':'*', '÷':'/', '√':'sqrt(', 'π':'pi', 'sin':'sin(', 'cos':'cos(', 'tan':'tan(', 'ln':'log(', 'log':'log10(', 'Ans': String(calcAns) };
+  calcExprStr += (map[label] !== undefined ? map[label] : label);
+  renderCalcDisplay();
+}
+
+function renderCalcDisplay() {
+  const el = document.getElementById('calcExpr'); if (el) el.textContent = calcExprStr || '\u00A0';
+}
+
+function calcEvaluate() {
+  if (!calcExprStr.trim()) return;
+  try {
+    const val = math.evaluate(calcExprStr);
+    const formatted = typeof val === 'number' ? math.format(val, { precision: 12 }) : val.toString();
+    document.getElementById('calcResult').textContent = formatted;
+    calcAns = val;
+    calcHistory.unshift({ expr: calcExprStr, result: formatted });
+    calcHistory = calcHistory.slice(0, 30);
+    S.set('calcHistory', calcHistory);
+    renderCalcHistory();
+  } catch (err) {
+    document.getElementById('calcResult').textContent = 'Error';
+  }
+}
+
+function renderCalcHistory() {
+  const el = document.getElementById('calcHistory'); if (!el) return;
+  el.innerHTML = calcHistory.map(h =>
+    `<div class="calc-hist-item" onclick="calcRecall('${h.expr.replace(/'/g,"\\'")}')"><span>${escHtml(h.expr)}</span><span style="color:var(--accent);">${escHtml(h.result)}</span></div>`
+  ).join('');
+}
+function calcRecall(expr) { calcExprStr = expr; renderCalcDisplay(); }
+
+/* Algebra & Calculus (symbolic engine via nerdamer) */
+function casRun(op) {
+  const exprRaw = document.getElementById('casExpr').value.trim();
+  const v = document.getElementById('casVar').value.trim() || 'x';
+  const lo = document.getElementById('casLow').value.trim();
+  const hi = document.getElementById('casHigh').value.trim();
+  const resEl = document.getElementById('casResult');
+  const stepsEl = document.getElementById('casSteps');
+  if (!exprRaw) { resEl.textContent = 'Enter an expression first.'; stepsEl.textContent=''; return; }
+  try {
+    let out = '', steps = '';
+    if (op === 'simplify') {
+      out = nerdamer(exprRaw).text('fractions');
+      steps = 'Automatically simplified — radicals reduced to simplest surd form, like terms combined.';
+    } else if (op === 'expand') {
+      out = nerdamer(exprRaw).expand().text('fractions');
+      steps = 'Expanded all products and powers.';
+    } else if (op === 'factor') {
+      const e = nerdamer(exprRaw);
+      out = (typeof e.factor === 'function' ? e.factor() : e).text('fractions');
+      steps = 'Factored where a factorization exists.';
+    } else if (op === 'derivative') {
+      out = nerdamer.diff(exprRaw, v).text('fractions');
+      steps = `d/d${v} [ ${exprRaw} ]`;
+    } else if (op === 'integral') {
+      const F = nerdamer.integrate(exprRaw, v);
+      if (lo && hi) {
+        const Fhi = nerdamer(F.toString()).sub(v, hi).evaluate();
+        const Flo = nerdamer(F.toString()).sub(v, lo).evaluate();
+        out = nerdamer(`(${Fhi.toString()})-(${Flo.toString()})`).evaluate().text('decimals');
+        steps = `∫ from ${lo} to ${hi} of [ ${exprRaw} ] d${v}  =  F(${hi}) − F(${lo}), where F(${v}) = ${F.toString()}`;
+      } else {
+        out = F.text('fractions') + ' + C';
+        steps = `Indefinite integral ∫ [ ${exprRaw} ] d${v}`;
+      }
+    } else if (op === 'solve') {
+      const eqStr = exprRaw.includes('=') ? exprRaw : exprRaw + '=0';
+      const sol = nerdamer.solveEquations(eqStr, v);
+      out = Array.isArray(sol) ? sol.join(' ,  ') : String(sol);
+      steps = `Solving [ ${eqStr} ] for ${v}`;
+    }
+    resEl.textContent = out || '—';
+    stepsEl.textContent = steps;
+  } catch (err) {
+    resEl.textContent = 'Could not solve — check the expression syntax.';
+    stepsEl.textContent = String((err && err.message) || err);
+  }
+}
+
+/* ===================== SPOTIFY (STUDY MUSIC) — no login, no client ID ===================== */
+/* Uses Spotify's own official embed player (open.spotify.com/embed/...), which is free and
+   requires zero account/setup for the person using this page — tap a mood or paste a link and it plays. */
+const SPOTIFY_PRESETS = [
+  { emoji:'🌙', name:'Lofi Beats',         uri:'playlist/37i9dQZF1DWWQRwui0ExPn' },
+  { emoji:'🎯', name:'Deep Focus',         uri:'playlist/37i9dQZF1DWZeKCadgRdKQ' },
+  { emoji:'🎹', name:'Peaceful Piano',     uri:'playlist/37i9dQZF1DX4sWSpwq3LiO' },
+  { emoji:'📚', name:'Instrumental Study', uri:'playlist/37i9dQZF1DX9sIqqvKsjG8' },
+];
+
+function renderSpotPresets() {
+  const el = document.getElementById('spotPresetGrid'); if (!el) return;
+  el.innerHTML = SPOTIFY_PRESETS.map((p,i) => `
+    <div class="spot-preset-btn" onclick="spotifyLoadPreset(${i})">
+      <div class="spot-preset-emoji">${p.emoji}</div>
+      <div class="spot-preset-name">${escHtml(p.name)}</div>
+    </div>`).join('');
+}
+
+function spotifyLoadPreset(i) {
+  const p = SPOTIFY_PRESETS[i]; if (!p) return;
+  spotifyLoadEmbed(p.uri, p.name);
+}
+
+function spotifyParseLink(raw) {
+  let m = raw.match(/open\.spotify\.com\/(playlist|album|track|artist|show|episode)\/([a-zA-Z0-9]+)/);
+  if (m) return `${m[1]}/${m[2]}`;
+  m = raw.match(/spotify:(playlist|album|track|artist|show|episode):([a-zA-Z0-9]+)/);
+  if (m) return `${m[1]}/${m[2]}`;
+  if (/^[a-zA-Z0-9]{18,24}$/.test(raw)) return `playlist/${raw}`;
+  return null;
+}
+
+function spotifyLoadFromInput() {
+  const raw = document.getElementById('spotLinkInput').value.trim();
+  if (!raw) { snack('Paste a Spotify link first'); return; }
+  const parsed = spotifyParseLink(raw);
+  if (!parsed) { snack('⚠ Could not read that Spotify link'); return; }
+  spotifyLoadEmbed(parsed, 'Your Playlist');
+}
+
+function spotifyLoadEmbed(uriPath, label) {
+  const wrap = document.getElementById('spotEmbedWrap');
+  const card = document.getElementById('card-spotify-player');
+  const title = document.getElementById('spotPlayerTitle');
+  if (!wrap || !card) return;
+  wrap.innerHTML = `<iframe style="border-radius:12px;" src="https://open.spotify.com/embed/${uriPath}?utm_source=generator&theme=0"
+    width="100%" height="352" frameborder="0" allowfullscreen=""
+    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
+  title.textContent = '🎵 ' + label;
+  card.style.display = 'block';
+  S.set('spotLastUri', { uriPath, label });
+  snack('🎧 Loaded — hit play in the player');
+}
+
+function spotifyClearPlayer() {
+  const wrap = document.getElementById('spotEmbedWrap'); if (wrap) wrap.innerHTML = '';
+  const card = document.getElementById('card-spotify-player'); if (card) card.style.display = 'none';
+  S.del('spotLastUri');
+}
+
+function spotifyRestoreLast() {
+  const last = S.get('spotLastUri', null);
+  if (last && last.uriPath) spotifyLoadEmbed(last.uriPath, last.label);
+}
+
 /* ===================== UTILS ===================== */
 function snack(msg){const el=document.getElementById('snack');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500);}
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -2574,6 +2881,10 @@ function timeAgo(iso){const diff=(Date.now()-new Date(iso))/1000;if(diff<60)retu
 buildNav();
 renderRevision();
 bgRestoreAll();
+buildCalcGrid();
+renderCalcHistory();
+renderSpotPresets();
+spotifyRestoreLast();
 </script>
 </body>
 </html>

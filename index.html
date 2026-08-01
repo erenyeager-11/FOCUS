@@ -2810,13 +2810,14 @@ function casRun(op) {
 }
 
 /* ===================== STUDY MUSIC — YouTube embed (full songs, zero login) ===================== */
-/* YouTube's embed player plays full-length audio/video with no account/login required —
-   this fixes the Spotify preview-clip limitation entirely. IDs verified real, official streams. */
+/* Uses YouTube PLAYLISTS (not single livestream IDs) — playlists auto-skip any track that
+   goes down instead of breaking entirely, which is what happened with hardcoded livestream IDs
+   (e.g. Lofi Girl's main stream was taken down in a copyright dispute). Verified real playlist IDs. */
 const SPOTIFY_PRESETS = [
-  { emoji:'🌙', name:'Lofi Beats',        uri:'jfKfPfyJRdk' },
-  { emoji:'☕', name:'Coffee Shop Jazz',  uri:'mwPR8aizAyo' },
-  { emoji:'🎹', name:'Piano & Study',     uri:'Dx5qFachd3A' },
-  { emoji:'📚', name:'24/7 Study Radio',  uri:'uMntpJdjrbM' },
+  { emoji:'🌙', name:'Lofi & Chillhop',  type:'playlist', id:'PLt7bG0K25iXi9KIt6P6yStMp9ObzXjApm' },
+  { emoji:'🎹', name:'Relaxing Piano',   type:'playlist', id:'PLUw7Nsql2TwR45Tjcdwm_6y34jmD8bK-f' },
+  { emoji:'📚', name:'Study Beats',      type:'playlist', id:'PLHLsCm5YIe3QVyfV20oY7MjvfTYFMZ94u' },
+  { emoji:'☕', name:'Chillhop Radio',   type:'playlist', id:'PLoFqog36C2E0yMWv3eVUd673K_A7FVoIG' },
 ];
 
 function renderSpotPresets() {
@@ -2830,13 +2831,15 @@ function renderSpotPresets() {
 
 function spotifyLoadPreset(i) {
   const p = SPOTIFY_PRESETS[i]; if (!p) return;
-  spotifyLoadEmbed(p.uri, p.name);
+  spotifyLoadEmbed(p.type, p.id, p.name);
 }
 
 function spotifyParseLink(raw) {
-  let m = raw.match(/(?:youtube\.com\/watch\?v=|youtube\.com\/live\/|youtube\.com\/embed\/|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-  if (m) return m[1];
-  if (/^[a-zA-Z0-9_-]{11}$/.test(raw)) return raw;
+  let m = raw.match(/[?&]list=([a-zA-Z0-9_-]+)/);
+  if (m) return { type: 'playlist', id: m[1] };
+  m = raw.match(/(?:youtube\.com\/watch\?v=|youtube\.com\/live\/|youtube\.com\/embed\/|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  if (m) return { type: 'video', id: m[1] };
+  if (/^[a-zA-Z0-9_-]{11}$/.test(raw)) return { type: 'video', id: raw };
   return null;
 }
 
@@ -2845,20 +2848,23 @@ function spotifyLoadFromInput() {
   if (!raw) { snack('Paste a YouTube link first'); return; }
   const parsed = spotifyParseLink(raw);
   if (!parsed) { snack('⚠ Could not read that YouTube link'); return; }
-  spotifyLoadEmbed(parsed, 'Your Pick');
+  spotifyLoadEmbed(parsed.type, parsed.id, 'Your Pick');
 }
 
-function spotifyLoadEmbed(videoId, label) {
+function spotifyLoadEmbed(type, id, label) {
   const wrap = document.getElementById('spotEmbedWrap');
   const card = document.getElementById('card-spotify-player');
   const title = document.getElementById('spotPlayerTitle');
   if (!wrap || !card) return;
-  wrap.innerHTML = `<iframe style="border-radius:12px;" src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0"
+  const src = type === 'playlist'
+    ? `https://www.youtube.com/embed/videoseries?list=${id}&autoplay=1&rel=0`
+    : `https://www.youtube.com/embed/${id}?autoplay=1&rel=0`;
+  wrap.innerHTML = `<iframe style="border-radius:12px;" src="${src}"
     width="100%" height="352" frameborder="0"
     allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>`;
   title.textContent = '🎵 ' + label;
   card.style.display = 'block';
-  S.set('spotLastUri', { uriPath: videoId, label });
+  S.set('spotLastUri', { type, id, label });
   snack('🎧 Playing — full length, no login needed');
 }
 
@@ -2870,7 +2876,7 @@ function spotifyClearPlayer() {
 
 function spotifyRestoreLast() {
   const last = S.get('spotLastUri', null);
-  if (last && last.uriPath) spotifyLoadEmbed(last.uriPath, last.label);
+  if (last && last.id) spotifyLoadEmbed(last.type, last.id, last.label);
 }
 
 /* ===================== UTILS ===================== */

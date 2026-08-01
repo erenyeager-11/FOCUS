@@ -930,13 +930,6 @@ html[data-theme="sunset"] body::after {
 #card-spotify-player { border-color:rgba(29,185,84,0.35); box-shadow:0 0 40px rgba(29,185,84,0.15); }
 #spotEmbedWrap iframe { display:block; }
 
-/* AI DOUBT SOLVER */
-.ds-hist-item { padding:10px 12px; background:var(--bg3); border:1px solid var(--border); border-radius:8px; margin-bottom:8px; cursor:pointer; transition:all 0.15s; }
-.ds-hist-item:hover { border-color:var(--border2); }
-.ds-hist-q { font-size:13px; font-weight:600; color:var(--text); }
-.ds-hist-a-preview { font-size:12px; color:var(--text2); margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-#dsAnswer b { color:var(--accent2); }
-
 /* Mobile layout fix - Comprehensive Override */
 @media (max-width: 768px) {
   .calc-grid { grid-template-columns:repeat(4,1fr); }
@@ -1424,33 +1417,7 @@ html[data-theme="sunset"] body::after {
         <div id="spotEmbedWrap"></div>
       </div>
     </div>
-
-    <!-- AI DOUBT SOLVER -->
-    <div class="page" id="page-doubtsolver">
-      <div class="page-header"><h1>Doubt Solver</h1><p>Type any doubt in plain text — AI explains it step by step</p></div>
-
-      <div class="card" style="margin-bottom:20px;">
-        <div class="card-title"><span class="card-title-text">Ask a Doubt</span></div>
-        <textarea class="input input-full" id="dsQuestion" rows="4" placeholder="Type your doubt here… e.g. Why does dividing by zero break math?" style="width:100%;resize:vertical;"></textarea>
-        <div class="btn-group" style="justify-content:flex-start;">
-          <button class="btn btn-primary" onclick="dsAsk()" id="dsAskBtn">✦ Solve My Doubt</button>
-          <button class="btn btn-secondary" onclick="dsClear()">Clear</button>
-        </div>
-      </div>
-
-      <div class="card" id="card-ds-answer" style="display:none;margin-bottom:20px;">
-        <div class="card-title"><span class="card-title-text">Answer</span></div>
-        <div id="dsAnswer" style="font-size:14px;line-height:1.8;"></div>
-      </div>
-
-      <div class="card">
-        <div class="card-title"><span class="card-title-text">Past Doubts</span>
-          <button class="bg-set-btn" onclick="dsClearHistory()">🗑 Clear</button>
-        </div>
-        <div id="dsHistory"></div>
-      </div>
-    </div>
-
+    
     <!-- SETTINGS -->
     <div class="page" id="page-settings">
       <div class="page-header"><h1>Settings</h1><p>Preferences &amp; Data Management</p></div>
@@ -1567,7 +1534,6 @@ const ICONS = {
   settings: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.6-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.6V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1A1.7 1.7 0 0 0 19.4 9c.2.6.8 1 1.6 1h.1a2 2 0 1 1 0 4H21c-.8 0-1.4.4-1.6 1z"></path></svg>',
   calculator: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="2" width="16" height="20" rx="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="8" y1="11" x2="8" y2="11.01"></line><line x1="12" y1="11" x2="12" y2="11.01"></line><line x1="16" y1="11" x2="16" y2="11.01"></line><line x1="8" y1="15" x2="8" y2="15.01"></line><line x1="12" y1="15" x2="12" y2="15.01"></line><line x1="16" y1="15" x2="16" y2="15.01"></line><line x1="8" y1="19" x2="8" y2="19.01"></line><line x1="12" y1="19" x2="12" y2="19.01"></line><line x1="16" y1="19" x2="16" y2="19.01"></line></svg>',
   spotify: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"></circle><path d="M7 10.7c3-.9 6.6-.7 9.2.9"></path><path d="M7.5 13.6c2.4-.7 5.3-.5 7.4.7"></path><path d="M8 16.4c1.9-.5 4.1-.4 5.8.6"></path></svg>',
-  doubtsolver: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2l1.9 5.8L20 9.5l-5 3.6 1.6 6-4.6-3.5-4.6 3.5 1.6-6-5-3.6 6.1-1.7z"></path></svg>'
 };
 
 const pages = [
@@ -1581,7 +1547,6 @@ const pages = [
   { id:'analytics', label:'Analytics',        icon:'analytics' },
   { id:'calculator',label:'Calculator',       icon:'calculator' },
   { id:'spotify',   label:'Study Music',      icon:'spotify' },
-  { id:'doubtsolver', label:'Doubt Solver',   icon:'doubtsolver' },
   { id:'settings',  label:'Settings',         icon:'settings' },
 ];
 let currentPage = 'dashboard';
@@ -1616,7 +1581,6 @@ if(id === 'groupstudy') { location.href = 'group-study.html'; return; }
   if(id==='notebook') renderNB();
   if(id==='calculator') { buildCalcGrid(); renderCalcHistory(); }
   if(id==='spotify') renderSpotPresets();
-  if(id==='doubtsolver') renderDsHistory();
   if(id==='settings') {
     document.getElementById('dailyGoalInput').value = S.get('dailyGoal', 4);
     updatePWAStatus();
@@ -2914,81 +2878,6 @@ function spotifyRestoreLast() {
   const last = S.get('spotLastUri', null);
   if (last && last.id) spotifyLoadEmbed(last.type, last.id, last.label);
 }
-
-/* ===================== AI DOUBT SOLVER ===================== */
-/* Calls our own serverless function at /api/doubt (see /api/doubt.js) instead of
-   Gemini directly — the API key lives ONLY in Vercel's Environment Variables
-   dashboard, never in any file, so it can never leak through git or view-source. */
-
-let dsHistory = S.get('dsHistory', []);
-
-function dsMdToHtml(text) {
-  let t = escHtml(text);
-  t = t.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
-  t = t.replace(/^[-*]\s+(.*)$/gm, '• $1');
-  t = t.replace(/\n/g, '<br>');
-  return t;
-}
-
-async function dsAsk() {
-  const q = document.getElementById('dsQuestion').value.trim();
-  if (!q) { snack('Type a doubt first'); return; }
-  const btn = document.getElementById('dsAskBtn');
-  const answerCard = document.getElementById('card-ds-answer');
-  const answerEl = document.getElementById('dsAnswer');
-  btn.disabled = true; btn.textContent = '⏳ Thinking…';
-  answerCard.style.display = 'block';
-  answerEl.innerHTML = '<p style="color:var(--text3);">Thinking…</p>';
-  try {
-    const res = await fetch('/api/doubt', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question: q })
-    });
-    const data = await res.json();
-    if (data.error) {
-      answerEl.innerHTML = `<p style="color:var(--accent3);">⚠ ${escHtml(data.error)}</p>`;
-    } else {
-      const text = data.text || 'No response received.';
-      answerEl.innerHTML = dsMdToHtml(text);
-      dsHistory.unshift({ q, a: text, ts: new Date().toISOString() });
-      dsHistory = dsHistory.slice(0, 30);
-      S.set('dsHistory', dsHistory);
-      renderDsHistory();
-    }
-  } catch (err) {
-    answerEl.innerHTML = '<p style="color:var(--accent3);">⚠ Could not reach the doubt solver — check your internet connection.</p>';
-  }
-  btn.disabled = false; btn.textContent = '✦ Solve My Doubt';
-}
-
-function dsClear() {
-  document.getElementById('dsQuestion').value = '';
-  document.getElementById('card-ds-answer').style.display = 'none';
-}
-
-function renderDsHistory() {
-  const el = document.getElementById('dsHistory'); if (!el) return;
-  if (!dsHistory.length) { el.innerHTML = '<p style="font-size:12px;color:var(--text3);">No doubts asked yet.</p>'; return; }
-  el.innerHTML = dsHistory.map((h,i) => `
-    <div class="ds-hist-item" onclick="dsRecall(${i})">
-      <div class="ds-hist-q">${escHtml(h.q)}</div>
-      <div class="ds-hist-a-preview">${escHtml(h.a.slice(0,90))}${h.a.length>90?'…':''}</div>
-    </div>`).join('');
-}
-
-function dsRecall(i) {
-  const h = dsHistory[i]; if (!h) return;
-  document.getElementById('dsQuestion').value = h.q;
-  document.getElementById('card-ds-answer').style.display = 'block';
-  document.getElementById('dsAnswer').innerHTML = dsMdToHtml(h.a);
-}
-
-function dsClearHistory() {
-  if (!confirm('Clear all past doubts?')) return;
-  dsHistory = []; S.set('dsHistory', []); renderDsHistory();
-}
-
 /* ===================== UTILS ===================== */
 function snack(msg){const el=document.getElementById('snack');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500);}
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}

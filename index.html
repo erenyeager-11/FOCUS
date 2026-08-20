@@ -930,6 +930,106 @@ html[data-theme="sunset"] body::after {
 #card-spotify-player { border-color:rgba(29,185,84,0.35); box-shadow:0 0 40px rgba(29,185,84,0.15); }
 #spotEmbedWrap iframe { display:block; }
 
+/* =====================================================================
+   NOTE PHOTO ATTACHMENTS
+===================================================================== */
+.note-img-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-top:10px; }
+.note-img-thumb { position:relative; border-radius:8px; overflow:hidden; aspect-ratio:1; cursor:pointer; border:1px solid var(--border2); background:var(--bg3); }
+.note-img-thumb img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.2s; }
+.note-img-thumb:hover img { transform:scale(1.08); }
+.note-img-remove {
+  position:absolute; top:3px; right:3px; width:18px; height:18px; border-radius:50%;
+  background:rgba(0,0,0,0.6); color:#fff; border:none; font-size:10px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; z-index:2; line-height:1;
+}
+.note-img-remove:hover { background:rgba(255,80,80,0.85); }
+.note-attach-row { display:flex; align-items:center; gap:8px; margin-top:10px; }
+.note-attach-btn {
+  font-size:11px; padding:5px 10px; border-radius:20px; border:1px dashed var(--border2);
+  background:transparent; color:var(--text2); cursor:pointer; transition:all 0.15s;
+}
+.note-attach-btn:hover { border-color:var(--accent); color:var(--accent); border-style:solid; }
+
+/* Lightbox for viewing attached images full-size */
+#lightboxOverlay {
+  display:none; position:fixed; inset:0; z-index:2000;
+  background:rgba(4,6,10,0.92); backdrop-filter:blur(6px);
+  align-items:center; justify-content:center; flex-direction:column; gap:16px;
+  padding:32px; cursor:zoom-out;
+}
+#lightboxOverlay.open { display:flex; animation:fadeUp 0.2s ease; }
+#lightboxOverlay img { max-width:min(900px,92vw); max-height:80vh; border-radius:12px; box-shadow:0 20px 80px rgba(0,0,0,0.6); cursor:default; }
+#lightboxOverlay .lb-close {
+  position:absolute; top:20px; right:24px; width:40px; height:40px; border-radius:50%;
+  background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:#fff;
+  font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+}
+#lightboxOverlay .lb-close:hover { background:rgba(255,255,255,0.16); }
+#lightboxOverlay .lb-caption { color:var(--text2); font-size:12px; cursor:default; }
+
+/* =====================================================================
+   SMART NOTEBOOK ATTACHMENTS (images & PDFs)
+===================================================================== */
+.nb-attach-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.nb-attach-btn {
+  font-size:11px; padding:5px 10px; border-radius:20px; border:1px dashed var(--border2);
+  background:transparent; color:var(--text2); cursor:pointer; transition:all 0.15s; white-space:nowrap;
+}
+.nb-attach-btn:hover { border-color:var(--accent5); color:var(--accent5); border-style:solid; }
+.nb-attachments { display:flex; flex-wrap:wrap; gap:8px; }
+.nb-attach-thumb { position:relative; width:56px; height:56px; border-radius:8px; overflow:hidden; cursor:pointer; border:1px solid var(--border2); flex-shrink:0; }
+.nb-attach-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+.nb-attach-file {
+  display:flex; align-items:center; gap:6px; padding:6px 10px; border-radius:8px;
+  background:rgba(255,107,107,0.08); border:1px solid rgba(255,107,107,0.2);
+  font-size:11px; color:var(--text2); cursor:pointer; max-width:180px; transition:all 0.15s;
+}
+.nb-attach-file:hover { border-color:var(--accent3); color:var(--accent3); }
+.nb-attach-file .nm { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.nb-attach-remove {
+  position:absolute; top:1px; right:1px; width:16px; height:16px; border-radius:50%;
+  background:rgba(0,0,0,0.65); color:#fff; border:none; font-size:9px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; z-index:2; line-height:1;
+}
+.nb-attach-remove-file {
+  border:none; background:none; color:var(--text3); cursor:pointer; font-size:11px; margin-left:2px;
+}
+.nb-attach-remove-file:hover { color:var(--accent3); }
+
+/* =====================================================================
+   FOCUS MODE — immersive distraction-free overlay
+===================================================================== */
+#focusModeOverlay {
+  display:none; position:fixed; inset:0; z-index:3000;
+  background: radial-gradient(ellipse 70% 60% at 50% 40%, rgba(59,158,255,0.10) 0%, var(--bg) 70%);
+  align-items:center; justify-content:center; flex-direction:column;
+  color:var(--text);
+}
+#focusModeOverlay.open { display:flex; animation:fadeUp 0.35s ease; }
+.fm-exit-btn {
+  position:absolute; top:24px; right:28px; width:42px; height:42px; border-radius:50%;
+  background:rgba(255,255,255,0.06); border:1px solid var(--border2); color:var(--text2);
+  font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:all 0.2s;
+}
+.fm-exit-btn:hover { background:rgba(255,107,107,0.14); color:var(--accent3); border-color:rgba(255,107,107,0.3); }
+.fm-breathe-wrap { position:relative; width:min(60vw,380px); height:min(60vw,380px); display:flex; align-items:center; justify-content:center; }
+.fm-breathe-ring {
+  position:absolute; inset:0; border-radius:50%;
+  border:1px solid var(--border2);
+  animation: fmBreathe 6s ease-in-out infinite;
+}
+.fm-breathe-ring.r2 { inset:30px; animation-delay:0.4s; opacity:0.7; }
+.fm-breathe-ring.r3 { inset:60px; animation-delay:0.8s; opacity:0.5; }
+@keyframes fmBreathe {
+  0%, 100% { transform:scale(0.92); box-shadow:0 0 0 0 rgba(59,158,255,0.0); border-color:var(--border2); }
+  50% { transform:scale(1.04); box-shadow:0 0 50px 6px rgba(59,158,255,0.12); border-color:rgba(59,158,255,0.35); }
+}
+.fm-timer { font-family:var(--mono); font-size:clamp(46px,8vw,86px); color:var(--accent); text-shadow:0 0 40px rgba(59,158,255,0.35); letter-spacing:3px; z-index:2; }
+.fm-sub { font-size:12px; letter-spacing:3px; text-transform:uppercase; color:var(--text3); margin-top:8px; z-index:2; }
+.fm-quote { margin-top:34px; font-size:14px; color:var(--text2); max-width:420px; text-align:center; font-style:italic; z-index:2; }
+.fm-controls { display:flex; gap:10px; margin-top:36px; z-index:2; }
+
 /* Mobile layout fix - Comprehensive Override */
 @media (max-width: 768px) {
   .calc-grid { grid-template-columns:repeat(4,1fr); }
@@ -973,6 +1073,9 @@ html[data-theme="sunset"] body::after {
   .quick-capture { bottom: 16px; right: 16px; }
   .pomo-phases { flex-wrap: wrap; gap: 6px; }
   .phase-btn { font-size: 11px; padding: 5px 12px; }
+  .note-img-grid { grid-template-columns: repeat(3, 1fr); }
+  .fm-breathe-wrap { width: 62vw; height: 62vw; }
+  .fm-exit-btn { top: 16px; right: 16px; }
 }
 
 @media (max-width: 480px) {
@@ -1083,6 +1186,7 @@ html[data-theme="sunset"] body::after {
             <button class="btn btn-primary" onclick="startStudy()">▶ Start</button>
             <button class="btn btn-secondary" onclick="pauseStudy()">⏸ Pause</button>
             <button class="btn btn-danger" onclick="resetStudyTimer()">↺ Reset Timer</button>
+            <button class="btn btn-purple" onclick="openFocusMode()">⛶ Focus Mode</button>
           </div>
         </div>
 
@@ -1259,7 +1363,7 @@ html[data-theme="sunset"] body::after {
 
     <!-- NOTES -->
     <div class="page" id="page-notes">
-      <div class="page-header"><h1>Notes</h1><p>Your quick-capture scratchpad</p></div>
+      <div class="page-header"><h1>Notes</h1><p>Your quick-capture scratchpad — with photos</p></div>
       <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
         <button class="btn btn-primary" onclick="addNote()">+ New Note</button>
       </div>
@@ -1499,6 +1603,38 @@ html[data-theme="sunset"] body::after {
 
 <!-- Hidden file input for BG photo picker -->
 <input type="file" id="bg-file-input" accept="image/*" style="display:none;" onchange="bgHandleFile(event)">
+
+<!-- Hidden file input for Note photo attachments (multiple) -->
+<input type="file" id="note-img-input" accept="image/*" multiple style="display:none;" onchange="noteHandleImageFiles(event)">
+
+<!-- Hidden file input for Smart Notebook attachments (images + PDFs, multiple) -->
+<input type="file" id="nb-attach-input" accept="image/*,application/pdf" multiple style="display:none;" onchange="nbHandleAttachFiles(event)">
+
+<!-- LIGHTBOX (full-size image viewer for note/notebook photos) -->
+<div id="lightboxOverlay" onclick="closeLightbox()">
+  <button class="lb-close" onclick="closeLightbox()">✕</button>
+  <img id="lightboxImg" src="" alt="Attachment preview" onclick="event.stopPropagation()">
+  <div class="lb-caption" id="lightboxCaption"></div>
+</div>
+
+<!-- FOCUS MODE — immersive distraction-free timer -->
+<div id="focusModeOverlay">
+  <button class="fm-exit-btn" onclick="closeFocusMode()" title="Exit Focus Mode (Esc)">✕</button>
+  <div class="fm-breathe-wrap">
+    <div class="fm-breathe-ring"></div>
+    <div class="fm-breathe-ring r2"></div>
+    <div class="fm-breathe-ring r3"></div>
+    <div style="text-align:center;">
+      <div class="fm-timer" id="fmTimer">00:00:00</div>
+      <div class="fm-sub" id="fmStatus">Ready</div>
+    </div>
+  </div>
+  <div class="fm-quote" id="fmQuote">Discipline creates freedom.</div>
+  <div class="fm-controls">
+    <button class="btn btn-primary" onclick="fmToggleStart()" id="fmStartBtn">▶ Start</button>
+    <button class="btn btn-secondary" onclick="closeFocusMode()">Exit Focus Mode</button>
+  </div>
+</div>
 
 <!-- QUICK CAPTURE -->
 <div class="quick-capture">
@@ -2249,13 +2385,22 @@ let notes=S.get('notes',[]);
 const NOTE_COLORS=['#1a2333','#1a1a2e','#1a2a1a','#2a1a1a','#2a2018'];
 const NOTE_ACCENTS=['var(--accent)','var(--accent2)','var(--accent3)','var(--accent4)','#c084fc'];
 function addNote(text=''){
-  notes.unshift({id:Date.now(),text,color:0,created:new Date().toISOString()});
+  notes.unshift({id:Date.now(),text,color:0,images:[],created:new Date().toISOString()});
   S.set('notes',notes); renderNotes();
 }
 function renderNotes(){
   const el=document.getElementById('noteGrid'); if(!el)return;
   if(!notes.length){el.innerHTML='<div style="color:var(--text3);font-size:13px;">No notes yet. Click + New Note.</div>';return;}
-  el.innerHTML=notes.map((n)=>`
+  el.innerHTML=notes.map((n)=>{
+    const imgs = n.images || [];
+    const imgGrid = imgs.length ? `<div class="note-img-grid">
+      ${imgs.map((src,ii)=>`
+        <div class="note-img-thumb" onclick="openLightbox('${src}','')">
+          <img src="${src}" alt="Note photo">
+          <button class="note-img-remove" onclick="event.stopPropagation();removeNoteImage(${n.id},${ii})" title="Remove photo">✕</button>
+        </div>`).join('')}
+    </div>` : '';
+    return `
     <div class="note-card" style="background:${NOTE_COLORS[n.color]};border-color:${NOTE_ACCENTS[n.color]}33;">
       <div class="note-colors">
         ${NOTE_COLORS.map((c,ci)=>`<div class="note-color${n.color===ci?' sel':''}" style="background:${NOTE_ACCENTS[ci]}" onclick="setNoteColor(${n.id},${ci})"></div>`).join('')}
@@ -2263,12 +2408,61 @@ function renderNotes(){
         <button onclick="deleteNote(${n.id})" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;">✕</button>
       </div>
       <textarea rows="5" placeholder="Write something…" onchange="saveNote(${n.id},this.value)">${escHtml(n.text)}</textarea>
-    </div>`).join('');
+      ${imgGrid}
+      <div class="note-attach-row">
+        <button class="note-attach-btn" onclick="event.stopPropagation();addNoteImages(${n.id})">📷 Add Photo</button>
+        ${imgs.length ? `<span style="font-size:10px;color:var(--text3);">${imgs.length} photo${imgs.length!==1?'s':''}</span>` : ''}
+      </div>
+    </div>`;
+  }).join('');
 }
 function saveNote(id,val){const n=notes.find(n=>n.id===id);if(!n)return;n.text=val;S.set('notes',notes);}
 function setNoteColor(id,ci){const n=notes.find(n=>n.id===id);if(!n)return;n.color=ci;S.set('notes',notes);renderNotes();}
 function deleteNote(id){notes=notes.filter(n=>n.id!==id);S.set('notes',notes);renderNotes();}
 renderNotes();
+
+let _noteImgTarget = null;
+function addNoteImages(id) {
+  _noteImgTarget = id;
+  document.getElementById('note-img-input').click();
+}
+function noteHandleImageFiles(e) {
+  const files = Array.from(e.target.files || []);
+  e.target.value = '';
+  if (!files.length || !_noteImgTarget) return;
+  const n = notes.find(n => n.id === _noteImgTarget); if (!n) return;
+  if (!n.images) n.images = [];
+  let remaining = files.length;
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      n.images.push(ev.target.result);
+      remaining--;
+      if (remaining === 0) {
+        try { S.set('notes', notes); } catch(err) { snack('⚠ Photo too large to save'); }
+        renderNotes();
+        snack('📷 Photo added to note');
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+}
+function removeNoteImage(id, idx) {
+  const n = notes.find(n => n.id === id); if (!n || !n.images) return;
+  n.images.splice(idx, 1);
+  S.set('notes', notes); renderNotes();
+}
+
+/* ===================== LIGHTBOX (shared by Notes + Smart Notebook) ===================== */
+function openLightbox(src, caption) {
+  document.getElementById('lightboxImg').src = src;
+  document.getElementById('lightboxCaption').textContent = caption || '';
+  document.getElementById('lightboxOverlay').classList.add('open');
+}
+function closeLightbox() {
+  document.getElementById('lightboxOverlay').classList.remove('open');
+  document.getElementById('lightboxImg').src = '';
+}
 
 /* ===================== HABITS ===================== */
 let habits=S.get('habits',[]);
@@ -2352,7 +2546,7 @@ function addNBNote(type='note') {
   };
   nbEntries.unshift({
     id: Date.now(), type, title: '', body: '',
-    placeholder: placeholders[type], tags: [], pinned: false,
+    placeholder: placeholders[type], tags: [], pinned: false, attachments: [],
     created: new Date().toISOString(), updated: new Date().toISOString(),
   });
   S.set('nbEntries', nbEntries); renderNB();
@@ -2394,6 +2588,19 @@ function renderNB() {
       `<span class="nb-tag" onclick="removeNBTag(${entry.id},'${escHtml(t)}')" title="Click to remove">${escHtml(t)} ✕</span>`
     ).join('');
     const wordCount = (entry.body||'').trim().split(/\s+/).filter(Boolean).length;
+    const atts = entry.attachments || [];
+    const attHtml = atts.length ? `<div class="nb-attachments">
+      ${atts.map((a,ai)=> a.type==='image'
+        ? `<div class="nb-attach-thumb" onclick="openLightbox('${a.data}','${escHtml(a.name||'')}')" title="${escHtml(a.name||'Photo')}">
+             <img src="${a.data}" alt="${escHtml(a.name||'attachment')}">
+             <button class="nb-attach-remove" onclick="event.stopPropagation();removeNBAttachment(${entry.id},${ai})" title="Remove">✕</button>
+           </div>`
+        : `<div class="nb-attach-file" onclick="openPDFAttachment('${a.data}')" title="Open ${escHtml(a.name||'PDF')}">
+             <span>📄</span><span class="nm">${escHtml(a.name||'document.pdf')}</span>
+             <button class="nb-attach-remove-file" onclick="event.stopPropagation();removeNBAttachment(${entry.id},${ai})" title="Remove">✕</button>
+           </div>`
+      ).join('')}
+    </div>` : '';
     return `<div class="nb-entry${entry.pinned?' pinned':''}" id="nbe-${entry.id}">
       <div class="nb-entry-header">
         <span class="nb-entry-type ${entry.type}">${meta.icon} ${meta.label}</span>
@@ -2404,6 +2611,10 @@ function renderNB() {
       <div class="nb-entry-body">
         <textarea class="nb-note-textarea ${meta.textareaClass}" placeholder="${escHtml(entry.placeholder||'Write here…')}"
           oninput="updateNBField(${entry.id},'body',this.value);updateWordCount(${entry.id},this.value)" rows="6">${escHtml(entry.body||'')}</textarea>
+        ${attHtml}
+        <div class="nb-attach-row">
+          <button class="nb-attach-btn" onclick="addNBAttachment(${entry.id})">📎 Attach photo / PDF</button>
+        </div>
         <div class="nb-tags-row">${tagHtml}
           <input class="nb-tag-input" placeholder="+ add tag" onkeydown="if(event.key==='Enter'||event.key===','){addNBTag(${entry.id},this.value);this.value='';}">
         </div>
@@ -2448,6 +2659,53 @@ function deleteNBEntry(id) {
   S.set('nbEntries', nbEntries); renderNB(); snack('Note deleted');
 }
 renderNB();
+
+/* ---- Smart Notebook attachments (images + PDFs) ---- */
+let _nbAttachTarget = null;
+function addNBAttachment(id) {
+  _nbAttachTarget = id;
+  document.getElementById('nb-attach-input').click();
+}
+function nbHandleAttachFiles(e) {
+  const files = Array.from(e.target.files || []);
+  e.target.value = '';
+  if (!files.length || !_nbAttachTarget) return;
+  const entry = nbEntries.find(e => e.id === _nbAttachTarget); if (!entry) return;
+  if (!entry.attachments) entry.attachments = [];
+  let remaining = files.length;
+  files.forEach(file => {
+    const isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      entry.attachments.push({
+        type: isPdf ? 'pdf' : 'image',
+        name: file.name,
+        data: ev.target.result,
+      });
+      entry.updated = new Date().toISOString();
+      remaining--;
+      if (remaining === 0) {
+        try { S.set('nbEntries', nbEntries); } catch(err) { snack('⚠ File too large to save'); }
+        renderNB();
+        snack('📎 Attachment added');
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+}
+function removeNBAttachment(id, idx) {
+  const entry = nbEntries.find(e => e.id === id); if (!entry || !entry.attachments) return;
+  entry.attachments.splice(idx, 1);
+  S.set('nbEntries', nbEntries); renderNB();
+}
+function openPDFAttachment(dataUrl) {
+  const win = window.open();
+  if (win) {
+    win.document.write(`<iframe src="${dataUrl}" style="border:none;width:100%;height:100vh;"></iframe>`);
+  } else {
+    snack('⚠ Allow pop-ups to view the PDF');
+  }
+}
 
 /* ===================== REVISION TRACKER ===================== */
 let rvSubjects = S.get('rvSubjects', []);
@@ -2878,7 +3136,50 @@ function spotifyRestoreLast() {
   const last = S.get('spotLastUri', null);
   if (last && last.id) spotifyLoadEmbed(last.type, last.id, last.label);
 }
-/* ===================== UTILS ===================== */
+/* ===================== FOCUS MODE ===================== */
+let fmInterval = null;
+const fmQuotes = ["Discipline creates freedom.","Focus beats motivation.","Outwork yesterday.","Small progress daily.","Be obsessively consistent.","One more rep.","No shortcuts.","Slow is smooth, smooth is fast.","The work reveals the work.","Stay with it."];
+
+function openFocusMode() {
+  document.getElementById('focusModeOverlay').classList.add('open');
+  document.getElementById('fmQuote').textContent = fmQuotes[Math.floor(Math.random()*fmQuotes.length)];
+  fmRender();
+  if (fmInterval) clearInterval(fmInterval);
+  fmInterval = setInterval(fmRender, 1000);
+  document.addEventListener('keydown', fmEscHandler);
+  if (document.documentElement.requestFullscreen) {
+    document.documentElement.requestFullscreen().catch(()=>{});
+  }
+}
+function closeFocusMode() {
+  document.getElementById('focusModeOverlay').classList.remove('open');
+  if (fmInterval) { clearInterval(fmInterval); fmInterval = null; }
+  document.removeEventListener('keydown', fmEscHandler);
+  if (document.fullscreenElement) {
+    document.exitFullscreen().catch(()=>{});
+  }
+}
+function fmEscHandler(e) { if (e.key === 'Escape') closeFocusMode(); }
+function fmRender() {
+  const t = document.getElementById('fmTimer');
+  const status = document.getElementById('fmStatus');
+  const startBtn = document.getElementById('fmStartBtn');
+  if (!t) return;
+  if (studyStartTime) {
+    const elapsed = Math.floor((Date.now() - studyStartTime) / 1000);
+    t.textContent = fmtTime(getAllSec() + elapsed);
+    status.textContent = 'Focusing…';
+    if (startBtn) startBtn.innerHTML = '⏸ Pause';
+  } else {
+    t.textContent = fmtTime(getAllSec());
+    status.textContent = 'Paused';
+    if (startBtn) startBtn.innerHTML = '▶ Start';
+  }
+}
+function fmToggleStart() {
+  if (studyStartTime) pauseStudy(); else startStudy();
+  fmRender();
+}
 function snack(msg){const el=document.getElementById('snack');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500);}
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function timeAgo(iso){const diff=(Date.now()-new Date(iso))/1000;if(diff<60)return 'just now';if(diff<3600)return `${Math.floor(diff/60)}m ago`;if(diff<86400)return `${Math.floor(diff/3600)}h ago`;return `${Math.floor(diff/86400)}d ago`;}
@@ -2891,7 +3192,7 @@ buildCalcGrid();
 renderCalcHistory();
 renderSpotPresets();
 spotifyRestoreLast();
-renderDsHistory();
 </script>
 </body>
 </html>
+

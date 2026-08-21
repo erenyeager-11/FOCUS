@@ -1745,6 +1745,24 @@ html[data-theme="sunset"] body::after {
     </div>
 
     <!-- GROUP STUDY -->
+    <div class="page" id="page-groupstudy">
+      <div class="page-header"><h1>Group Study</h1><p>Study together in real-time rooms — public or private, with live chat</p></div>
+
+      <div id="gsSetupNotice" class="card" style="display:none;margin-bottom:20px;border-color:rgba(255,209,102,0.3);">
+        <div class="card-title"><span class="card-title-text">⚙️ One-time setup needed</span></div>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:12px;">
+          Group Study needs a free real-time backend so rooms and chat sync across everyone's own devices — this is the one part of Focus Lab that can't run on local storage alone. It takes about 5 minutes and stays on Firebase's free tier for personal / small-group use:
+        </p>
+        <div class="gs-setup-steps">
+          1. Go to <code>console.firebase.google.com</code> → Create a project (any name)<br>
+          2. Open <strong>Build → Firestore Database</strong> → Create database → start in <strong>test mode</strong><br>
+          3. Open <strong>Build → Authentication</strong> → Sign-in method → enable <strong>Anonymous</strong><br>
+          4. Project Settings (⚙️) → scroll to "Your apps" → click the <strong>Web</strong> icon → register an app → copy the <code>firebaseConfig</code> object<br>
+          5. In this file's code, find <code>FIREBASE_CONFIG</code> near the top of the script and paste your values in<br>
+          6. In Firestore → <strong>Rules</strong> tab, paste the rules block from the code comment right above <code>FIREBASE_CONFIG</code>, then click Publish
+        </div>
+      </div>
+
       <div id="gsLobbyView">
         <div class="card" style="margin-bottom:20px;">
           <div class="card-title"><span class="card-title-text">👤 Your Study Identity</span></div>

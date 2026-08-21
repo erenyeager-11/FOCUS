@@ -19,6 +19,10 @@
 <!-- Calculator engines: math.js (numeric/scientific) + nerdamer (symbolic algebra & calculus) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/nerdamer@1.1.13/all.min.js"></script>
+<!-- Group Study: Firebase (free serverless backend) — needed so rooms/chat sync across everyone's devices -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <style>
 :root {
   --bg: #080c12;
@@ -1159,6 +1163,49 @@ html[data-theme="sunset"] body::after {
 .fm-distraction { font-size:11px; color:var(--text3); margin-top:6px; z-index:2; letter-spacing:0.5px; }
 .fm-distraction.has-count { color:var(--accent4); }
 
+/* =====================================================================
+   GROUP STUDY — real-time rooms (Firebase-backed)
+===================================================================== */
+.gs-setup-steps { font-size:12px; color:var(--text2); line-height:2.1; }
+.gs-setup-steps code { background:var(--bg3); padding:2px 6px; border-radius:4px; font-family:var(--mono); font-size:11px; color:var(--accent4); }
+.gs-room-row {
+  display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px;
+  background:var(--bg3); border:1px solid var(--border); margin-bottom:8px;
+  cursor:pointer; transition:all 0.15s;
+}
+.gs-room-row:hover { border-color:var(--border2); background:var(--surface2); }
+.gs-room-emoji { font-size:22px; flex-shrink:0; }
+.gs-room-name { font-size:13px; font-weight:600; }
+.gs-room-sub { font-size:10px; color:var(--text3); }
+.gs-room-arrow { color:var(--text3); font-size:14px; flex-shrink:0; margin-left:auto; }
+
+.gs-member-row { display:flex; align-items:center; gap:10px; padding:10px 8px; border-bottom:1px solid var(--border); }
+.gs-member-row:last-child { border-bottom:none; }
+.gs-member-emoji { font-size:22px; flex-shrink:0; }
+.gs-member-name { font-size:13px; font-weight:600; }
+.gs-member-status { font-size:11px; color:var(--text3); margin-top:2px; }
+.gs-member-status.is-studying { color:var(--accent2); }
+.gs-member-actions { display:flex; gap:4px; flex-shrink:0; flex-wrap:wrap; justify-content:flex-end; margin-left:auto; }
+
+.gs-chat-msg { display:flex; margin-bottom:10px; }
+.gs-chat-msg.mine { justify-content:flex-end; }
+.gs-chat-bubble {
+  position:relative; max-width:78%; background:var(--bg3); border:1px solid var(--border);
+  border-radius:12px; padding:8px 30px 8px 12px;
+}
+.gs-chat-msg.mine .gs-chat-bubble { background:rgba(var(--accent-rgb),0.12); border-color:rgba(var(--accent-rgb),0.25); }
+.gs-chat-meta { font-size:10px; color:var(--text3); margin-bottom:2px; }
+.gs-chat-text { font-size:13px; color:var(--text); word-break:break-word; }
+.gs-chat-del { position:absolute; top:4px; right:4px; background:none; border:none; color:var(--text3); cursor:pointer; font-size:10px; padding:2px; }
+.gs-chat-del:hover { color:var(--accent3); }
+
+.gs-dash-badge {
+  display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--accent);
+  background:rgba(var(--accent-rgb),0.1); border:1px solid rgba(var(--accent-rgb),0.25);
+  padding:6px 12px; border-radius:20px; cursor:pointer; margin-top:8px;
+}
+.gs-dash-badge:hover { background:rgba(var(--accent-rgb),0.18); }
+
 /* Mobile layout fix - Comprehensive Override */
 @media (max-width: 768px) {
   .calc-grid { grid-template-columns:repeat(4,1fr); }
@@ -1210,6 +1257,9 @@ html[data-theme="sunset"] body::after {
   .cmd-palette { margin-top: 8vh; }
   .heatmap-cell { width: 10px; height: 10px; }
   .heatmap-grid { grid-template-rows: repeat(7, 10px); }
+  .gs-member-row { flex-wrap: wrap; }
+  .gs-member-actions { width: 100%; justify-content: flex-start; margin-top: 6px; margin-left: 0; }
+  .gs-chat-bubble { max-width: 88%; }
 }
 
 @media (max-width: 480px) {
@@ -1281,6 +1331,7 @@ html[data-theme="sunset"] body::after {
       <div class="page-header">
         <h1>Dashboard</h1>
         <p id="dash-greeting">Good morning — let's get to work.</p>
+        <div id="gsDashboardBadge" style="display:none;"></div>
       </div>
       <div class="grid-3" style="margin-bottom:20px;">
         <div class="stat-card"><div class="stat-value" id="dash-today">0.00</div><div class="stat-label">Hours Today</div></div>
@@ -1692,7 +1743,66 @@ html[data-theme="sunset"] body::after {
         <div id="spotEmbedWrap"></div>
       </div>
     </div>
-    
+
+    <!-- GROUP STUDY -->
+      <div id="gsLobbyView">
+        <div class="card" style="margin-bottom:20px;">
+          <div class="card-title"><span class="card-title-text">👤 Your Study Identity</span></div>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <div id="gsMyIconDisplay" style="font-size:28px;">🙂</div>
+            <input class="input" id="gsNameInput" placeholder="Your display name" style="flex:1;min-width:160px;">
+            <button class="btn btn-secondary btn-sm" onclick="gsOpenIconPicker()">Change Icon</button>
+            <button class="btn btn-primary btn-sm" onclick="gsSaveIdentity()">Save</button>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="gsOpenCreateRoom()">+ Create Room</button>
+          <button class="btn btn-secondary" onclick="gsRefreshPublicRooms()">🔄 Refresh Public Rooms</button>
+        </div>
+
+        <div class="card" style="margin-bottom:20px;">
+          <div class="card-title"><span class="card-title-text">🚪 Your Rooms</span></div>
+          <div id="gsMyRoomsList"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span class="card-title-text">🌐 Discover Public Rooms</span></div>
+          <div id="gsPublicRoomsList"></div>
+        </div>
+      </div>
+
+      <div id="gsRoomView" style="display:none;">
+        <div class="card" style="margin-bottom:16px;">
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <div id="gsRoomIcon" style="font-size:30px;">🎓</div>
+            <div style="flex:1;min-width:160px;">
+              <div id="gsRoomName" style="font-size:18px;font-weight:700;"></div>
+              <div id="gsRoomMeta" style="font-size:11px;color:var(--text3);"></div>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="gsCopyInviteLink()">🔗 Copy Invite Link</button>
+            <button class="btn btn-secondary btn-sm" onclick="gsBackToLobby()">← Lobby</button>
+            <button class="btn btn-danger btn-sm" onclick="gsLeaveRoom()">Leave Room</button>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title"><span class="card-title-text">👥 Members</span></div>
+            <div id="gsMembersList"></div>
+          </div>
+          <div class="card" style="display:flex;flex-direction:column;">
+            <div class="card-title"><span class="card-title-text">💬 Room Chat</span></div>
+            <div id="gsChatMessages" style="flex:1;max-height:320px;min-height:200px;overflow-y:auto;margin-bottom:12px;"></div>
+            <div class="todo-input-row" style="margin-bottom:0;">
+              <input class="input input-full" id="gsChatInput" placeholder="Message the room…" onkeydown="if(event.key==='Enter')gsSendMessage()">
+              <button class="btn btn-primary" onclick="gsSendMessage()">Send</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- SETTINGS -->
     <div class="page" id="page-settings">
       <div class="page-header"><h1>Settings</h1><p>Preferences &amp; Data Management</p></div>
@@ -1853,6 +1963,7 @@ const ICONS = {
   settings: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.6-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.6V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1A1.7 1.7 0 0 0 19.4 9c.2.6.8 1 1.6 1h.1a2 2 0 1 1 0 4H21c-.8 0-1.4.4-1.6 1z"></path></svg>',
   calculator: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="2" width="16" height="20" rx="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="8" y1="11" x2="8" y2="11.01"></line><line x1="12" y1="11" x2="12" y2="11.01"></line><line x1="16" y1="11" x2="16" y2="11.01"></line><line x1="8" y1="15" x2="8" y2="15.01"></line><line x1="12" y1="15" x2="12" y2="15.01"></line><line x1="16" y1="15" x2="16" y2="15.01"></line><line x1="8" y1="19" x2="8" y2="19.01"></line><line x1="12" y1="19" x2="12" y2="19.01"></line><line x1="16" y1="19" x2="16" y2="19.01"></line></svg>',
   spotify: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"></circle><path d="M7 10.7c3-.9 6.6-.7 9.2.9"></path><path d="M7.5 13.6c2.4-.7 5.3-.5 7.4.7"></path><path d="M8 16.4c1.9-.5 4.1-.4 5.8.6"></path></svg>',
+  groupstudy: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="9" cy="8" r="3"></circle><circle cx="17" cy="9" r="2.4"></circle><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"></path><path d="M15.5 14.5c2.3.3 4.5 2 4.5 5.5"></path></svg>',
 };
 
 const pages = [
@@ -1866,6 +1977,7 @@ const pages = [
   { id:'analytics', label:'Analytics',        icon:'analytics' },
   { id:'calculator',label:'Calculator',       icon:'calculator' },
   { id:'spotify',   label:'Study Music',      icon:'spotify' },
+  { id:'groupstudy',label:'Group Study',      icon:'groupstudy' },
   { id:'settings',  label:'Settings',         icon:'settings' },
 ];
 let currentPage = 'dashboard';
@@ -1889,13 +2001,12 @@ function buildNav() {
 }
 
 function navigate(id) {
-if(id === 'groupstudy') { location.href = 'group-study.html'; return; }
   currentPage = id;
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
   buildNav();
   if(id==='analytics') updateAnalytics();
-  if(id==='dashboard') { updateStats(); buildChart(); buildGoalWidget(); }
+  if(id==='dashboard') { updateStats(); buildChart(); buildGoalWidget(); gsUpdateDashboardBadge(); }
   if(id==='focus') renderAmbientUI();
   if(id==='revision') renderRevision();
   if(id==='notebook') renderNB();
@@ -2319,6 +2430,7 @@ function startStudy() {
     S.set('studyStart', studyStartTime);
     studyInterval = setInterval(updateStudyTimer, 1000);
     snack('Timer started ▶');
+    gsSyncPresence(true);
   }
 }
 
@@ -2338,6 +2450,7 @@ function pauseStudy() {
     clearInterval(studyInterval);
     updateStats(); buildCalendar(); buildChart(); buildGoalWidget();
     snack('Session saved ✓');
+    gsSyncPresence(false);
   }
 }
 
@@ -3676,6 +3789,416 @@ function buildSubjectBreakdown() {
     </div>`).join('');
 }
 
+/* =====================================================================
+   GROUP STUDY — real-time rooms, chat, roles (Firebase-backed)
+
+   Paste these Firestore Rules in Firebase Console → Firestore → Rules:
+   -----------------------------------------------------------------
+   rules_version = '2';
+   service cloud.firestore {
+     match /databases/{database}/documents {
+       match /groupRooms/{roomId} {
+         allow read: if true;
+         allow create: if request.auth != null;
+         allow update, delete: if request.auth != null
+           && resource.data.adminId == request.auth.uid;
+         match /members/{memberId} {
+           allow read: if true;
+           allow create: if request.auth != null && request.auth.uid == memberId;
+           allow update: if request.auth != null;
+           allow delete: if request.auth != null;
+         }
+         match /messages/{messageId} {
+           allow read: if true;
+           allow create: if request.auth != null;
+           allow delete: if request.auth != null;
+         }
+       }
+     }
+   }
+   -----------------------------------------------------------------
+===================================================================== */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyA2yHdXCpNJeSpy6-NEjVlQDLz1W4zI5Qo",
+  authDomain: "focus-lab-cf401.firebaseapp.com",
+  projectId: "focus-lab-cf401",
+  storageBucket: "focus-lab-cf401.firebasestorage.app",
+  messagingSenderId: "1073970407517",
+  appId: "1:1073970407517:web:b65a08e7cba21b760185b4"
+};
+const GS_ICONS = ['🙂','😎','🦉','🐱','🦊','🐼','🐧','🦄','🐸','🐨','🦁','🐢','🐙','🌟','🔥','⚡'];
+const gsConfigured = !!(FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey !== "YOUR_API_KEY");
+
+let gsDb = null, gsAuth = null, gsUid = null;
+let gsCurrentRoomId = S.get('gsCurrentRoomId', null);
+let gsMembersUnsub = null, gsMessagesUnsub = null, gsRoomUnsub = null, gsPublicRoomsUnsub = null;
+let gsRoomData = null;
+let gsMembersCache = {};
+
+function gsInit() {
+  if (!gsConfigured) {
+    const notice = document.getElementById('gsSetupNotice');
+    if (notice) notice.style.display = 'block';
+    return;
+  }
+  try {
+    if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+    gsDb = firebase.firestore();
+    gsAuth = firebase.auth();
+    gsAuth.onAuthStateChanged(user => {
+      if (user) { gsUid = user.uid; gsAfterAuthReady(); }
+      else { gsAuth.signInAnonymously().catch(err => console.log('Group Study auth error:', err)); }
+    });
+  } catch (err) { console.log('Group Study init error:', err); }
+}
+
+function gsAfterAuthReady() {
+  const nameInp = document.getElementById('gsNameInput');
+  if (nameInp) nameInp.value = S.get('groupDisplayName', '');
+  gsUpdateIconDisplay();
+  gsRefreshPublicRooms();
+  gsRenderMyRooms();
+  const params = new URLSearchParams(location.search);
+  const linkRoom = params.get('room');
+  if (linkRoom) setTimeout(() => gsPromptJoinByLink(linkRoom), 300);
+  else if (gsCurrentRoomId) gsEnterRoom(gsCurrentRoomId);
+}
+
+function gsUpdateIconDisplay() {
+  const el = document.getElementById('gsMyIconDisplay');
+  if (el) el.textContent = S.get('groupDisplayIcon', '🙂');
+}
+function gsOpenIconPicker() {
+  document.getElementById('modalContent').innerHTML = `
+    <h3>Choose Your Icon</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin:16px 0;">
+      ${GS_ICONS.map(ic => `<button onclick="gsPickIcon('${ic}')" style="font-size:26px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;width:48px;height:48px;cursor:pointer;">${ic}</button>`).join('')}
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Close</button></div>`;
+  document.getElementById('modalOverlay').style.display = 'flex';
+}
+function gsPickIcon(icon) {
+  S.set('groupDisplayIcon', icon);
+  gsUpdateIconDisplay();
+  closeModal();
+  if (gsCurrentRoomId && gsUid && gsDb) gsDb.collection('groupRooms').doc(gsCurrentRoomId).collection('members').doc(gsUid).update({ icon }).catch(()=>{});
+}
+function gsSaveIdentity() {
+  const name = document.getElementById('gsNameInput').value.trim();
+  if (!name) { snack('Enter a display name first'); return; }
+  S.set('groupDisplayName', name);
+  snack('✓ Identity saved');
+  if (gsCurrentRoomId && gsUid && gsDb) gsDb.collection('groupRooms').doc(gsCurrentRoomId).collection('members').doc(gsUid).update({ name }).catch(()=>{});
+}
+function gsRequireIdentity() {
+  if (!S.get('groupDisplayName', '')) { snack('⚠ Set your display name first (top of page)'); return false; }
+  return true;
+}
+
+/* ---- Room creation ---- */
+function gsOpenCreateRoom() {
+  if (!gsConfigured) { snack('⚠ Group Study needs a one-time setup — see the notice above'); return; }
+  if (!gsRequireIdentity()) return;
+  document.getElementById('modalContent').innerHTML = `
+    <h3>Create a Study Room</h3>
+    <div class="form-row"><label>Room Name</label><input class="input input-full" id="gsRoomNameInput" placeholder="e.g. Midnight Grinders"></div>
+    <div class="form-row"><label>Icon</label>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        ${GS_ICONS.slice(0,8).map((ic,i)=>`<button type="button" onclick="this.parentNode.querySelectorAll('button').forEach(b=>b.style.borderColor='var(--border2)');this.style.borderColor='var(--accent)';document.getElementById('gsRoomIconPick').value='${ic}'" style="font-size:22px;background:var(--bg3);border:2px solid ${i===0?'var(--accent)':'var(--border2)'};border-radius:8px;width:40px;height:40px;cursor:pointer;">${ic}</button>`).join('')}
+        <input type="hidden" id="gsRoomIconPick" value="${GS_ICONS[0]}">
+      </div>
+    </div>
+    <div class="form-row">
+      <label>Visibility</label>
+      <div style="display:flex;gap:8px;">
+        <button type="button" id="gsVisPublicBtn" class="filter-btn active" onclick="gsSetVisibility(true)">🌐 Public</button>
+        <button type="button" id="gsVisPrivateBtn" class="filter-btn" onclick="gsSetVisibility(false)">🔒 Private (link only)</button>
+      </div>
+      <input type="hidden" id="gsRoomIsPublic" value="true">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="gsCreateRoom()">Create</button>
+    </div>`;
+  document.getElementById('modalOverlay').style.display = 'flex';
+}
+function gsSetVisibility(isPublic) {
+  document.getElementById('gsRoomIsPublic').value = isPublic ? 'true' : 'false';
+  document.getElementById('gsVisPublicBtn').classList.toggle('active', isPublic);
+  document.getElementById('gsVisPrivateBtn').classList.toggle('active', !isPublic);
+}
+function gsCreateRoom() {
+  const name = document.getElementById('gsRoomNameInput').value.trim();
+  if (!name) { snack('Enter a room name'); return; }
+  const icon = document.getElementById('gsRoomIconPick').value || GS_ICONS[0];
+  const isPublic = document.getElementById('gsRoomIsPublic').value === 'true';
+  const myName = S.get('groupDisplayName','');
+  const myIcon = S.get('groupDisplayIcon','🙂');
+  gsDb.collection('groupRooms').add({
+    name, icon, isPublic,
+    adminId: gsUid, adminName: myName,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+  }).then(roomRef => roomRef.collection('members').doc(gsUid).set({
+      name: myName, icon: myIcon, role: 'admin',
+      isStudying: false, sessionStartedAt: null,
+      joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    }).then(() => roomRef.id)
+  ).then(roomId => {
+    closeModal();
+    gsSaveMyRoomLocally(roomId, name, icon);
+    gsEnterRoom(roomId);
+    snack('🎉 Room created!');
+  }).catch(err => { snack('⚠ Could not create room'); console.log(err); });
+}
+
+function gsSaveMyRoomLocally(id, name, icon) {
+  const list = S.get('myGroupRooms', []);
+  if (!list.some(r => r.id === id)) { list.unshift({ id, name, icon }); S.set('myGroupRooms', list.slice(0, 20)); }
+  gsRenderMyRooms();
+}
+function gsRemoveMyRoomLocally(id) {
+  S.set('myGroupRooms', S.get('myGroupRooms', []).filter(r => r.id !== id));
+  gsRenderMyRooms();
+}
+function gsRenderMyRooms() {
+  const el = document.getElementById('gsMyRoomsList'); if (!el) return;
+  const list = S.get('myGroupRooms', []);
+  if (!list.length) { el.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:8px 2px;">You haven\u2019t joined any rooms yet.</div>'; return; }
+  el.innerHTML = list.map(r => `
+    <div class="gs-room-row" onclick="gsEnterRoom('${r.id}')">
+      <span class="gs-room-emoji">${r.icon || '🎓'}</span>
+      <span class="gs-room-name">${escHtml(r.name)}</span>
+      <span class="gs-room-arrow">→</span>
+    </div>`).join('');
+}
+
+/* ---- Public rooms discovery (live) ---- */
+function gsRefreshPublicRooms() {
+  if (!gsConfigured || !gsDb) return;
+  if (gsPublicRoomsUnsub) gsPublicRoomsUnsub();
+  const el = document.getElementById('gsPublicRoomsList');
+  if (el) el.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:8px 2px;">Loading…</div>';
+  gsPublicRoomsUnsub = gsDb.collection('groupRooms').where('isPublic','==',true)
+    .orderBy('createdAt','desc').limit(30).onSnapshot(snap => {
+      const rooms = [];
+      snap.forEach(doc => rooms.push({ id: doc.id, ...doc.data() }));
+      if (!el) return;
+      if (!rooms.length) { el.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:8px 2px;">No public rooms yet — create the first one!</div>'; return; }
+      el.innerHTML = rooms.map(r => `
+        <div class="gs-room-row" onclick="gsEnterRoom('${r.id}')">
+          <span class="gs-room-emoji">${r.icon || '🎓'}</span>
+          <div style="flex:1;min-width:0;">
+            <div class="gs-room-name">${escHtml(r.name)}</div>
+            <div class="gs-room-sub">by ${escHtml(r.adminName || 'Someone')}</div>
+          </div>
+          <span class="gs-room-arrow">→</span>
+        </div>`).join('');
+    }, err => { console.log(err); if (el) el.innerHTML = '<div style="color:var(--text3);font-size:12px;">Could not load public rooms.</div>'; });
+}
+
+function gsPromptJoinByLink(roomId) {
+  if (!gsRequireIdentity()) { snack('Set your name above, then open the invite link again'); return; }
+  gsEnterRoom(roomId);
+}
+
+/* ---- Entering / rendering a room ---- */
+function gsEnterRoom(roomId) {
+  if (!gsConfigured) { snack('⚠ Group Study needs a one-time setup — see the notice above'); return; }
+  if (!gsRequireIdentity()) return;
+  gsLeaveRoomListeners();
+  gsCurrentRoomId = roomId;
+  S.set('gsCurrentRoomId', roomId);
+
+  document.getElementById('gsLobbyView').style.display = 'none';
+  document.getElementById('gsRoomView').style.display = 'block';
+
+  const roomRef = gsDb.collection('groupRooms').doc(roomId);
+  const myName = S.get('groupDisplayName','');
+  const myIcon = S.get('groupDisplayIcon','🙂');
+
+  roomRef.get().then(doc => {
+    if (!doc.exists) { snack('⚠ Room not found'); gsBackToLobby(); return; }
+    gsRoomData = { id: roomId, ...doc.data() };
+    gsSaveMyRoomLocally(roomId, gsRoomData.name, gsRoomData.icon);
+    gsRenderRoomHeader();
+
+    const memberRef = roomRef.collection('members').doc(gsUid);
+    memberRef.get().then(mdoc => {
+      if (!mdoc.exists) {
+        memberRef.set({
+          name: myName, icon: myIcon, role: 'member',
+          isStudying: !!studyStartTime,
+          sessionStartedAt: studyStartTime ? firebase.firestore.FieldValue.serverTimestamp() : null,
+          joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        });
+      } else {
+        memberRef.update({ name: myName, icon: myIcon });
+      }
+    });
+
+    gsRoomUnsub = roomRef.onSnapshot(d => {
+      if (d.exists) { gsRoomData = { id: roomId, ...d.data() }; gsRenderRoomHeader(); }
+      else { snack('Room was deleted'); gsBackToLobby(); }
+    });
+
+    gsMembersUnsub = roomRef.collection('members').orderBy('joinedAt','asc').onSnapshot(snap => {
+      gsMembersCache = {};
+      snap.forEach(d => { gsMembersCache[d.id] = d.data(); });
+      gsRenderMembers();
+      gsUpdateDashboardBadge();
+    });
+
+    gsMessagesUnsub = roomRef.collection('messages').orderBy('createdAt','asc').limit(200).onSnapshot(snap => {
+      const msgs = [];
+      snap.forEach(d => msgs.push({ id: d.id, ...d.data() }));
+      gsRenderChat(msgs.slice(-100));
+    });
+  });
+}
+
+function gsRenderRoomHeader() {
+  if (!gsRoomData) return;
+  document.getElementById('gsRoomIcon').textContent = gsRoomData.icon || '🎓';
+  document.getElementById('gsRoomName').textContent = gsRoomData.name || 'Room';
+  const me = gsMembersCache[gsUid];
+  const myRole = me ? me.role : 'member';
+  document.getElementById('gsRoomMeta').textContent =
+    `${gsRoomData.isPublic ? '🌐 Public' : '🔒 Private'} · Admin: ${gsRoomData.adminName || '—'}${myRole!=='member' ? ' · You: '+(myRole==='admin'?'Admin':'Manager') : ''}`;
+}
+
+function gsRenderMembers() {
+  const el = document.getElementById('gsMembersList'); if (!el) return;
+  const me = gsMembersCache[gsUid] || { role: 'member' };
+  const iAmAdmin = me.role === 'admin';
+  const iAmManagerOrAbove = me.role === 'admin' || me.role === 'manager';
+  const ids = Object.keys(gsMembersCache);
+  if (!ids.length) { el.innerHTML = '<div style="color:var(--text3);font-size:12px;">No members yet.</div>'; return; }
+  el.innerHTML = ids.map(id => {
+    const m = gsMembersCache[id];
+    const roleBadge = m.role === 'admin' ? '👑' : m.role === 'manager' ? '🛡️' : '';
+    const studying = m.isStudying;
+    const isSelf = id === gsUid;
+    const targetIsAdmin = m.role === 'admin';
+    let actionsHtml = '';
+    if (!isSelf && !targetIsAdmin) {
+      if (iAmAdmin) {
+        actionsHtml = `<div class="gs-member-actions">
+          ${m.role==='member' ? `<button class="btn btn-sm btn-secondary" onclick="gsSetRole('${id}','manager')">Make Manager</button>` : `<button class="btn btn-sm btn-secondary" onclick="gsSetRole('${id}','member')">Demote</button>`}
+          <button class="btn btn-sm btn-danger" onclick="gsKickMember('${id}')">Kick</button>
+        </div>`;
+      } else if (iAmManagerOrAbove && m.role === 'member') {
+        actionsHtml = `<div class="gs-member-actions"><button class="btn btn-sm btn-danger" onclick="gsKickMember('${id}')">Kick</button></div>`;
+      }
+    }
+    return `<div class="gs-member-row">
+      <span class="gs-member-emoji">${m.icon || '🙂'}</span>
+      <div style="flex:1;min-width:0;">
+        <div class="gs-member-name">${roleBadge} ${escHtml(m.name || 'Anonymous')}${isSelf?' (you)':''}</div>
+        <div class="gs-member-status ${studying?'is-studying':''}">${studying ? '🟢 Studying now' : '⚪ Idle'}</div>
+      </div>
+      ${actionsHtml}
+    </div>`;
+  }).join('');
+}
+
+function gsSetRole(memberId, role) {
+  if (!gsCurrentRoomId) return;
+  gsDb.collection('groupRooms').doc(gsCurrentRoomId).collection('members').doc(memberId).update({ role })
+    .then(() => snack(role==='manager' ? '🛡️ Promoted to Manager' : 'Demoted to Member'))
+    .catch(()=>snack('⚠ Could not update role'));
+}
+function gsKickMember(memberId) {
+  if (!gsCurrentRoomId) return;
+  if (!confirm('Remove this member from the room?')) return;
+  gsDb.collection('groupRooms').doc(gsCurrentRoomId).collection('members').doc(memberId).delete()
+    .then(() => snack('Member removed'))
+    .catch(()=>snack('⚠ Could not remove member'));
+}
+
+/* ---- Chat ---- */
+function gsRenderChat(msgs) {
+  const el = document.getElementById('gsChatMessages'); if (!el) return;
+  const me = gsMembersCache[gsUid] || { role: 'member' };
+  const canDeleteAny = me.role === 'admin' || me.role === 'manager';
+  if (!msgs.length) { el.innerHTML = '<div style="color:var(--text3);font-size:12px;text-align:center;padding:20px;">No messages yet — say hi 👋</div>'; return; }
+  el.innerHTML = msgs.map(m => {
+    const mine = m.senderId === gsUid;
+    const canDelete = mine || canDeleteAny;
+    return `<div class="gs-chat-msg${mine?' mine':''}">
+      <div class="gs-chat-bubble">
+        <div class="gs-chat-meta">${m.senderIcon||'🙂'} <strong>${escHtml(m.senderName||'Anon')}</strong></div>
+        <div class="gs-chat-text">${escHtml(m.text||'')}</div>
+        ${canDelete ? `<button class="gs-chat-del" onclick="gsDeleteMessage('${m.id}')" title="Delete">✕</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+  el.scrollTop = el.scrollHeight;
+}
+function gsSendMessage() {
+  const inp = document.getElementById('gsChatInput');
+  const text = inp.value.trim();
+  if (!text || !gsCurrentRoomId) return;
+  gsDb.collection('groupRooms').doc(gsCurrentRoomId).collection('messages').add({
+    text, senderId: gsUid, senderName: S.get('groupDisplayName',''), senderIcon: S.get('groupDisplayIcon','🙂'),
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+  }).then(() => { inp.value = ''; }).catch(()=>snack('⚠ Message failed to send'));
+}
+function gsDeleteMessage(msgId) {
+  if (!gsCurrentRoomId) return;
+  gsDb.collection('groupRooms').doc(gsCurrentRoomId).collection('messages').doc(msgId).delete().catch(()=>{});
+}
+
+/* ---- Leave room / cleanup ---- */
+function gsLeaveRoomListeners() {
+  if (gsMembersUnsub) { gsMembersUnsub(); gsMembersUnsub = null; }
+  if (gsMessagesUnsub) { gsMessagesUnsub(); gsMessagesUnsub = null; }
+  if (gsRoomUnsub) { gsRoomUnsub(); gsRoomUnsub = null; }
+}
+function gsLeaveRoom() {
+  if (!gsCurrentRoomId) return;
+  if (!confirm('Leave this room?')) return;
+  const roomId = gsCurrentRoomId;
+  const me = gsMembersCache[gsUid];
+  if (me && me.role === 'admin') snack('⚠ You were the admin — promote a Manager from Firebase console if the room should keep going');
+  gsDb.collection('groupRooms').doc(roomId).collection('members').doc(gsUid).delete().catch(()=>{});
+  gsRemoveMyRoomLocally(roomId);
+  gsBackToLobby();
+}
+function gsBackToLobby() {
+  gsLeaveRoomListeners();
+  gsCurrentRoomId = null;
+  S.del('gsCurrentRoomId');
+  gsRoomData = null; gsMembersCache = {};
+  document.getElementById('gsRoomView').style.display = 'none';
+  document.getElementById('gsLobbyView').style.display = 'block';
+  gsUpdateDashboardBadge();
+}
+function gsCopyInviteLink() {
+  if (!gsCurrentRoomId) return;
+  const url = `${location.origin}${location.pathname}?room=${gsCurrentRoomId}`;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(() => snack('🔗 Invite link copied!')).catch(() => prompt('Copy this invite link:', url));
+  } else {
+    prompt('Copy this invite link:', url);
+  }
+}
+
+/* ---- Sync main Study Timer presence into the active Group Study room ---- */
+function gsSyncPresence(isStudying) {
+  if (!gsConfigured || !gsCurrentRoomId || !gsUid || !gsDb) return;
+  gsDb.collection('groupRooms').doc(gsCurrentRoomId).collection('members').doc(gsUid).update({
+    isStudying,
+    sessionStartedAt: isStudying ? firebase.firestore.FieldValue.serverTimestamp() : null,
+  }).catch(()=>{});
+}
+function gsUpdateDashboardBadge() {
+  const el = document.getElementById('gsDashboardBadge'); if (!el) return;
+  if (!gsCurrentRoomId || !gsRoomData) { el.style.display = 'none'; return; }
+  const studyingCount = Object.values(gsMembersCache).filter(m => m.isStudying).length;
+  el.style.display = 'block';
+  el.innerHTML = `<span class="gs-dash-badge" onclick="navigate('groupstudy')">🎓 In "${escHtml(gsRoomData.name)}" · ${studyingCount} studying now →</span>`;
+}
+
 function computeAchievements() {
   const totalHrs = getAllSec() / 3600;
   let streak = 0, d = new Date();
@@ -3728,6 +4251,7 @@ renderSpotPresets();
 spotifyRestoreLast();
 renderAmbientUI();
 refreshSubjectList();
+gsInit();
 </script>
 </body>
 </html>

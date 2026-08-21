@@ -3907,7 +3907,13 @@ function gsSaveIdentity() {
   S.set('groupDisplayName', name);
   snack('✓ Identity saved');
   if (gsCurrentRoomId && gsUid && gsDb) gsDb.collection('groupRooms').doc(gsCurrentRoomId).collection('members').doc(gsUid).update({ name }).catch(()=>{});
+  const params = new URLSearchParams(location.search);
+  const linkRoom = params.get('room');
+  if (linkRoom && linkRoom !== gsCurrentRoomId) {
+    gsEnterRoom(linkRoom);
+  }
 }
+
 function gsRequireIdentity() {
   if (!S.get('groupDisplayName', '')) { snack('⚠ Set your display name first (top of page)'); return false; }
   return true;

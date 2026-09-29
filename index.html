@@ -1206,6 +1206,40 @@ html[data-theme="sunset"] body::after {
 }
 .gs-dash-badge:hover { background:rgba(var(--accent-rgb),0.18); }
 
+/* Reference-style live study room */
+.gs-focus-panel { display:grid; grid-template-columns:minmax(210px,.8fr) minmax(0,1.2fr); gap:16px; margin-bottom:16px; }
+.gs-live-timer { background:linear-gradient(135deg,rgba(var(--accent-rgb),.18),rgba(0,212,170,.06)); border:1px solid rgba(var(--accent-rgb),.28); }
+.gs-live-time { font-family:var(--mono); font-size:clamp(29px,4vw,46px); color:var(--accent); letter-spacing:2px; margin:8px 0; }
+.gs-live-meta { font-size:11px; color:var(--text2); line-height:1.6; }
+.gs-live-members { display:flex; align-items:center; gap:8px; color:var(--accent2); font-size:12px; font-weight:600; }
+.gs-live-dot { width:8px; height:8px; border-radius:50%; background:var(--accent2); box-shadow:0 0 0 4px rgba(0,212,170,.14); }
+.gs-member-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(112px,1fr)); gap:10px; }
+.gs-member-tile { background:var(--bg3); border:1px solid var(--border); border-radius:10px; padding:12px 8px; min-height:122px; text-align:center; transition:transform .18s,border-color .18s; }
+.gs-member-tile:hover { transform:translateY(-2px); border-color:var(--border2); }
+.gs-member-tile.is-studying { border-color:rgba(255,116,65,.72); box-shadow:0 0 24px rgba(255,116,65,.12); background:linear-gradient(155deg,rgba(255,116,65,.13),var(--bg3) 65%); }
+.gs-scene { height:56px; display:flex; align-items:center; justify-content:center; position:relative; margin-bottom:6px; }
+.gs-scene-avatar { width:44px; height:44px; display:grid; place-items:center; border-radius:13px; background:#202936; font-size:25px; position:relative; z-index:2; border:1px solid #334050; }
+.gs-scene-desk { position:absolute; width:68px; height:17px; border-bottom:3px solid #4d5865; bottom:0; border-radius:0 0 4px 4px; opacity:.8; }
+.gs-scene-desk:before { content:''; position:absolute; width:10px; height:23px; border-left:3px solid #4d5865; border-right:3px solid #4d5865; left:25px; top:14px; }
+.gs-scene-book { position:absolute; font-size:15px; right:19px; top:3px; z-index:3; filter:drop-shadow(0 3px 5px rgba(0,0,0,.3)); }
+.gs-scene.idle .gs-scene-avatar { filter:grayscale(.8); opacity:.52; }.gs-scene.idle .gs-scene-desk { opacity:.35; }
+.gs-scene.studying .gs-scene-avatar { animation:gsStudyBob 2.3s ease-in-out infinite; }.gs-scene.studying .gs-scene-book { animation:gsBookGlow 1.6s ease-in-out infinite alternate; }
+@keyframes gsStudyBob { 50% { transform:translateY(-3px) rotate(-1deg); } }@keyframes gsBookGlow { to { transform:translateY(-2px) rotate(-8deg); filter:drop-shadow(0 0 7px rgba(255,195,77,.72)); } }
+.gs-member-tile .gs-member-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.gs-member-time { margin-top:5px; font-family:var(--mono); font-size:10px; color:var(--accent4); }.gs-member-tile.is-studying .gs-member-time { color:#ff9b76; }
+.gs-rank-row { display:grid; grid-template-columns:30px 36px minmax(0,1fr) auto; align-items:center; gap:10px; padding:10px 8px; border-bottom:1px solid var(--border); }
+.gs-rank-row:last-child { border-bottom:0; }
+.gs-rank-row.is-self { background:rgba(var(--accent-rgb),.09); border-radius:8px; }
+.gs-rank-num { font-family:var(--mono); font-size:12px; color:var(--accent4); text-align:center; }
+.gs-rank-avatar { width:34px; height:34px; border-radius:50%; display:grid; place-items:center; background:var(--bg3); font-size:17px; }
+.gs-rank-name { font-size:12px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.gs-rank-sub { font-size:10px; color:var(--text3); margin-top:2px; }
+.gs-rank-time { font-family:var(--mono); font-size:11px; color:var(--accent4); }
+.gs-history-row { display:flex; align-items:center; gap:12px; padding:10px 4px; border-bottom:1px solid var(--border); }
+.gs-history-row:last-child { border-bottom:0; }
+.gs-history-date { font-size:12px; color:var(--text2); min-width:92px; }.gs-history-time{font-family:var(--mono);font-size:11px;color:var(--accent);margin-left:auto;}
+.gs-focus-panel .card { overflow:hidden; }.gs-live-timer { position:relative; }.gs-live-timer:after { content:''; position:absolute; width:190px; height:190px; border:1px solid rgba(255,116,65,.18); border-radius:50%; top:-110px; right:-80px; }
+
 /* Mobile layout fix - Comprehensive Override */
 @media (max-width: 768px) {
   .calc-grid { grid-template-columns:repeat(4,1fr); }
@@ -1260,6 +1294,8 @@ html[data-theme="sunset"] body::after {
   .gs-member-row { flex-wrap: wrap; }
   .gs-member-actions { width: 100%; justify-content: flex-start; margin-top: 6px; margin-left: 0; }
   .gs-chat-bubble { max-width: 88%; }
+  .gs-focus-panel { grid-template-columns:1fr; }
+  .gs-member-grid { grid-template-columns:repeat(3,1fr); }
 }
 
 @media (max-width: 480px) {
@@ -1746,7 +1782,7 @@ html[data-theme="sunset"] body::after {
 
     <!-- GROUP STUDY -->
     <div class="page" id="page-groupstudy">
-      <div class="page-header"><h1>Group Study</h1><p>Study together in real-time rooms — public or private, with live chat</p></div>
+      <div class="page-header"><h1>Group Study</h1><p>Live focus, room rankings, and daily records that reset at 5:00 AM.</p></div>
 
       <div id="gsSetupNotice" class="card" style="display:none;margin-bottom:20px;border-color:rgba(255,209,102,0.3);">
         <div class="card-title"><span class="card-title-text">⚙️ One-time setup needed</span></div>
@@ -1804,9 +1840,22 @@ html[data-theme="sunset"] body::after {
           </div>
         </div>
 
-        <div class="grid-2">
+        <div class="gs-focus-panel">
+          <div class="card gs-live-timer">
+            <div class="card-title"><span class="card-title-text">Your focus today</span><span style="color:var(--accent2);font-size:10px;">● LIVE</span></div>
+            <div class="gs-live-time" id="gsMyFocusTime">00:00:00</div>
+            <div class="gs-live-meta">This is the same timer running on your dashboard. It resets for the room at 5:00 AM.</div>
+          </div>
           <div class="card">
-            <div class="card-title"><span class="card-title-text">👥 Members</span></div>
+            <div class="card-title"><span class="card-title-text">Studying together</span></div>
+            <div class="gs-live-members"><span class="gs-live-dot"></span><span id="gsStudyingCount">0 members studying right now</span></div>
+            <div class="gs-live-meta" style="margin-top:12px;">Start your main Focus Lab timer and your live status and time appear automatically for everyone in this room.</div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-bottom:16px;">
+          <div class="card">
+            <div class="card-title"><span class="card-title-text">👥 Room focus board</span><span style="font-size:10px;color:var(--text3);">TODAY</span></div>
             <div id="gsMembersList"></div>
           </div>
           <div class="card" style="display:flex;flex-direction:column;">
@@ -1816,6 +1865,16 @@ html[data-theme="sunset"] body::after {
               <input class="input input-full" id="gsChatInput" placeholder="Message the room…" onkeydown="if(event.key==='Enter')gsSendMessage()">
               <button class="btn btn-primary" onclick="gsSendMessage()">Send</button>
             </div>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title"><span class="card-title-text">🏆 Daily rankings</span><span style="font-size:10px;color:var(--text3);">RESETS 5:00 AM</span></div>
+            <div id="gsLeaderboardList"></div>
+          </div>
+          <div class="card">
+            <div class="card-title"><span class="card-title-text">◷ Room history</span></div>
+            <div id="gsHistoryList"></div>
           </div>
         </div>
       </div>
@@ -3849,9 +3908,11 @@ const gsConfigured = !!(FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey !== "YO
 
 let gsDb = null, gsAuth = null, gsUid = null;
 let gsCurrentRoomId = S.get('gsCurrentRoomId', null);
-let gsMembersUnsub = null, gsMessagesUnsub = null, gsRoomUnsub = null, gsPublicRoomsUnsub = null;
+let gsMembersUnsub = null, gsMessagesUnsub = null, gsRoomUnsub = null, gsPublicRoomsUnsub = null, gsHistoryUnsub = null;
 let gsRoomData = null;
 let gsMembersCache = {};
+let gsHistoryCache = [];
+let gsClockInterval = null;
 
 function gsInit() {
   if (!gsConfigured) {
@@ -3868,6 +3929,56 @@ function gsInit() {
       else { gsAuth.signInAnonymously().catch(err => console.log('Group Study auth error:', err)); }
     });
   } catch (err) { console.log('Group Study init error:', err); }
+}
+
+/* A group study day runs from 5:00 AM local time to the next 5:00 AM. */
+function gsStudyDayKey(date = new Date()) {
+  const d = new Date(date);
+  if (d.getHours() < 5) d.setDate(d.getDate() - 1);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function gsStudyDayStartMs(date = new Date()) {
+  const d = new Date(date);
+  if (d.getHours() < 5) d.setDate(d.getDate() - 1);
+  d.setHours(5,0,0,0);
+  return d.getTime();
+}
+function gsFmtTime(seconds) { return fmtTime(Math.max(0, Math.floor(seconds || 0))); }
+function gsMemberSeconds(member, now = Date.now()) {
+  if (!member || member.studyDay !== gsStudyDayKey()) return 0;
+  const saved = Number(member.dailySeconds || 0);
+  return saved + (member.isStudying && member.sessionStartedAtMs ? Math.max(0, (now - member.sessionStartedAtMs) / 1000) : 0);
+}
+function gsRenderMyFocusTimer() {
+  const el = document.getElementById('gsMyFocusTime');
+  if (!el) return;
+  const me = gsMembersCache[gsUid];
+  el.textContent = gsFmtTime(me ? gsMemberSeconds(me) : 0);
+}
+function gsStudyScene(member, studying) {
+  const accent = studying ? '📖' : '☾';
+  return `<div class="gs-scene ${studying ? 'studying' : 'idle'}"><span class="gs-scene-avatar">${escHtml(member.icon || '🙂')}</span><span class="gs-scene-book">${accent}</span><span class="gs-scene-desk"></span></div>`;
+}
+function gsEnsureDailyCycle() {
+  const me = gsMembersCache[gsUid];
+  const today = gsStudyDayKey();
+  if (!me || !me.studyDay || me.studyDay === today || !gsCurrentRoomId || !gsDb) return;
+  const cutoff = gsStudyDayStartMs();
+  const oldSeconds = Number(me.dailySeconds || 0) + (me.isStudying && me.sessionStartedAtMs ? Math.max(0, (cutoff - me.sessionStartedAtMs) / 1000) : 0);
+  const carrySeconds = me.isStudying ? Math.max(0, (Date.now() - cutoff) / 1000) : 0;
+  const oldDay = me.studyDay;
+  me.studyDay = today;
+  me.dailySeconds = carrySeconds;
+  me.sessionStartedAtMs = me.isStudying ? cutoff : null;
+  const roomRef = gsDb.collection('groupRooms').doc(gsCurrentRoomId);
+  roomRef.collection('dailyHistory').doc(`${oldDay}_${gsUid}`).set({
+    day: oldDay, memberId: gsUid, memberName: me.name || S.get('groupDisplayName','You'), memberIcon: me.icon || '🙂',
+    duration: Math.floor(oldSeconds), savedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }, { merge:true }).catch(()=>{});
+  roomRef.collection('members').doc(gsUid).update({
+    studyDay: today, dailySeconds: carrySeconds, sessionStartedAtMs: me.sessionStartedAtMs
+  }).catch(()=>{});
+  snack('New group study day started. Yesterday is in room history.');
 }
 
 function gsAfterAuthReady() {
@@ -4053,6 +4164,8 @@ function gsEnterRoom(roomId) {
           name: myName, icon: myIcon, role: 'member',
           isStudying: !!studyStartTime,
           sessionStartedAt: studyStartTime ? firebase.firestore.FieldValue.serverTimestamp() : null,
+          sessionStartedAtMs: studyStartTime ? Date.now() : null,
+          studyDay: gsStudyDayKey(), dailySeconds: 0,
           joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
         });
       } else {
@@ -4068,9 +4181,19 @@ function gsEnterRoom(roomId) {
     gsMembersUnsub = roomRef.collection('members').orderBy('joinedAt','asc').onSnapshot(snap => {
       gsMembersCache = {};
       snap.forEach(d => { gsMembersCache[d.id] = d.data(); });
+      gsEnsureDailyCycle();
       gsRenderMembers();
       gsUpdateDashboardBadge();
     });
+
+    gsHistoryUnsub = roomRef.collection('dailyHistory').orderBy('savedAt','desc').limit(30).onSnapshot(snap => {
+      gsHistoryCache = [];
+      snap.forEach(d => gsHistoryCache.push({ id:d.id, ...d.data() }));
+      gsRenderHistory();
+    }, () => { gsHistoryCache = []; gsRenderHistory(); });
+
+    if (gsClockInterval) clearInterval(gsClockInterval);
+    gsClockInterval = setInterval(() => { gsEnsureDailyCycle(); gsRenderMembers(); }, 1000);
 
     gsMessagesUnsub = roomRef.collection('messages').orderBy('createdAt','asc').limit(200).onSnapshot(snap => {
       const msgs = [];
@@ -4097,10 +4220,16 @@ function gsRenderMembers() {
   const iAmManagerOrAbove = me.role === 'admin' || me.role === 'manager';
   const ids = Object.keys(gsMembersCache);
   if (!ids.length) { el.innerHTML = '<div style="color:var(--text3);font-size:12px;">No members yet.</div>'; return; }
-  el.innerHTML = ids.map(id => {
+  const list = ids.map(id => ({ id, ...gsMembersCache[id], seconds:gsMemberSeconds(gsMembersCache[id]) }));
+  const countEl = document.getElementById('gsStudyingCount');
+  if (countEl) countEl.textContent = `${list.filter(m => m.isStudying && m.studyDay === gsStudyDayKey()).length} members studying right now`;
+  gsRenderMyFocusTimer();
+  el.className = 'gs-member-grid';
+  el.innerHTML = list.map(member => {
+    const id = member.id;
     const m = gsMembersCache[id];
     const roleBadge = m.role === 'admin' ? '👑' : m.role === 'manager' ? '🛡️' : '';
-    const studying = m.isStudying;
+    const studying = m.isStudying && m.studyDay === gsStudyDayKey();
     const isSelf = id === gsUid;
     const targetIsAdmin = m.role === 'admin';
     let actionsHtml = '';
@@ -4114,15 +4243,27 @@ function gsRenderMembers() {
         actionsHtml = `<div class="gs-member-actions"><button class="btn btn-sm btn-danger" onclick="gsKickMember('${id}')">Kick</button></div>`;
       }
     }
-    return `<div class="gs-member-row">
-      <span class="gs-member-emoji">${m.icon || '🙂'}</span>
-      <div style="flex:1;min-width:0;">
-        <div class="gs-member-name">${roleBadge} ${escHtml(m.name || 'Anonymous')}${isSelf?' (you)':''}</div>
-        <div class="gs-member-status ${studying?'is-studying':''}">${studying ? '🟢 Studying now' : '⚪ Idle'}</div>
-      </div>
+    return `<div class="gs-member-tile ${studying?'is-studying':''}">
+      ${gsStudyScene(m, studying)}
+      <div class="gs-member-name">${roleBadge} ${escHtml(m.name || 'Anonymous')}${isSelf?' · you':''}</div>
+      <div class="gs-member-time">${gsFmtTime(gsMemberSeconds(m))}</div>
+      <div class="gs-member-status ${studying?'is-studying':''}">${studying ? 'Studying now' : 'Idle'}</div>
       ${actionsHtml}
     </div>`;
   }).join('');
+  const leaderboard = document.getElementById('gsLeaderboardList');
+  if (leaderboard) leaderboard.innerHTML = list.sort((a,b) => b.seconds-a.seconds).map((m,index) => `
+    <div class="gs-rank-row ${m.id===gsUid?'is-self':''}">
+      <div class="gs-rank-num">${index === 0 ? '♛' : index + 1}</div><div class="gs-rank-avatar">${m.icon || '🙂'}</div>
+      <div><div class="gs-rank-name">${escHtml(m.name || 'Anonymous')}${m.id===gsUid?' · you':''}</div><div class="gs-rank-sub">${m.isStudying && m.studyDay===gsStudyDayKey() ? 'Studying right now' : 'Focus logged today'}</div></div>
+      <div class="gs-rank-time">${gsFmtTime(m.seconds)}</div>
+    </div>`).join('');
+}
+
+function gsRenderHistory() {
+  const el = document.getElementById('gsHistoryList'); if (!el) return;
+  if (!gsHistoryCache.length) { el.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:10px 0;">Completed days will appear here after the 5:00 AM reset.</div>'; return; }
+  el.innerHTML = gsHistoryCache.map(h => `<div class="gs-history-row"><span>${h.memberIcon || '🙂'}</span><div><div style="font-size:12px;font-weight:600;">${escHtml(h.memberName || 'Member')}</div><div class="gs-history-date">${escHtml(h.day || '')}</div></div><div class="gs-history-time">${gsFmtTime(h.duration)}</div></div>`).join('');
 }
 
 function gsSetRole(memberId, role) {
@@ -4177,6 +4318,8 @@ function gsLeaveRoomListeners() {
   if (gsMembersUnsub) { gsMembersUnsub(); gsMembersUnsub = null; }
   if (gsMessagesUnsub) { gsMessagesUnsub(); gsMessagesUnsub = null; }
   if (gsRoomUnsub) { gsRoomUnsub(); gsRoomUnsub = null; }
+  if (gsHistoryUnsub) { gsHistoryUnsub(); gsHistoryUnsub = null; }
+  if (gsClockInterval) { clearInterval(gsClockInterval); gsClockInterval = null; }
 }
 function gsLeaveRoom() {
   if (!gsCurrentRoomId) return;
@@ -4210,10 +4353,23 @@ function gsCopyInviteLink() {
 /* ---- Sync main Study Timer presence into the active Group Study room ---- */
 function gsSyncPresence(isStudying) {
   if (!gsConfigured || !gsCurrentRoomId || !gsUid || !gsDb) return;
-  gsDb.collection('groupRooms').doc(gsCurrentRoomId).collection('members').doc(gsUid).update({
-    isStudying,
-    sessionStartedAt: isStudying ? firebase.firestore.FieldValue.serverTimestamp() : null,
-  }).catch(()=>{});
+  gsEnsureDailyCycle();
+  const me = gsMembersCache[gsUid] || {};
+  const today = gsStudyDayKey();
+  const previousSeconds = me.studyDay === today ? Number(me.dailySeconds || 0) : 0;
+  const elapsed = !isStudying && me.isStudying && me.sessionStartedAtMs
+    ? Math.max(0, (Date.now() - me.sessionStartedAtMs) / 1000) : 0;
+  const patch = isStudying ? {
+    isStudying:true, studyDay:today, dailySeconds:previousSeconds,
+    sessionStartedAt:firebase.firestore.FieldValue.serverTimestamp(), sessionStartedAtMs:Date.now()
+  } : {
+    isStudying:false, studyDay:today, dailySeconds:previousSeconds + elapsed,
+    sessionStartedAt:null, sessionStartedAtMs:null
+  };
+  Object.assign(me, patch);
+  gsMembersCache[gsUid] = me;
+  gsDb.collection('groupRooms').doc(gsCurrentRoomId).collection('members').doc(gsUid).update(patch)
+    .then(() => gsRenderMembers()).catch(()=>{});
 }
 function gsUpdateDashboardBadge() {
   const el = document.getElementById('gsDashboardBadge'); if (!el) return;

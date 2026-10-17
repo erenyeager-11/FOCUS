@@ -147,6 +147,29 @@ nav{flex-direction:row;padding:6px;border-radius:26px;overflow-x:auto}nav button
 .ipc .btn{width:100%;justify-content:center;padding:13px 22px;font-size:15px}
 .ipc .btn+.btn{margin-top:10px}
 .ipc .later{font-weight:600;color:var(--mute);background:none;border:0}
+/* ===== smart notebook ===== */
+.ov2{position:fixed;inset:0;z-index:65;display:none;align-items:center;justify-content:center;padding:14px;background:rgba(40,20,10,.5);backdrop-filter:blur(4px)}.ov2.on{display:flex}
+.nbed,.nbrv{width:min(640px,100%);max-height:92vh;overflow:auto;display:flex;flex-direction:column;gap:10px}
+@supports(height:100dvh){.nbed,.nbrv{max-height:92dvh}}
+.nbrv{width:min(560px,100%)}.nrc{min-height:200px;padding:10px 4px}.nrc h2{font-size:24px;margin-top:4px}
+.nbgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;align-items:start}
+.nbn{background:var(--card);border-radius:22px;padding:16px 18px;cursor:pointer;box-shadow:0 8px 28px rgba(160,90,40,.06);border-top:4px solid var(--o);transition:.2s;min-width:0}
+.nbn:hover{transform:translateY(-2px)}.nbn h4{font-size:15px;font-weight:800;flex:1;overflow-wrap:anywhere}
+.nbn .r1{display:flex;gap:8px;align-items:flex-start}.nbn .r1 svg{color:var(--o);fill:var(--o);width:16px;height:16px}
+.nbx{white-space:pre-wrap;overflow-wrap:anywhere;color:var(--ink);font-size:13px;margin:8px 0;max-height:160px;overflow:hidden}
+.nbx.mono,.nrc .mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13.5px}.nrc .nbx{max-height:none;font-size:17px;margin-top:14px}.nrc .nbx.mono{font-size:16px}
+.nbth{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.nbth img{width:64px;height:64px;object-fit:cover;border-radius:12px;border:1px solid var(--line);background:var(--soft);cursor:zoom-in}
+.nrc .nbth img{width:100%;height:auto;max-height:260px;object-fit:contain}.nrc .nbth{flex-direction:column}
+.nbn .tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.nbacts{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 16px}.nbacts .btn{padding:8px 16px;font-size:13px}
+.chips .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}.chips small{opacity:.7;margin-left:4px}
+.nbfiles{display:flex;flex-direction:column;gap:8px}
+.nbf{display:flex;align-items:center;gap:10px;background:var(--soft);border:1px solid var(--line);border-radius:16px;padding:8px 10px}
+.nbf img{width:46px;height:46px;border-radius:10px;object-fit:cover;cursor:zoom-in}.nbf .nbfi{width:46px;height:46px;border-radius:10px;background:var(--card);display:grid;place-items:center;color:var(--o)}
+.nbf div{flex:1;min-width:0;cursor:pointer}.nbf b{display:block;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.nbf small{color:var(--mute)}
+#ne-pin.on{color:var(--o);border-color:var(--o)}#ne-pin.on svg{fill:var(--o)}
+#nbli{max-width:100%;max-height:92vh;border-radius:16px;background:#fff}
+@media(max-width:760px){.nbgrid{grid-template-columns:1fr}.nbed,.nbrv{padding:16px}.ov2{padding:8px}}
 /* ===== touch + mobile polish ===== */
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{-webkit-tap-highlight-color:transparent;overscroll-behavior-y:none}
@@ -226,6 +249,7 @@ img,svg,iframe{max-width:100%}
 <symbol id="trophy" viewBox="0 0 24 24"><path d="M7 4h10v5a5 5 0 0 1-10 0zM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4M12 14v4M8 21h8"/></symbol>
 <symbol id="full" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></symbol>
 <symbol id="pip" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><rect x="12" y="11" width="6" height="5" rx="1.500"/></symbol>
+<symbol id="note" viewBox="0 0 24 24"><path d="M5 4h14v11l-5 5H5z"/><path d="M14 20v-5h5M8 9h8M8 12h5"/></symbol>
 </defs></svg>
 
 <div id="shell">
@@ -270,13 +294,20 @@ img,svg,iframe{max-width:100%}
  <small id="part" style="color:#8a5a30"></small><div id="hgf"></div>
  <div class="big" data-tm>25:00</div>
  <div class="row2"><button class="pill" data-go onclick="toggleT()">Start</button><button class="pill ghost" onclick="resetT()">Reset</button></div></div>
- <div class="tl hide" id="tl-fc"><small style="color:#8a5a30">Focus timer:</small><div class="big" id="fcT">00:00:00</div><div class="row2"><button class="pill" id="fcGo" onclick="fcToggle()">Start</button><button class="pill ghost" onclick="fcReset()">Reset</button></div></div>
+ <div class="tl hide" id="tl-fc"><small style="color:#8a5a30">Focus timer: jitna padhoge utna time count hoga</small><div class="big" id="fcT">00:00:00</div><div class="row2"><button class="pill" id="fcGo" onclick="fcToggle()">Start</button><button class="pill ghost" onclick="fcReset()">Reset</button></div></div>
  <div class="tl hide" id="tl-sw"><div class="big sm" id="swT">00:00:00</div><div class="row2"><button class="pill" id="swGo" onclick="swToggle()">Start</button><button class="pill ghost" onclick="swLap()">Lap</button><button class="pill ghost" onclick="swReset()">Reset</button></div><div class="laps" id="laps"></div></div>
  <div class="tl hide" id="tl-cd"><div class="cdin" id="cdIn"><input id="cdh" type="number" min="0" max="23" value="0"><span>h</span><input id="cdm" type="number" min="0" max="59" value="10"><span>m</span><input id="cds" type="number" min="0" max="59" value="0"><span>s</span></div><div class="big sm" id="cdT" style="display:none">00:10:00</div>
   <div class="cdp" id="cdP"><button onclick="cdSet(300)">5 min</button><button onclick="cdSet(600)">10 min</button><button onclick="cdSet(1800)">30 min</button><button onclick="cdSet(3600)">1 hour</button></div>
   <div class="row2"><button class="pill" id="cdGo" onclick="cdToggle()">Start</button><button class="pill ghost" onclick="cdReset()">Reset</button></div></div>
  <button class="sbtn" onclick="document.getElementById('snds').classList.toggle('on')"><svg class="i" style="width:16px"><use href="#mus"/></svg>Sounds</button>
  <div class="snds" id="snds"></div></div></section>
+
+<section class="pg" id="p-nb">
+ <div class="row" style="margin-bottom:12px"><input id="nbq" placeholder="Search notes, formulas, tags, files" oninput="rNb()"><button class="btn p" onclick="editNote()">New note</button></div>
+ <div class="chips" id="nbbooks"></div>
+ <div class="chips" id="nbtags"></div>
+ <div class="nbacts" id="nbacts"></div>
+ <div class="nbgrid" id="nbgrid"></div></section>
 
 <section class="pg" id="p-syl"><div class="row" style="margin-bottom:16px"><input id="sin" placeholder="New subject, e.g. Physics" onkeydown="if(event.key==='Enter')addSub()"><button class="btn p" onclick="addSub()"><svg class="i"><use href="#plus"/></svg>Subject</button></div><div id="subs"></div></section>
 
@@ -308,10 +339,26 @@ img,svg,iframe{max-width:100%}
 
 
 <section class="pg" id="p-set"><div class="g g2"><div class="card"><h3>Profile and goals</h3><div class="row" style="margin-bottom:10px"><input id="sname" placeholder="Your name"><button class="btn p" onclick="ST.name=sname.value.trim();save();ren();snack('Saved')">Save</button></div><div class="row"><input id="sgoal" type="number" min="10" step="10" placeholder="Daily goal (minutes)"><button class="btn p" onclick="ST.goal=+sgoal.value||120;save();ren();snack('Goal saved')">Save</button></div></div>
-<div class="card"><h3>Appearance and data</h3><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" onclick="tgTheme()">Toggle dark mode</button><button class="btn" onclick="showInstall(true)">Download web app</button><button class="btn" onclick="exp()">Export JSON</button><button class="btn" style="color:#d4503e" onclick="if(confirm('Delete ALL data?')){localStorage.removeItem('sv2');location.reload()}">Clear all data</button></div></div></div></section>
+<div class="card"><h3>Appearance and data</h3><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" onclick="tgTheme()">Toggle dark mode</button><button class="btn" onclick="showInstall(true)">Download web app</button><button class="btn" onclick="exp()">Export JSON</button><button class="btn" style="color:#d4503e" onclick="if(confirm('Delete ALL data?')){localStorage.removeItem('sv2');try{_db&&_db.close();indexedDB.deleteDatabase('svfiles')}catch(e){}location.reload()}">Clear all data</button></div></div></div></section>
 </main></div>
 <div id="mdl" style="display:none;position:fixed;inset:0;background:rgba(40,20,10,.45);backdrop-filter:blur(4px);z-index:60;align-items:center;justify-content:center;padding:16px" onclick="if(event.target===this)closeM()"><div class="card" id="mdlc" style="width:min(460px,100%)"></div></div>
 
+<div class="ov2" id="nbe" onclick="if(event.target===this)closeNE()"><div class="card nbed">
+ <div class="row"><input id="ne-t" placeholder="Title, e.g. Newton's laws or Integration by parts"><button class="rb2" id="ne-pin" title="Pin to top" onclick="nePin()"><svg class="i"><use href="#star"/></svg></button></div>
+ <select id="ne-b"></select>
+ <textarea id="ne-x" rows="9" placeholder="Write formulas, points, steps. Paste a screenshot here to attach it." onpaste="nePaste(event)"></textarea>
+ <input id="ne-g" placeholder="Tags, comma separated (physics, ch3, exam)">
+ <div class="nbfiles" id="ne-f"></div>
+ <div class="row" style="flex-wrap:wrap"><label class="btn" style="cursor:pointer;flex:0 0 auto"><svg class="i" style="width:16px"><use href="#plus"/></svg>Attach images or files<input type="file" multiple hidden id="ne-in" onchange="neAttach(this.files);this.value=''"></label><span style="flex:1"></span>
+ <button class="btn" id="ne-del" style="color:#d4503e;flex:0 0 auto" onclick="neDel()">Delete</button><button class="btn" style="flex:0 0 auto" onclick="closeNE()">Cancel</button><button class="btn p" style="flex:0 0 auto" onclick="neSave()">Save</button></div>
+</div></div>
+<div class="ov2" id="nbr" style="z-index:70" onclick="if(event.target===this)closeRev()"><div class="card nbrv">
+ <div class="row"><b id="nr-c" class="mut"></b><button class="x" style="flex:0" onclick="closeRev()"><svg class="i"><use href="#x"/></svg></button></div>
+ <div id="nr-card" class="nrc"></div>
+ <div class="row2"><button class="pill ghost" onclick="revNav(-1)">Prev</button><button class="pill" id="nr-show" onclick="NR.s=!NR.s;drawRev()">Show</button><button class="pill ghost" onclick="revNav(1)">Next</button></div>
+ <div style="text-align:center;margin-top:12px"><button class="btn" onclick="revShuf()">Shuffle</button></div>
+</div></div>
+<div class="ov2" id="nbl" style="z-index:80" onclick="closeImg()"><img id="nbli" alt=""></div>
 <div class="ipop" id="ipop" onclick="if(event.target===this)hideInstall(true)"><div class="ipc"><img src="icon-192.png" alt="Studyverse"><h2>DOWNLOAD WEB APP</h2><p id="ipBody"></p><button class="btn p" id="ipGo" onclick="doInstall()">Download App</button><button class="btn later" onclick="hideInstall(true)">Not now</button></div></div>
 
 <div id="snk" style="position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(30px);background:var(--card);padding:10px 20px;border-radius:99px;box-shadow:0 8px 24px rgba(160,90,40,.25);opacity:0;transition:.3s;z-index:50;font-weight:700"></div>
@@ -328,10 +375,10 @@ const dk=d=>{d=d||new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).p
 const secOn=k=>ST.sessions.filter(s=>s.d===k).reduce((a,s)=>a+s.s,0),totalSec=()=>ST.sessions.reduce((a,s)=>a+s.s,0);
 const streak=()=>{let n=0,d=new Date();if(!secOn(dk(d)))d.setDate(d.getDate()-1);while(secOn(dk(d))){n++;d.setDate(d.getDate()-1)}return n};
 const fmt=s=>{s=Math.max(0,Math.floor(s));return String(Math.floor(s/3600)).padStart(2,'0')+':'+String(Math.floor(s%3600/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
-const PG=[['ov','home','Overview'],['focus','timer','Focus corner'],['syl','book','My syllabus'],['pet','paw','My little pet'],['dia','pen','Study diary'],['hab','hab','Habits'],['grp','users','Group study'],['mus','mus','Study music']];
+const PG=[['ov','home','Overview'],['focus','timer','Focus corner'],['syl','book','My syllabus'],['nb','note','Smart notebook'],['pet','paw','My little pet'],['dia','pen','Study diary'],['hab','hab','Habits'],['grp','users','Group study'],['mus','mus','Study music']];
 $('nav').innerHTML=PG.map(p=>`<button id="n-${p[0]}" title="${p[2]}" onclick="go('${p[0]}')">${ic(p[1])}</button>`).join('')+'<div class="sp"></div><button id="n-set" title="Settings" onclick="go(\'set\')">'+ic('set')+'</button>';
 function go(id){window.scrollTo(0,0);document.querySelectorAll('.pg').forEach(e=>e.classList.toggle('on',e.id==='p-'+id));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.id==='n-'+id));$('ttl').textContent=(PG.find(p=>p[0]===id)||[0,0,'Settings'])[2];
- ({ov:rOv,syl:rSyl,pet:rPet,dia:rDia,hab:rHab,grp:gInit,set:()=>{sname.value=ST.name;sgoal.value=ST.goal}}[id]||(()=>{}))()}
+ ({ov:rOv,syl:rSyl,nb:rNb,pet:rPet,dia:rDia,hab:rHab,grp:gInit,set:()=>{sname.value=ST.name;sgoal.value=ST.goal}}[id]||(()=>{}))()}
 function tgTheme(){const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'':'dark';localStorage.setItem('svt',r.dataset.theme||'')}
 document.documentElement.dataset.theme=localStorage.getItem('svt')||'';
 function exp(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(ST,null,2)],{type:'application/json'}));a.download='studyverse-'+dk()+'.json';a.click()}
@@ -526,6 +573,70 @@ function cdToggle(){if(cdEnd!==null){cdLeft=Math.max(0,(cdEnd-Date.now())/1000);
  cdI=setInterval(()=>{cdLeft=Math.max(0,(cdEnd-Date.now())/1000);cdDraw();if(cdLeft<=0){clearInterval(cdI);cdEnd=null;cdLog();gSync(false);cdReset();beep();snack('Countdown finished');if('Notification' in window&&Notification.permission==='granted')new Notification('Studyverse',{body:'Countdown finished'})}},250);cdDraw();
  if('Notification' in window&&Notification.permission==='default')Notification.requestPermission()}
 function cdReset(){if(cdEnd!==null){clearInterval(cdI);cdEnd=null;cdLog();gSync(false)}clearInterval(cdI);cdEnd=null;cdAct=false;cdDraw()}
+/* ===== Smart notebook ===== */
+const NBC=['#ff9a5c','#5fd08a','#8b7be8','#f2b13c','#2aa3e0','#e1306c'];
+let nbSel='all',nbTag='',NE=null,NL=[],NR={l:[],i:0,s:false},_db=null;const fURL=new Map();
+const idb=()=>_db?Promise.resolve(_db):new Promise((res,rej)=>{if(!window.indexedDB)return rej(new Error('no idb'));const r=indexedDB.open('svfiles',1);r.onupgradeneeded=()=>r.result.createObjectStore('f',{keyPath:'id'});r.onsuccess=()=>res(_db=r.result);r.onerror=()=>rej(r.error)});
+const fx=(mode,fn)=>idb().then(d=>new Promise((res,rej)=>{const t=d.transaction('f',mode),q=fn(t.objectStore('f'));t.oncomplete=()=>res(q&&q.result);t.onerror=()=>rej(t.error)}));
+const fPut=f=>fx('readwrite',s=>s.put(f)),fGet=id=>fx('readonly',s=>s.get(id)),fDel=id=>{fURL.delete(id);return fx('readwrite',s=>s.delete(id)).catch(()=>{})};
+const fileURL=async id=>{if(fURL.has(id))return fURL.get(id);const f=await fGet(id);if(!f)return '';const u=URL.createObjectURL(f.blob);fURL.set(id,u);return u};
+const hyd=r=>(r||document).querySelectorAll('img[data-fid]').forEach(im=>{fileURL(im.dataset.fid).then(u=>{if(u)im.src=u}).catch(()=>{})});
+const isImg=t=>/^image\//.test(t||''),nbOf=id=>(ST.nbs||[]).find(b=>b.id===id);
+const sz=b=>b<1024?b+' B':b<1048576?Math.round(b/1024)+' KB':(b/1048576).toFixed(1)+' MB';
+async function packImage(f){if(!/^image\/(png|jpe?g|webp)$/.test(f.type)||f.size<400*1024)return f;try{const bm=await createImageBitmap(f),k=Math.min(1,2000/Math.max(bm.width,bm.height)),c=document.createElement('canvas');c.width=Math.round(bm.width*k);c.height=Math.round(bm.height*k);c.getContext('2d').drawImage(bm,0,0,c.width,c.height);const b=await new Promise(r=>c.toBlob(r,'image/jpeg',.88));return b&&b.size<f.size?b:f}catch(e){return f}}
+function rNb(){
+ if(!ST.nbs){ST.nbs=[{id:1,n:'Important formulas',c:0,m:1},{id:2,n:'Quick revision',c:1},{id:3,n:'Screenshots and files',c:2}];save()}
+ ST.notes=ST.notes||[];if(nbSel!=='all'&&!nbOf(nbSel))nbSel='all';
+ const cnt=id=>ST.notes.filter(n=>id==='all'||n.nb===id).length;
+ $('nbbooks').innerHTML=`<button class="${nbSel==='all'?'on':''}" onclick="pickNb('all')">All notes <small>${cnt('all')}</small></button>`+ST.nbs.map(b=>`<button class="${nbSel===b.id?'on':''}" onclick="pickNb('${b.id}')"><i class="dot" style="background:${NBC[b.c%6]}"></i>${esc(b.n)}<small>${cnt(b.id)}</small></button>`).join('')+`<button onclick="addNb()">${ic('plus',14)} Notebook</button>`;
+ const scope=ST.notes.filter(n=>nbSel==='all'||n.nb===nbSel),tags=[...new Set(scope.flatMap(n=>n.tg||[]))].sort();
+ if(nbTag&&!tags.includes(nbTag))nbTag='';
+ $('nbtags').innerHTML=tags.map(t=>`<button class="${nbTag===t?'on':''}" onclick="nbTag=nbTag==='${esc(t)}'?'':'${esc(t)}';rNb()">#${esc(t)}</button>`).join('');
+ const q=($('nbq').value||'').toLowerCase();
+ NL=scope.filter(n=>(!nbTag||(n.tg||[]).includes(nbTag))&&(!q||(n.t+' '+n.x+' '+(n.tg||[]).join(' ')+' '+n.files.map(f=>f.n).join(' ')).toLowerCase().includes(q)));
+ NL.sort((a,b)=>(b.pin?1:0)-(a.pin?1:0)||b.u-a.u);
+ $('nbacts').innerHTML=`<button class="btn" onclick="startRev()">Quick revise (${NL.length})</button>`+(nbSel!=='all'?`<button class="btn" onclick="renNb()">Rename</button><button class="btn" style="color:#d4503e" onclick="delNb()">Delete notebook</button>`:'');
+ $('nbgrid').innerHTML=NL.length?NL.map(n=>{const b=nbOf(n.nb)||{c:0},imgs=n.files.filter(f=>isImg(f.t)),oth=n.files.filter(f=>!isImg(f.t));
+  return `<div class="nbn" style="border-top-color:${NBC[b.c%6]}" onclick="editNote(${n.id})"><div class="r1"><h4>${esc(n.t)}</h4>${n.pin?ic('star'):''}</div><div class="mut">${esc(b.n||'')} · ${new Date(n.u).toLocaleDateString(undefined,{day:'numeric',month:'short'})}</div>${n.x?`<div class="nbx ${b.m?'mono':''}">${esc(n.x.slice(0,260))}</div>`:''}${imgs.length?`<div class="nbth">${imgs.slice(0,4).map(f=>`<img data-fid="${f.id}" alt="">`).join('')}${imgs.length>4?`<span class="tag">+${imgs.length-4}</span>`:''}</div>`:''}${oth.length?`<div class="tags">${oth.map(f=>`<span class="tag du">${esc(f.n)}</span>`).join('')}</div>`:''}${(n.tg||[]).length?`<div class="tags">${n.tg.map(t=>`<span class="tag">#${esc(t)}</span>`).join('')}</div>`:''}</div>`}).join(''):`<div class="card empty" style="grid-column:1/-1">${ST.notes.length?'No notes match this view.':'No notes yet. Tap New note to add formulas, screenshots or revision points.'}</div>`;
+ hyd($('nbgrid'))}
+const pickNb=v=>{nbSel=v==='all'?'all':+v;nbTag='';rNb()};
+function addNb(){const v=prompt('Notebook name (e.g. Physics formulas, Exam day, Mistakes)');if(!v||!v.trim())return;const id=Date.now();ST.nbs.push({id,n:v.trim(),c:ST.nbs.length%6,m:/formula|equation|derivation/i.test(v)?1:0});nbSel=id;save();rNb()}
+function renNb(){const b=nbOf(nbSel),v=prompt('Rename notebook',b.n);if(v&&v.trim()){b.n=v.trim();save();rNb()}}
+function delNb(){const b=nbOf(nbSel),k=ST.notes.filter(n=>n.nb===b.id);if(!confirm('Delete "'+b.n+'" and its '+k.length+' note(s) with attachments?'))return;k.forEach(n=>n.files.forEach(f=>fDel(f.id)));ST.notes=ST.notes.filter(n=>n.nb!==b.id);ST.nbs=ST.nbs.filter(x=>x.id!==b.id);nbSel='all';save();rNb()}
+/* editor */
+function editNote(id){if(!ST.nbs||!ST.nbs.length){snack('Create a notebook first');return}ST.notes=ST.notes||[];const n=id?ST.notes.find(x=>x.id===id):null;
+ NE={id:n?n.id:null,files:n?n.files.map(f=>({...f})):[],added:[],removed:[],pin:n?!!n.pin:false};
+ $('ne-b').innerHTML=ST.nbs.map(b=>`<option value="${b.id}">${esc(b.n)}</option>`).join('');$('ne-b').value=n?n.nb:(nbSel!=='all'&&nbOf(nbSel)?nbSel:ST.nbs[0].id);
+ $('ne-t').value=n?n.t:'';$('ne-x').value=n?n.x:'';$('ne-g').value=n?(n.tg||[]).join(', '):'';$('ne-del').style.display=n?'':'none';
+ $('ne-pin').classList.toggle('on',NE.pin);neFiles();$('nbe').classList.add('on')}
+function closeNE(saved){if(NE&&!saved)NE.added.forEach(fDel);NE=null;$('nbe').classList.remove('on')}
+function nePin(){NE.pin=!NE.pin;$('ne-pin').classList.toggle('on',NE.pin)}
+function neFiles(){$('ne-f').innerHTML=NE.files.map(f=>`<div class="nbf">${isImg(f.t)?`<img data-fid="${f.id}" alt="" onclick="openImg('${f.id}')">`:`<span class="nbfi">${ic('pen',18)}</span>`}<div onclick="${isImg(f.t)?`openImg('${f.id}')`:`openFile('${f.id}')`}"><b>${esc(f.n)}</b><small>${sz(f.s)}</small></div><button class="x" onclick="neRm('${f.id}')">${ic('x',16)}</button></div>`).join('');hyd($('ne-f'))}
+async function neAttach(list){if(!NE)return;for(const f0 of [...list]){if(f0.size>15*1048576){snack(f0.name+' is over 15 MB');continue}
+ try{const f=await packImage(f0),id='f'+Date.now()+Math.random().toString(36).slice(2,6),nm=(!f0.name||/^image\.\w+$/.test(f0.name))?'screenshot-'+new Date().toTimeString().slice(0,5).replace(':','')+'.'+((f.type||'image/png').split('/')[1]||'png').replace('jpeg','jpg'):f0.name;
+  await fPut({id,name:nm,type:f.type||f0.type,size:f.size,blob:f});NE.files.push({id,n:nm,t:f.type||f0.type,s:f.size});NE.added.push(id)}catch(e){snack('Could not save '+(f0.name||'file'))}}
+ neFiles();try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}}
+function nePaste(e){const fs=[...(e.clipboardData&&e.clipboardData.files||[])].filter(f=>isImg(f.type));if(fs.length){e.preventDefault();neAttach(fs)}}
+function neRm(id){NE.files=NE.files.filter(f=>f.id!==id);if(NE.added.includes(id)){NE.added=NE.added.filter(x=>x!==id);fDel(id)}else NE.removed.push(id);neFiles()}
+function neSave(){const t=$('ne-t').value.trim(),x=$('ne-x').value.trim();if(!t&&!x&&!NE.files.length){snack('Write something or attach a file');return}
+ const o={id:NE.id||Date.now(),nb:+$('ne-b').value,t:t||'Untitled',x,tg:$('ne-g').value.split(',').map(s=>s.trim().replace(/^#/,'')).filter(Boolean),pin:NE.pin,files:NE.files,u:Date.now()},i=ST.notes.findIndex(z=>z.id===o.id);
+ if(i>=0){o.c=ST.notes[i].c;ST.notes[i]=o}else{o.c=o.u;ST.notes.unshift(o)}
+ NE.removed.forEach(fDel);save();closeNE(true);nbSel=o.nb;snack('Note saved');rNb()}
+function neDel(){if(!NE||!NE.id||!confirm('Delete this note and its attachments?'))return;[...NE.files,...NE.removed.map(id=>({id}))].forEach(f=>fDel(f.id));NE.added.forEach(fDel);ST.notes=ST.notes.filter(n=>n.id!==NE.id);save();closeNE(true);rNb()}
+async function openImg(id){const u=await fileURL(id);if(u){$('nbli').src=u;$('nbl').classList.add('on')}}
+const closeImg=()=>$('nbl').classList.remove('on');
+async function openFile(id){const f=await fGet(id);if(!f)return;const a=document.createElement('a');a.href=URL.createObjectURL(f.blob);a.download=f.name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),4000)}
+/* quick revision (flashcard style) */
+function startRev(){if(!NL.length){snack('No notes to revise here');return}NR={l:NL.map(n=>n.id),i:0,s:false};$('nbr').classList.add('on');drawRev()}
+function drawRev(){const n=ST.notes.find(z=>z.id===NR.l[NR.i]);if(!n)return closeRev();const b=nbOf(n.nb)||{},im=n.files.filter(f=>isImg(f.t));
+ $('nr-c').textContent=(NR.i+1)+' / '+NR.l.length;
+ $('nr-card').innerHTML=`<small class="mut">${esc(b.n||'')}</small><h2>${esc(n.t)}</h2>`+(NR.s?`${n.x?`<div class="nbx ${b.m?'mono':''}">${esc(n.x)}</div>`:''}${im.length?`<div class="nbth">${im.map(f=>`<img data-fid="${f.id}" alt="" onclick="openImg('${f.id}')">`).join('')}</div>`:''}`:'<p class="mut" style="margin-top:14px">Try to recall it, then tap Show.</p>');
+ hyd($('nr-card'));$('nr-show').textContent=NR.s?'Hide':'Show'}
+function revNav(d){NR.i=(NR.i+d+NR.l.length)%NR.l.length;NR.s=false;drawRev()}
+function revShuf(){for(let i=NR.l.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[NR.l[i],NR.l[j]]=[NR.l[j],NR.l[i]]}NR.i=0;NR.s=false;drawRev()}
+const closeRev=()=>$('nbr').classList.remove('on');
+addEventListener('keydown',e=>{if(e.key==='Escape'){if($('nbl').classList.contains('on'))closeImg();else if($('nbe').classList.contains('on'))closeNE();else closeRev();return}
+ if($('nbr').classList.contains('on')&&!$('nbl').classList.contains('on')){if(e.key==='ArrowRight')revNav(1);else if(e.key==='ArrowLeft')revNav(-1);else if(e.key===' '){e.preventDefault();NR.s=!NR.s;drawRev()}}});
 subOpts();ren();go('ov');gInit();
 /* open a page from app shortcut / link, e.g. index.html#focus */
 {const h=location.hash.slice(1);if(PG.some(p=>p[0]===h)||h==='set')go(h)}

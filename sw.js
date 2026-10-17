@@ -1,5 +1,5 @@
 /* Studyverse - Service Worker */
-const CACHE_VERSION = 'studyverse-v1';
+const CACHE_VERSION = 'studyverse-v2';
 const CORE_ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './icon-512-maskable.png', './apple-touch-icon.png', './favicon.png'];
 /* third-party static files worth keeping for offline (fonts + Firebase SDK) */
 const CDN_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com', 'www.gstatic.com'];

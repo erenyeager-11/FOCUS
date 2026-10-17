@@ -3,6 +3,15 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Studyverse</title>
 <meta name="theme-color" content="#ff9a5c">
+<meta name="description" content="Studyverse: focus timers, syllabus revision, habits, diary, music and live group study.">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="favicon.ico" sizes="any"><link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Studyverse">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="format-detection" content="telephone=no">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -127,6 +136,62 @@ main{min-width:0}
 @media(max-width:900px){.ov,.g2,.gm,.hero{grid-template-columns:1fr}.cal{margin:0 18px 18px;justify-self:start}.hero p{margin-bottom:20px}}
 @media(max-width:760px){body{padding:8px}#shell{grid-template-columns:1fr;padding:12px;border-radius:28px;padding-bottom:92px}.side{position:fixed;left:10px;right:10px;bottom:calc(8px + env(safe-area-inset-bottom,0px));top:auto;height:auto;z-index:20}.logo{display:none}
 nav{flex-direction:row;padding:6px;border-radius:26px;overflow-x:auto}nav button,nav button.on{flex:0 0 46px;height:46px;border-radius:18px;margin:0}nav .sp{display:none}.big{font-size:60px}.me div{display:none}.top{padding:12px 14px}}
+
+/* ===== install popup ===== */
+.ipop{position:fixed;inset:0;z-index:90;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(40,20,10,.5)}
+.ipop.on{display:flex;animation:in .3s ease}
+.ipc{width:min(380px,100%);background:var(--card);border-radius:30px;padding:28px 24px 22px;text-align:center;box-shadow:0 24px 70px rgba(120,50,10,.35)}
+.ipc img{width:76px;height:76px;border-radius:20px;box-shadow:0 8px 22px rgba(255,154,92,.45)}
+.ipc h2{margin:16px 0 8px;font-size:21px;font-weight:800;letter-spacing:.5px}
+.ipc p{color:var(--mute);font-size:13.5px;line-height:1.6;margin-bottom:20px}
+.ipc .btn{width:100%;justify-content:center;padding:13px 22px;font-size:15px}
+.ipc .btn+.btn{margin-top:10px}
+.ipc .later{font-weight:600;color:var(--mute);background:none;border:0}
+/* ===== touch + mobile polish ===== */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{-webkit-tap-highlight-color:transparent;overscroll-behavior-y:none}
+button,.btn,.room,.fm,.ck,.hd,.dt{touch-action:manipulation;-webkit-user-select:none;user-select:none}
+img,svg,iframe{max-width:100%}
+@supports(height:100dvh){#shell{min-height:calc(100dvh - 40px)}.side{height:calc(100dvh - 84px)}}
+.modes{max-width:100%;overflow-x:auto;scrollbar-width:none}.modes::-webkit-scrollbar{display:none}
+.modes button{white-space:nowrap}
+@media(max-width:760px){
+ .side{height:auto!important;top:auto!important}
+ .side nav{gap:2px;padding:6px 8px;overflow-x:hidden}
+ .side nav button,.side nav button.on{flex:1 1 0;min-width:0;height:44px;border-radius:16px}
+ #tools button{padding:6px 10px;font-size:11.5px}
+ input,select,textarea{font-size:16px}
+ #shell{backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none;background:rgba(255,255,255,.35);min-height:calc(100vh - 16px)}
+ :root[data-theme=dark] #shell{background:rgba(30,22,22,.5)}
+ @supports(height:100dvh){#shell{min-height:calc(100dvh - 16px)}}
+ .side nav{box-shadow:0 10px 28px rgba(150,70,20,.35);-webkit-overflow-scrolling:touch}
+ .top{flex-wrap:wrap;gap:10px;border-radius:20px;padding:12px 14px}
+ .top h1{font-size:15px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .fm{padding:6px 10px;font-size:11px;gap:8px}.rb2{width:38px;height:38px}.av{width:38px;height:38px}
+ .card{padding:16px;border-radius:22px}
+ .hero>div{padding:20px}.hero h2{font-size:20px}.hero{min-height:0}
+ .cal{width:calc(100% - 36px);margin:0 18px 18px;justify-self:stretch}
+ .bars{gap:8px}
+ .addr{flex-wrap:wrap}.addr .in{flex:1 1 100%}
+ .focus{min-height:calc(100vh - 220px);padding:64px 12px 28px;border-radius:24px}
+ @supports(height:100dvh){.focus{min-height:calc(100dvh - 220px)}}
+ .big{font-size:58px}.big.sm{font-size:46px}
+ .pill{padding:10px 24px}
+ .cdin input{width:70px;font-size:26px;padding:8px 2px}
+ .tm{font-size:30px}
+ .ig{grid-template-columns:repeat(4,1fr)}
+ .hb{flex-wrap:wrap;gap:8px}.hb>b{flex:1 0 100%}
+ .ch{padding:11px 14px}
+ .chat{height:200px}
+ .mem{grid-template-columns:repeat(auto-fill,minmax(104px,1fr))}
+ .pet svg.pt{width:190px;height:190px}
+ .spot{grid-template-columns:1fr 1fr}
+ #snk{bottom:calc(92px + env(safe-area-inset-bottom,0px))!important;max-width:90vw;text-align:center}
+ .focus:fullscreen{padding-top:64px}
+}
+@media(max-width:380px){.big{font-size:50px}.big.sm{font-size:40px}nav button,nav button.on{flex-basis:42px}}
+@media(hover:none){.btn:hover{transform:none}.room:hover{outline:0}.spot button:hover{outline:0}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style></head><body>
 <svg width="0" height="0" style="position:absolute"><defs>
 <symbol id="home" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></symbol>
@@ -231,7 +296,7 @@ nav{flex-direction:row;padding:6px;border-radius:26px;overflow-x:auto}nav button
  </div>
  <div id="gRoom" style="display:none">
   <div class="card" style="margin-bottom:18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap"><span id="gRI"></span><div style="flex:1;min-width:160px"><div style="font-size:18px;font-weight:800" id="rtitle"></div><div class="mut" id="rmeta"></div></div><button class="btn" onclick="copyInvite()">Copy invite link</button><button class="btn" onclick="backLobby()">Lobby</button><button class="btn" onclick="leave()">Leave room</button></div>
-  <div class="g g2" style="margin-bottom:18px"><div class="card pom"><h3>Your focus today <span class="tag">LIVE</span></h3><div class="tm" id="gMyT" style="font-size:40px;text-align:left">00:00:00</div></div>
+  <div class="g g2" style="margin-bottom:18px"><div class="card pom"><h3>Your focus today <span class="tag">LIVE</span></h3><div class="tm" id="gMyT" style="font-size:40px;text-align:left">00:00:00</div><small>Pomodoro, Focus, Stopwatch aur Countdown ka total time. Room ke liye 5:00 AM pe reset hota hai.</small></div>
   <div class="card"><h3>Studying together</h3><div class="tag" id="gCnt" style="display:inline-block">0 members studying right now</div><p class="mut" style="margin-top:12px">Start your Focus timer and your live status and time show up for everyone in this room.</p></div></div>
   <div class="g g2" style="margin-bottom:18px"><div class="card"><h3>Room focus board <span class="mut">TODAY</span></h3><div class="mem" id="mem"></div></div>
   <div class="card"><h3>Room chat</h3><div class="chat" id="chat"></div><div class="row"><input id="cin" placeholder="Message the room" onkeydown="if(event.key==='Enter')sendMsg()"><button class="btn p" onclick="sendMsg()"><svg class="i"><use href="#send"/></svg></button></div></div></div>
@@ -243,9 +308,11 @@ nav{flex-direction:row;padding:6px;border-radius:26px;overflow-x:auto}nav button
 
 
 <section class="pg" id="p-set"><div class="g g2"><div class="card"><h3>Profile and goals</h3><div class="row" style="margin-bottom:10px"><input id="sname" placeholder="Your name"><button class="btn p" onclick="ST.name=sname.value.trim();save();ren();snack('Saved')">Save</button></div><div class="row"><input id="sgoal" type="number" min="10" step="10" placeholder="Daily goal (minutes)"><button class="btn p" onclick="ST.goal=+sgoal.value||120;save();ren();snack('Goal saved')">Save</button></div></div>
-<div class="card"><h3>Appearance and data</h3><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" onclick="tgTheme()">Toggle dark mode</button><button class="btn" onclick="exp()">Export JSON</button><button class="btn" style="color:#d4503e" onclick="if(confirm('Delete ALL data?')){localStorage.removeItem('sv2');location.reload()}">Clear all data</button></div></div></div></section>
+<div class="card"><h3>Appearance and data</h3><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" onclick="tgTheme()">Toggle dark mode</button><button class="btn" onclick="showInstall(true)">Download web app</button><button class="btn" onclick="exp()">Export JSON</button><button class="btn" style="color:#d4503e" onclick="if(confirm('Delete ALL data?')){localStorage.removeItem('sv2');location.reload()}">Clear all data</button></div></div></div></section>
 </main></div>
 <div id="mdl" style="display:none;position:fixed;inset:0;background:rgba(40,20,10,.45);backdrop-filter:blur(4px);z-index:60;align-items:center;justify-content:center;padding:16px" onclick="if(event.target===this)closeM()"><div class="card" id="mdlc" style="width:min(460px,100%)"></div></div>
+
+<div class="ipop" id="ipop" onclick="if(event.target===this)hideInstall(true)"><div class="ipc"><img src="icon-192.png" alt="Studyverse"><h2>DOWNLOAD WEB APP</h2><p id="ipBody"></p><button class="btn p" id="ipGo" onclick="doInstall()">Download App</button><button class="btn later" onclick="hideInstall(true)">Not now</button></div></div>
 
 <div id="snk" style="position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(30px);background:var(--card);padding:10px 20px;border-radius:99px;box-shadow:0 8px 24px rgba(160,90,40,.25);opacity:0;transition:.3s;z-index:50;font-weight:700"></div>
 
@@ -263,7 +330,7 @@ const streak=()=>{let n=0,d=new Date();if(!secOn(dk(d)))d.setDate(d.getDate()-1)
 const fmt=s=>{s=Math.max(0,Math.floor(s));return String(Math.floor(s/3600)).padStart(2,'0')+':'+String(Math.floor(s%3600/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
 const PG=[['ov','home','Overview'],['focus','timer','Focus corner'],['syl','book','My syllabus'],['pet','paw','My little pet'],['dia','pen','Study diary'],['hab','hab','Habits'],['grp','users','Group study'],['mus','mus','Study music']];
 $('nav').innerHTML=PG.map(p=>`<button id="n-${p[0]}" title="${p[2]}" onclick="go('${p[0]}')">${ic(p[1])}</button>`).join('')+'<div class="sp"></div><button id="n-set" title="Settings" onclick="go(\'set\')">'+ic('set')+'</button>';
-function go(id){document.querySelectorAll('.pg').forEach(e=>e.classList.toggle('on',e.id==='p-'+id));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.id==='n-'+id));$('ttl').textContent=(PG.find(p=>p[0]===id)||[0,0,'Settings'])[2];
+function go(id){window.scrollTo(0,0);document.querySelectorAll('.pg').forEach(e=>e.classList.toggle('on',e.id==='p-'+id));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.id==='n-'+id));$('ttl').textContent=(PG.find(p=>p[0]===id)||[0,0,'Settings'])[2];
  ({ov:rOv,syl:rSyl,pet:rPet,dia:rDia,hab:rHab,grp:gInit,set:()=>{sname.value=ST.name;sgoal.value=ST.goal}}[id]||(()=>{}))()}
 function tgTheme(){const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'':'dark';localStorage.setItem('svt',r.dataset.theme||'')}
 document.documentElement.dataset.theme=localStorage.getItem('svt')||'';
@@ -367,14 +434,14 @@ function openCreate(){if(!fdb){snack('Group study is still connecting');return}i
 function crDraw(){$('crI').innerHTML=GI.map(g=>`<button class="${cr.icon===g?'sel':''}" onclick="cr.icon='${g}';crDraw()">${gAv(g,38)}</button>`).join('');$('crV').innerHTML=`<button class="${cr.pub?'on':''}" onclick="cr.pub=true;crDraw()">Public</button><button class="${cr.pub?'':'on'}" onclick="cr.pub=false;crDraw()">Private (link only)</button>`}
 async function mkRoom(){const n=$('crn').value.trim();if(!n){snack('Enter a room name');return}
  try{const r=await fdb.collection('groupRooms').add({name:n,icon:cr.icon,isPublic:cr.pub,adminId:fuid,adminName:ST.name,createdAt:ts()});
- await r.collection('members').doc(fuid).set({name:ST.name,icon:ST.gicon,role:'admin',isStudying:!!end,sessionStartedAt:end?ts():null,sessionStartedAtMs:end?Date.now():null,studyDay:sday(),dailySeconds:Math.floor(secOn(sday())),joinedAt:ts()});closeM();enter(r.id);snack('Room created')}catch(e){snack('Could not create room')}}
+ await r.collection('members').doc(fuid).set({name:ST.name,icon:ST.gicon,role:'admin',isStudying:!!runStart(),sessionStartedAt:runStart()?ts():null,sessionStartedAtMs:runStart()||null,studyDay:sday(),dailySeconds:Math.floor(secOn(sday())),joinedAt:ts()});closeM();enter(r.id);snack('Room created')}catch(e){snack('Could not create room')}}
 async function enter(id){if(!fdb||!need())return;unsubs.forEach(u=>u());unsubs=[];mem={};hist=[];const ref=fdb.collection('groupRooms').doc(id);let d;
  try{d=await ref.get()}catch(e){snack('Could not open room');return}
  if(!d.exists){snack('Room not found');ST.room=null;save();return}
  rdata={id,...d.data()};ST.room=id;ST.rooms=ST.rooms.filter(r=>r.id!==id);ST.rooms.unshift({id,name:rdata.name,icon:rdata.icon});ST.rooms=ST.rooms.slice(0,20);save();myRooms();
  $('gLobby').style.display='none';$('gRoom').style.display='block';hdr();
  const me=ref.collection('members').doc(fuid),md=await me.get();
- if(!md.exists)await me.set({name:ST.name,icon:ST.gicon,role:'member',isStudying:!!end,sessionStartedAt:end?ts():null,sessionStartedAtMs:end?Date.now():null,studyDay:sday(),dailySeconds:Math.floor(secOn(sday())),joinedAt:ts()});else await me.update({name:ST.name,icon:ST.gicon});
+ if(!md.exists)await me.set({name:ST.name,icon:ST.gicon,role:'member',isStudying:!!runStart(),sessionStartedAt:runStart()?ts():null,sessionStartedAtMs:runStart()||null,studyDay:sday(),dailySeconds:Math.floor(secOn(sday())),joinedAt:ts()});else await me.update({name:ST.name,icon:ST.gicon,isStudying:!!runStart(),sessionStartedAtMs:runStart()||null,sessionStartedAt:null});
  unsubs.push(ref.onSnapshot(s=>{if(s.exists){rdata={id,...s.data()};hdr()}else{snack('Room was deleted');backLobby()}}));
  unsubs.push(ref.collection('members').orderBy('joinedAt','asc').onSnapshot(s=>{mem={};s.docs.forEach(x=>mem[x.id]=x.data());cycle();gDraw();badge();hdr()}));
  unsubs.push(ref.collection('dailyHistory').orderBy('savedAt','desc').limit(30).onSnapshot(s=>{hist=s.docs.map(x=>x.data());drawHist()},()=>{hist=[];drawHist()}));
@@ -400,9 +467,10 @@ function sendMsg(){const v=$('cin').value.trim();if(!v||!ST.room)return;fdb.coll
 const delMsg=id=>fdb.collection('groupRooms').doc(ST.room).collection('messages').doc(id).delete().catch(()=>{});
 const setRole=(id,r)=>mref(id).update({role:r}).then(()=>snack(r==='manager'?'Promoted to manager':'Demoted to member')).catch(()=>snack('Could not update role'));
 const kick=id=>{if(confirm('Remove this member from the room?'))mref(id).delete().then(()=>snack('Member removed')).catch(()=>snack('Could not remove member'))};
-async function gSync(on){if(!fdb||!fuid||!ST.room)return;cycle();const o=mem[fuid]||{},d=sday(),prev=o.studyDay===d?(o.dailySeconds||0):0,el=!on&&o.isStudying&&o.sessionStartedAtMs?Math.max(0,(Date.now()-o.sessionStartedAtMs)/1000):0;
+const runStart=()=>(end&&mode==='focus')?since:fcStart?fcFrom:swStart?swFrom:cdEnd!==null?cdFrom:null;
+async function gSync(on){if(!fdb||!fuid||!ST.room||!mem[fuid])return;cycle();const o=mem[fuid]||{},d=sday(),prev=o.studyDay===d?(o.dailySeconds||0):0,el=!on&&o.isStudying&&o.sessionStartedAtMs?Math.max(0,(Date.now()-o.sessionStartedAtMs)/1000):0;
  const p=on?{isStudying:true,studyDay:d,dailySeconds:prev,sessionStartedAt:ts(),sessionStartedAtMs:Date.now()}:{isStudying:false,studyDay:d,dailySeconds:prev+el,sessionStartedAt:null,sessionStartedAtMs:null};
- mem[fuid]={...o,...p};gDraw();try{await mref().set(p,{merge:true})}catch(e){}}
+ mem[fuid]={...o,...p};gDraw();try{await mref().set(p,{merge:true})}catch(e){snack('Group sync failed: '+(e.code||'error'))}}
 function badge(){const el=$('gbadge');if(!el)return;if(!ST.room||!rdata){el.innerHTML='';return}const n=Object.values(mem).filter(m=>m.isStudying&&m.studyDay===sday()).length;el.innerHTML=`<span class="gb2" onclick="go('grp')">${ic('users',16)} In "${esc(rdata.name)}" · ${n} studying now</span>`}
 function copyInvite(){const u=location.origin+location.pathname+'?room='+ST.room;(navigator.clipboard?navigator.clipboard.writeText(u).then(()=>snack('Invite link copied')):Promise.reject()).catch(()=>prompt('Copy invite link',u))}
 function backLobby(){unsubs.forEach(u=>u());unsubs=[];clearInterval(clock);ST.room=null;rdata=null;mem={};save();$('gRoom').style.display='none';$('gLobby').style.display='block';badge()}
@@ -458,5 +526,24 @@ function cdToggle(){if(cdEnd!==null){cdLeft=Math.max(0,(cdEnd-Date.now())/1000);
  cdI=setInterval(()=>{cdLeft=Math.max(0,(cdEnd-Date.now())/1000);cdDraw();if(cdLeft<=0){clearInterval(cdI);cdEnd=null;cdLog();gSync(false);cdReset();beep();snack('Countdown finished');if('Notification' in window&&Notification.permission==='granted')new Notification('Studyverse',{body:'Countdown finished'})}},250);cdDraw();
  if('Notification' in window&&Notification.permission==='default')Notification.requestPermission()}
 function cdReset(){if(cdEnd!==null){clearInterval(cdI);cdEnd=null;cdLog();gSync(false)}clearInterval(cdI);cdEnd=null;cdAct=false;cdDraw()}
-subOpts();ren();go('ov');
+subOpts();ren();go('ov');gInit();
+/* open a page from app shortcut / link, e.g. index.html#focus */
+{const h=location.hash.slice(1);if(PG.some(p=>p[0]===h)||h==='set')go(h)}
+/* ===== PWA: service worker + install popup ===== */
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+let dip=null;
+const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+const isStd=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+const iSkip=()=>{try{return Date.now()-(+localStorage.getItem('svi')||0)<3*864e5}catch(e){return false}};
+function showInstall(force){
+ if(isStd()){if(force===true)snack('App is already installed');return}
+ if(force!==true&&(iSkip()||$('ipop').classList.contains('on')))return;
+ if(!dip&&!isIOS){if(force===true)snack('Open your browser menu and choose Install app / Add to Home Screen');return}
+ $('ipBody').innerHTML=dip?'Install Studyverse on your device. It opens full screen, loads faster and feels like a real app.':'On iPhone or iPad: tap the <b>Share</b> button in Safari, then choose <b>Add to Home Screen</b>.';
+ $('ipGo').style.display=dip?'':'none';$('ipop').classList.add('on')}
+function hideInstall(later){$('ipop').classList.remove('on');if(later){try{localStorage.setItem('svi',Date.now())}catch(e){}}}
+async function doInstall(){if(!dip)return;dip.prompt();try{await dip.userChoice}catch(e){}dip=null;hideInstall()}
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();dip=e;setTimeout(showInstall,1500)});
+addEventListener('appinstalled',()=>{dip=null;hideInstall()});
+if(isIOS)setTimeout(showInstall,2500);
 </script></body></html>

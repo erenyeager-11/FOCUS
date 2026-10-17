@@ -1,60 +1,22 @@
 {
-  "name": "Focus Lab",
-  "short_name": "Focus Lab",
-  "description": "A focused study dashboard with timers, tasks, notes, habits, revision tracking, analytics, and offline support.",
+  "name": "Studyverse",
+  "short_name": "Studyverse",
+  "description": "Study dashboard with focus timers, tasks, syllabus revision, habits, diary, study music and live group study rooms.",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
-  "orientation": "portrait-primary",
-  "background_color": "#080c12",
-  "theme_color": "#3b9eff",
-  "categories": ["education", "productivity", "utilities"],
+  "orientation": "any",
+  "background_color": "#ffd7a3",
+  "theme_color": "#ff9a5c",
+  "categories": ["education", "productivity"],
   "icons": [
-    {
-      "src": "./focuslab-icon-192-v2.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "./focuslab-icon-512-v2.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "./focuslab-icon-512-maskable-v2.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
+    { "src": "./icon-192.png?v=3", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-512.png?v=3", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-512-maskable.png?v=3", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
   "shortcuts": [
-    {
-      "name": "Focus Timers",
-      "short_name": "Timers",
-      "url": "./index.html#focus",
-      "icons": [
-        {
-          "src": "./focuslab-icon-192-v2.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "Smart Notebook",
-      "short_name": "Notebook",
-      "url": "./index.html#notebook",
-      "icons": [
-        {
-          "src": "./focuslab-icon-192-v2.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
-    }
+    { "name": "Focus timers", "short_name": "Focus", "url": "./index.html#focus", "icons": [{ "src": "./icon-192.png?v=3", "sizes": "192x192", "type": "image/png" }] },
+    { "name": "Group study", "short_name": "Group", "url": "./index.html#grp", "icons": [{ "src": "./icon-192.png?v=3", "sizes": "192x192", "type": "image/png" }] }
   ]
-} 
+}

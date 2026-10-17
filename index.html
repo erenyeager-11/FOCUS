@@ -199,12 +199,13 @@ nav{flex-direction:row;padding:6px;border-radius:26px;overflow-x:auto}nav button
 
 <section class="pg" id="p-focus"><div class="focus">
  <div style="position:absolute;top:16px;right:16px;display:flex;gap:8px"><button class="rb2" id="fsb" title="Full screen" onclick="toggleFs()"><svg class="i"><use href="#full"/></svg></button><button class="rb2" title="Picture in picture" onclick="togglePip()"><svg class="i"><use href="#pip"/></svg></button></div>
- <div class="modes" id="tools"><button id="t-pomo" class="on" onclick="setTool('pomo')">Pomodoro</button><button id="t-sw" onclick="setTool('sw')">Stopwatch</button><button id="t-cd" onclick="setTool('cd')">Countdown</button></div>
+ <div class="modes" id="tools"><button id="t-pomo" class="on" onclick="setTool('pomo')">Pomodoro</button><button id="t-fc" onclick="setTool('fc')">Focus</button><button id="t-sw" onclick="setTool('sw')">Stopwatch</button><button id="t-cd" onclick="setTool('cd')">Countdown</button></div>
  <span class="chip"><svg class="i" style="width:16px"><use href="#book"/></svg><select id="fsub" onchange="ST.sub=this.value;save()"></select></span>
  <div class="tl" id="tl-pomo"><div class="modes" id="modes"></div>
  <small id="part" style="color:#8a5a30"></small><div id="hgf"></div>
  <div class="big" data-tm>25:00</div>
  <div class="row2"><button class="pill" data-go onclick="toggleT()">Start</button><button class="pill ghost" onclick="resetT()">Reset</button></div></div>
+ <div class="tl hide" id="tl-fc"><small style="color:#8a5a30">Focus timer: jitna padhoge utna time count hoga</small><div class="big" id="fcT">00:00:00</div><div class="row2"><button class="pill" id="fcGo" onclick="fcToggle()">Start</button><button class="pill ghost" onclick="fcReset()">Reset</button></div></div>
  <div class="tl hide" id="tl-sw"><div class="big sm" id="swT">00:00:00</div><div class="row2"><button class="pill" id="swGo" onclick="swToggle()">Start</button><button class="pill ghost" onclick="swLap()">Lap</button><button class="pill ghost" onclick="swReset()">Reset</button></div><div class="laps" id="laps"></div></div>
  <div class="tl hide" id="tl-cd"><div class="cdin" id="cdIn"><input id="cdh" type="number" min="0" max="23" value="0"><span>h</span><input id="cdm" type="number" min="0" max="59" value="10"><span>m</span><input id="cds" type="number" min="0" max="59" value="0"><span>s</span></div><div class="big sm" id="cdT" style="display:none">00:10:00</div>
   <div class="cdp" id="cdP"><button onclick="cdSet(300)">5 min</button><button onclick="cdSet(600)">10 min</button><button onclick="cdSet(1800)">30 min</button><button onclick="cdSet(3600)">1 hour</button></div>
@@ -230,7 +231,7 @@ nav{flex-direction:row;padding:6px;border-radius:26px;overflow-x:auto}nav button
  </div>
  <div id="gRoom" style="display:none">
   <div class="card" style="margin-bottom:18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap"><span id="gRI"></span><div style="flex:1;min-width:160px"><div style="font-size:18px;font-weight:800" id="rtitle"></div><div class="mut" id="rmeta"></div></div><button class="btn" onclick="copyInvite()">Copy invite link</button><button class="btn" onclick="backLobby()">Lobby</button><button class="btn" onclick="leave()">Leave room</button></div>
-  <div class="g g2" style="margin-bottom:18px"><div class="card pom"><h3>Your focus today <span class="tag">LIVE</span></h3><div class="tm" id="gMyT" style="font-size:40px;text-align:left">00:00:00</div><small>Same timer as your Overview. Resets for the room at 5:00 AM.</small></div>
+  <div class="g g2" style="margin-bottom:18px"><div class="card pom"><h3>Your focus today <span class="tag">LIVE</span></h3><div class="tm" id="gMyT" style="font-size:40px;text-align:left">00:00:00</div><small>Pomodoro, Focus, Stopwatch aur Countdown ka total time. Room ke liye 5:00 AM pe reset hota hai.</small></div>
   <div class="card"><h3>Studying together</h3><div class="tag" id="gCnt" style="display:inline-block">0 members studying right now</div><p class="mut" style="margin-top:12px">Start your Focus timer and your live status and time show up for everyone in this room.</p></div></div>
   <div class="g g2" style="margin-bottom:18px"><div class="card"><h3>Room focus board <span class="mut">TODAY</span></h3><div class="mem" id="mem"></div></div>
   <div class="card"><h3>Room chat</h3><div class="chat" id="chat"></div><div class="row"><input id="cin" placeholder="Message the room" onkeydown="if(event.key==='Enter')sendMsg()"><button class="btn p" onclick="sendMsg()"><svg class="i"><use href="#send"/></svg></button></div></div></div>
@@ -284,7 +285,7 @@ function drawT(){const m=String(Math.floor(left/60)).padStart(2,'0')+':'+String(
  $('fm').classList.toggle('on',!!end);$('part').textContent='Part '+(ST.sessions.filter(s=>s.d===dk()).length+1);
  $('meS').textContent=Math.round(secOn(dk())/60)+' min today';pipUpd()}
 function logSince(){if(since&&mode==='focus'){const s=Math.floor((Date.now()-since)/1000);if(s>5){ST.sessions.push({d:dk(),s,sub:ST.sub});save()}}since=null}
-function toggleT(){if(end){stopT();return}if(swStart)swToggle();end=Date.now()+left*1000;since=Date.now();tick=setInterval(()=>{left=Math.max(0,(end-Date.now())/1000);drawT();if(left<=0){stopT();setMode(mode==='focus'?'short':'focus');snack(mode==='short'?'Focus done. Take a break.':'Break over.')}},250);if(mode==='focus')gSync(true);drawT()}
+function toggleT(){if(end){stopT();return}stopOthers('pomo');end=Date.now()+left*1000;since=Date.now();tick=setInterval(()=>{left=Math.max(0,(end-Date.now())/1000);drawT();if(left<=0){stopT();setMode(mode==='focus'?'short':'focus');snack(mode==='short'?'Focus done. Take a break.':'Break over.')}},250);if(mode==='focus')gSync(true);drawT()}
 function stopT(){const was=!!end;if(tick)clearInterval(tick);tick=null;if(end)left=Math.max(0,(end-Date.now())/1000);end=null;logSince();if(was)gSync(false);drawT();if($('p-ov').classList.contains('on'))rOv()}
 function resetT(){stopT();left=dur(mode);drawT()}
 /* ambience */
@@ -366,14 +367,14 @@ function openCreate(){if(!fdb){snack('Group study is still connecting');return}i
 function crDraw(){$('crI').innerHTML=GI.map(g=>`<button class="${cr.icon===g?'sel':''}" onclick="cr.icon='${g}';crDraw()">${gAv(g,38)}</button>`).join('');$('crV').innerHTML=`<button class="${cr.pub?'on':''}" onclick="cr.pub=true;crDraw()">Public</button><button class="${cr.pub?'':'on'}" onclick="cr.pub=false;crDraw()">Private (link only)</button>`}
 async function mkRoom(){const n=$('crn').value.trim();if(!n){snack('Enter a room name');return}
  try{const r=await fdb.collection('groupRooms').add({name:n,icon:cr.icon,isPublic:cr.pub,adminId:fuid,adminName:ST.name,createdAt:ts()});
- await r.collection('members').doc(fuid).set({name:ST.name,icon:ST.gicon,role:'admin',isStudying:!!end,sessionStartedAt:end?ts():null,sessionStartedAtMs:end?Date.now():null,studyDay:sday(),dailySeconds:0,joinedAt:ts()});closeM();enter(r.id);snack('Room created')}catch(e){snack('Could not create room')}}
+ await r.collection('members').doc(fuid).set({name:ST.name,icon:ST.gicon,role:'admin',isStudying:!!end,sessionStartedAt:end?ts():null,sessionStartedAtMs:end?Date.now():null,studyDay:sday(),dailySeconds:Math.floor(secOn(sday())),joinedAt:ts()});closeM();enter(r.id);snack('Room created')}catch(e){snack('Could not create room')}}
 async function enter(id){if(!fdb||!need())return;unsubs.forEach(u=>u());unsubs=[];mem={};hist=[];const ref=fdb.collection('groupRooms').doc(id);let d;
  try{d=await ref.get()}catch(e){snack('Could not open room');return}
  if(!d.exists){snack('Room not found');ST.room=null;save();return}
  rdata={id,...d.data()};ST.room=id;ST.rooms=ST.rooms.filter(r=>r.id!==id);ST.rooms.unshift({id,name:rdata.name,icon:rdata.icon});ST.rooms=ST.rooms.slice(0,20);save();myRooms();
  $('gLobby').style.display='none';$('gRoom').style.display='block';hdr();
  const me=ref.collection('members').doc(fuid),md=await me.get();
- if(!md.exists)await me.set({name:ST.name,icon:ST.gicon,role:'member',isStudying:!!end,sessionStartedAt:end?ts():null,sessionStartedAtMs:end?Date.now():null,studyDay:sday(),dailySeconds:0,joinedAt:ts()});else await me.update({name:ST.name,icon:ST.gicon});
+ if(!md.exists)await me.set({name:ST.name,icon:ST.gicon,role:'member',isStudying:!!end,sessionStartedAt:end?ts():null,sessionStartedAtMs:end?Date.now():null,studyDay:sday(),dailySeconds:Math.floor(secOn(sday())),joinedAt:ts()});else await me.update({name:ST.name,icon:ST.gicon});
  unsubs.push(ref.onSnapshot(s=>{if(s.exists){rdata={id,...s.data()};hdr()}else{snack('Room was deleted');backLobby()}}));
  unsubs.push(ref.collection('members').orderBy('joinedAt','asc').onSnapshot(s=>{mem={};s.docs.forEach(x=>mem[x.id]=x.data());cycle();gDraw();badge();hdr()}));
  unsubs.push(ref.collection('dailyHistory').orderBy('savedAt','desc').limit(30).onSnapshot(s=>{hist=s.docs.map(x=>x.data());drawHist()},()=>{hist=[];drawHist()}));
@@ -412,8 +413,8 @@ function leave(){if(!confirm('Leave this room?'))return;const id=ST.room,me=mem[
 const fsEl=()=>document.fullscreenElement||document.webkitFullscreenElement;
 function toggleFs(){const el=document.querySelector('.focus');if(fsEl())(document.exitFullscreen||document.webkitExitFullscreen).call(document);else{const f=el.requestFullscreen||el.webkitRequestFullscreen;if(f)f.call(el);else snack('Full screen is not supported here')}}
 let pipW=null,pipV=null,pipI=null;
-const runN=()=>({pomo:!!end,sw:!!swStart,cd:cdEnd!==null}[tool]),lbl=()=>tool==='sw'?'Stopwatch':tool==='cd'?'Countdown':(mode==='focus'?ST.sub:MODES[mode]);
-const tmTxt=()=>tool==='sw'?fmt(swMs()/1000):tool==='cd'?fmt(cdLeft):document.querySelector('[data-tm]').textContent;
+const runN=()=>({pomo:!!end,fc:!!fcStart,sw:!!swStart,cd:cdEnd!==null}[tool]),lbl=()=>tool==='fc'?'Focus timer':tool==='sw'?'Stopwatch':tool==='cd'?'Countdown':(mode==='focus'?ST.sub:MODES[mode]);
+const tmTxt=()=>tool==='fc'?fmt(fcMs()/1000):tool==='sw'?fmt(swMs()/1000):tool==='cd'?fmt(cdLeft):document.querySelector('[data-tm]').textContent;
 function pipUpd(){if(!pipW)return;const d=pipW.document,t=d.getElementById('pt');if(t){t.textContent=tmTxt();d.getElementById('pb').textContent=runN()?'Pause':'Start';d.getElementById('ps').textContent=lbl()}}
 function pipDraw(c){const x=c.getContext('2d'),g=x.createLinearGradient(0,0,0,c.height);g.addColorStop(0,'#ffe9bd');g.addColorStop(1,'#ffc58a');x.fillStyle=g;x.fillRect(0,0,c.width,c.height);x.textAlign='center';x.fillStyle='#8a5a30';x.font='600 20px sans-serif';x.fillText(lbl(),c.width/2,44);x.fillStyle='#e0872e';x.font='300 78px sans-serif';x.fillText(tmTxt(),c.width/2,128);x.fillStyle='#8a5a30';x.font='700 16px sans-serif';x.fillText(runN()?'Running':'Paused',c.width/2,162)}
 async function togglePip(){
@@ -423,29 +424,39 @@ async function togglePip(){
   if(window.documentPictureInPicture){
    pipW=await documentPictureInPicture.requestWindow({width:300,height:230});const d=pipW.document;
    d.head.innerHTML='<meta charset="utf-8"><style>body{margin:0;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;font-family:Nunito,"Segoe UI",system-ui,sans-serif;background:linear-gradient(180deg,#ffe9bd,#ffc58a);color:#3a2a22}#ps{font-weight:700;font-size:13px;color:#8a5a30}#pt{font-size:64px;font-weight:300;color:#e0872e;font-variant-numeric:tabular-nums;line-height:1}button{padding:9px 28px;border-radius:99px;border:1.5px solid #3a2a22;background:rgba(255,255,255,.5);font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;color:#3a2a22}</style>';
-   d.body.innerHTML='<div id="ps"></div><div id="pt"></div><button id="pb"></button>';d.getElementById('pb').onclick=()=>({pomo:toggleT,sw:swToggle,cd:cdToggle}[tool])();
+   d.body.innerHTML='<div id="ps"></div><div id="pt"></div><button id="pb"></button>';d.getElementById('pb').onclick=()=>({pomo:toggleT,fc:fcToggle,sw:swToggle,cd:cdToggle}[tool])();
    pipW.addEventListener('pagehide',()=>{pipW=null});pipUpd();
   }else if(document.pictureInPictureEnabled){
    const c=document.createElement('canvas');c.width=320;c.height=180;pipDraw(c);pipV=document.createElement('video');pipV.muted=true;pipV.srcObject=c.captureStream(2);await pipV.play();
    pipI=setInterval(()=>pipDraw(c),500);pipV.addEventListener('leavepictureinpicture',()=>{clearInterval(pipI);pipV.srcObject=null;pipV=null});await pipV.requestPictureInPicture();
   }else snack('Picture in picture is not supported in this browser')
  }catch(e){snack('Could not open picture in picture')}}
-/* stopwatch + countdown */
+/* stopwatch + countdown + focus timer */
 let tool='pomo',swAcc=0,swStart=null,swI=null,swFrom=null,laps=[],cdLeft=600,cdTot=600,cdEnd=null,cdI=null,cdAct=false;
-function setTool(t){tool=t;['pomo','sw','cd'].forEach(k=>{$('tl-'+k).classList.toggle('hide',k!==t);$('t-'+k).classList.toggle('on',k===t)});pipUpd()}
+function setTool(t){tool=t;['pomo','fc','sw','cd'].forEach(k=>{$('tl-'+k).classList.toggle('hide',k!==t);$('t-'+k).classList.toggle('on',k===t)});pipUpd()}
 const swMs=()=>swAcc+(swStart?Date.now()-swStart:0);
 function swDraw(){$('swT').textContent=fmt(swMs()/1000);$('swGo').textContent=swStart?'Pause':(swAcc?'Resume':'Start');pipUpd()}
 function swLog(){if(swFrom){const s=Math.floor((Date.now()-swFrom)/1000);if(s>5){ST.sessions.push({d:dk(),s,sub:ST.sub});save()}swFrom=null;drawT();if($('p-ov').classList.contains('on'))rOv()}}
-function swToggle(){if(swStart){swAcc+=Date.now()-swStart;swStart=null;clearInterval(swI);swLog();gSync(false)}else{if(end)stopT();swStart=Date.now();swFrom=Date.now();swI=setInterval(swDraw,250);gSync(true)}swDraw()}
+function swToggle(){if(swStart){swAcc+=Date.now()-swStart;swStart=null;clearInterval(swI);swLog();gSync(false)}else{stopOthers('sw');swStart=Date.now();swFrom=Date.now();swI=setInterval(swDraw,250);gSync(true)}swDraw()}
 function swLap(){const t=swMs();if(!t)return;laps.unshift(t);const L=laps.length;$('laps').innerHTML=laps.map((v,i)=>`<div class="lp"><span>Lap ${L-i}</span><span>${fmt((v-(laps[i+1]||0))/1000)}</span><span>${fmt(v/1000)}</span></div>`).join('')}
 function swReset(){if(swStart){clearInterval(swI);swStart=null;swLog();gSync(false)}swAcc=0;laps=[];$('laps').innerHTML='';swDraw()}
 function beep(){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();AC.resume();[0,.4,.8].forEach(t=>{const o=AC.createOscillator(),g=AC.createGain(),n=AC.currentTime+t;o.frequency.value=880;g.gain.setValueAtTime(.25,n);g.gain.exponentialRampToValueAtTime(.001,n+.3);o.connect(g);g.connect(AC.destination);o.start(n);o.stop(n+.3)})}catch(e){}}
 function cdSet(s){if(cdAct)return;$('cdh').value=Math.floor(s/3600);$('cdm').value=Math.floor(s%3600/60);$('cds').value=s%60}
 function cdDraw(){$('cdT').textContent=fmt(cdLeft);$('cdT').style.display=cdAct?'block':'none';$('cdIn').style.display=cdAct?'none':'flex';$('cdP').style.display=cdAct?'none':'flex';$('cdGo').textContent=cdEnd!==null?'Pause':(cdAct?'Resume':'Start');pipUpd()}
-function cdToggle(){if(cdEnd!==null){cdLeft=Math.max(0,(cdEnd-Date.now())/1000);cdEnd=null;clearInterval(cdI);cdDraw();return}
+/* focus timer (count-up) */
+let fcAcc=0,fcStart=null,fcI=null,fcFrom=null,cdFrom=null;
+const fcMs=()=>fcAcc+(fcStart?Date.now()-fcStart:0);
+function fcDraw(){$('fcT').textContent=fmt(fcMs()/1000);$('fcGo').textContent=fcStart?'Pause':(fcAcc?'Resume':'Start');pipUpd()}
+function fcLog(){if(fcFrom){const s=Math.floor((Date.now()-fcFrom)/1000);if(s>5){ST.sessions.push({d:dk(),s,sub:ST.sub});save()}fcFrom=null;drawT();if($('p-ov').classList.contains('on'))rOv()}}
+function fcToggle(){if(fcStart){fcAcc+=Date.now()-fcStart;fcStart=null;clearInterval(fcI);fcLog();gSync(false)}else{stopOthers('fc');fcStart=Date.now();fcFrom=Date.now();fcI=setInterval(fcDraw,250);gSync(true)}fcDraw()}
+function fcReset(){if(fcStart){clearInterval(fcI);fcStart=null;fcLog();gSync(false)}fcAcc=0;fcDraw()}
+function cdLog(){if(cdFrom){const s=Math.floor((Date.now()-cdFrom)/1000);if(s>5){ST.sessions.push({d:dk(),s,sub:ST.sub});save()}cdFrom=null;drawT();if($('p-ov').classList.contains('on'))rOv()}}
+function stopOthers(k){if(k!=='pomo'&&end)stopT();if(k!=='fc'&&fcStart)fcToggle();if(k!=='sw'&&swStart)swToggle();if(k!=='cd'&&cdEnd!==null)cdToggle()}
+function cdToggle(){if(cdEnd!==null){cdLeft=Math.max(0,(cdEnd-Date.now())/1000);cdEnd=null;clearInterval(cdI);cdLog();gSync(false);cdDraw();return}
  if(!cdAct){const s=(+$('cdh').value||0)*3600+(+$('cdm').value||0)*60+(+$('cds').value||0);if(s<=0){snack('Set a time first');return}cdLeft=cdTot=s;cdAct=true}
- cdEnd=Date.now()+cdLeft*1000;cdI=setInterval(()=>{cdLeft=Math.max(0,(cdEnd-Date.now())/1000);cdDraw();if(cdLeft<=0){clearInterval(cdI);cdEnd=null;cdReset();beep();snack('Countdown finished');if('Notification' in window&&Notification.permission==='granted')new Notification('Studyverse',{body:'Countdown finished'})}},250);cdDraw();
+ stopOthers('cd');cdEnd=Date.now()+cdLeft*1000;cdFrom=Date.now();gSync(true);
+ cdI=setInterval(()=>{cdLeft=Math.max(0,(cdEnd-Date.now())/1000);cdDraw();if(cdLeft<=0){clearInterval(cdI);cdEnd=null;cdLog();gSync(false);cdReset();beep();snack('Countdown finished');if('Notification' in window&&Notification.permission==='granted')new Notification('Studyverse',{body:'Countdown finished'})}},250);cdDraw();
  if('Notification' in window&&Notification.permission==='default')Notification.requestPermission()}
-function cdReset(){clearInterval(cdI);cdEnd=null;cdAct=false;cdDraw()}
+function cdReset(){if(cdEnd!==null){clearInterval(cdI);cdEnd=null;cdLog();gSync(false)}clearInterval(cdI);cdEnd=null;cdAct=false;cdDraw()}
 subOpts();ren();go('ov');
 </script></body></html>

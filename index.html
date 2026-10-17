@@ -216,6 +216,7 @@ img,svg,iframe{max-width:100%}
 @media(hover:none){.btn:hover{transform:none}.room:hover{outline:0}.spot button:hover{outline:0}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style></head><body>
+<div id="boot" style="position:fixed;inset:0;z-index:999;background:#ffd7a3;display:grid;place-items:center;font:800 22px Nunito,system-ui,sans-serif;color:#2b2320;transition:opacity .3s">Studyverse...</div><script>setTimeout(function(){var b=document.getElementById("boot");if(b)b.remove()},8000)</script>
 <svg width="0" height="0" style="position:absolute"><defs>
 <symbol id="home" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></symbol>
 <symbol id="timer" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.500 2M9 2h6"/></symbol>
@@ -338,8 +339,8 @@ img,svg,iframe{max-width:100%}
  <div class="card" style="margin-bottom:18px"><h3>Paste a YouTube link</h3><div class="row"><input id="ylink" placeholder="https://youtube.com/..." onkeydown="if(event.key==='Enter')ytLink()"><button class="btn p" onclick="ytLink()">Load</button></div></div><div class="card" id="ypl" style="display:none"></div></section>
 
 
-<section class="pg" id="p-set"><div class="g g2"><div class="card"><h3>Profile and goals</h3><div class="row" style="margin-bottom:10px"><input id="sname" placeholder="Your name"><button class="btn p" onclick="ST.name=sname.value.trim();save();ren();snack('Saved')">Save</button></div><div class="row"><input id="sgoal" type="number" min="10" step="10" placeholder="Daily goal (minutes)"><button class="btn p" onclick="ST.goal=+sgoal.value||120;save();ren();snack('Goal saved')">Save</button></div></div>
-<div class="card"><h3>Appearance and data</h3><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" onclick="tgTheme()">Toggle dark mode</button><button class="btn" onclick="showInstall(true)">Download web app</button><button class="btn" onclick="exp()">Export JSON</button><button class="btn" style="color:#d4503e" onclick="if(confirm('Delete ALL data?')){localStorage.removeItem('sv2');try{_db&&_db.close();indexedDB.deleteDatabase('svfiles')}catch(e){}location.reload()}">Clear all data</button></div></div></div></section>
+<section class="pg" id="p-set"><div class="g g2"><div class="card" id="acct" style="grid-column:1/-1"></div><div class="card"><h3>Profile and goals</h3><div class="row" style="margin-bottom:10px"><input id="sname" placeholder="Your name"><button class="btn p" onclick="ST.name=sname.value.trim();save();ren();snack('Saved')">Save</button></div><div class="row"><input id="sgoal" type="number" min="10" step="10" placeholder="Daily goal (minutes)"><button class="btn p" onclick="ST.goal=+sgoal.value||120;save();ren();snack('Goal saved')">Save</button></div></div>
+<div class="card"><h3>Appearance and data</h3><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" onclick="tgTheme()">Toggle dark mode</button><button class="btn" onclick="showInstall(true)">Download web app</button><button class="btn" onclick="exp()">Export JSON</button><button class="btn" style="color:#d4503e" onclick="clearAll()">Clear all data</button></div></div></div></section>
 </main></div>
 <div id="mdl" style="display:none;position:fixed;inset:0;background:rgba(40,20,10,.45);backdrop-filter:blur(4px);z-index:60;align-items:center;justify-content:center;padding:16px" onclick="if(event.target===this)closeM()"><div class="card" id="mdlc" style="width:min(460px,100%)"></div></div>
 
@@ -369,16 +370,24 @@ const $=id=>document.getElementById(id),esc=s=>String(s).replace(/[&<>"]/g,c=>({
 const ic=(n,s)=>`<svg class="i"${s?` style="width:${s}px;height:${s}px"`:''}><use href="#${n}"/></svg>`;
 let ST={tasks:[],sessions:[],subs:[],diary:[],habs:[],goal:120,name:'',sub:'General',fmin:25,rooms:[],room:null};
 try{Object.assign(ST,JSON.parse(localStorage.getItem('sv2')||'{}'))}catch(e){}
-const save=()=>{try{localStorage.setItem('sv2',JSON.stringify(ST))}catch(e){}};
+const save=()=>{try{localStorage.setItem('sv2',JSON.stringify(ST))}catch(e){}try{schedPush()}catch(e){}};
 const snack=m=>{const e=$('snk');e.textContent=m;e.style.opacity=1;e.style.transform='translateX(-50%)';setTimeout(()=>{e.style.opacity=0;e.style.transform='translateX(-50%) translateY(30px)'},2300)};
-const dk=d=>{d=d||new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
-const secOn=k=>ST.sessions.filter(s=>s.d===k).reduce((a,s)=>a+s.s,0),totalSec=()=>ST.sessions.reduce((a,s)=>a+s.s,0);
-const streak=()=>{let n=0,d=new Date();if(!secOn(dk(d)))d.setDate(d.getDate()-1);while(secOn(dk(d))){n++;d.setDate(d.getDate()-1)}return n};
+const CUT=5*36e5; /* a study day runs 5:00 AM to 5:00 AM */
+const sd=()=>new Date(Date.now()-CUT);
+const dk=d=>{d=d||sd();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const dkAt=ms=>dk(new Date(ms-CUT)),nextCut=ms=>{const x=new Date(ms-CUT);x.setHours(0,0,0,0);x.setDate(x.getDate()+1);return x.getTime()+CUT};
+const logOn=k=>ST.sessions.filter(s=>s.d===k).reduce((a,s)=>a+s.s,0);
+/* time of the timer that is running right now (not yet logged), split at 5 AM */
+function liveSegs(){const f=runStart();if(!f)return[];const to=Date.now(),o=[];let a=f;while(a<to){const b=Math.min(to,nextCut(a));o.push([dkAt(a),(b-a)/1000]);a=b}return o}
+const secOn=k=>logOn(k)+liveSegs().reduce((x,g)=>x+(g[0]===k?g[1]:0),0),totalSec=()=>ST.sessions.reduce((a,s)=>a+s.s,0)+liveSegs().reduce((x,g)=>x+g[1],0);
+function addSess(from,to,sub){if(Math.floor((to-from)/1000)<=5)return;let a=from;while(a<to){const b=Math.min(to,nextCut(a)),n=Math.floor((b-a)/1000);if(n>0)ST.sessions.push({d:dkAt(a),s:n,sub:sub||ST.sub,t:Math.floor(b)});a=b}save()}
+const streak=()=>{let n=0,d=sd();if(!secOn(dk(d)))d.setDate(d.getDate()-1);while(secOn(dk(d))){n++;d.setDate(d.getDate()-1)}return n};
 const fmt=s=>{s=Math.max(0,Math.floor(s));return String(Math.floor(s/3600)).padStart(2,'0')+':'+String(Math.floor(s%3600/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
 const PG=[['ov','home','Overview'],['focus','timer','Focus corner'],['syl','book','My syllabus'],['nb','note','Smart notebook'],['pet','paw','My little pet'],['dia','pen','Study diary'],['hab','hab','Habits'],['grp','users','Group study'],['mus','mus','Study music']];
 $('nav').innerHTML=PG.map(p=>`<button id="n-${p[0]}" title="${p[2]}" onclick="go('${p[0]}')">${ic(p[1])}</button>`).join('')+'<div class="sp"></div><button id="n-set" title="Settings" onclick="go(\'set\')">'+ic('set')+'</button>';
 function go(id){window.scrollTo(0,0);document.querySelectorAll('.pg').forEach(e=>e.classList.toggle('on',e.id==='p-'+id));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.id==='n-'+id));$('ttl').textContent=(PG.find(p=>p[0]===id)||[0,0,'Settings'])[2];
- ({ov:rOv,syl:rSyl,nb:rNb,pet:rPet,dia:rDia,hab:rHab,grp:gInit,set:()=>{sname.value=ST.name;sgoal.value=ST.goal}}[id]||(()=>{}))()}
+ renderPage(id)}
+function renderPage(id){({ov:rOv,syl:rSyl,nb:rNb,pet:rPet,dia:rDia,hab:rHab,grp:gInit,set:()=>{sname.value=ST.name;sgoal.value=ST.goal;acctDraw()}}[id]||(()=>{}))()}
 function tgTheme(){const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'':'dark';localStorage.setItem('svt',r.dataset.theme||'')}
 document.documentElement.dataset.theme=localStorage.getItem('svt')||'';
 function exp(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(ST,null,2)],{type:'application/json'}));a.download='studyverse-'+dk()+'.json';a.click()}
@@ -398,8 +407,9 @@ function drawT(){const m=String(Math.floor(left/60)).padStart(2,'0')+':'+String(
  document.querySelectorAll('[data-go]').forEach(e=>e.textContent=end?'Pause':'Start');Object.keys(MODES).forEach(k=>$('m-'+k).classList.toggle('on',k===mode));
  $('fm').classList.toggle('on',!!end);$('part').textContent='Part '+(ST.sessions.filter(s=>s.d===dk()).length+1);
  $('meS').textContent=Math.round(secOn(dk())/60)+' min today';pipUpd()}
-function logSince(){if(since&&mode==='focus'){const s=Math.floor((Date.now()-since)/1000);if(s>5){ST.sessions.push({d:dk(),s,sub:ST.sub});save()}}since=null}
-function toggleT(){if(end){stopT();return}stopOthers('pomo');end=Date.now()+left*1000;since=Date.now();tick=setInterval(()=>{left=Math.max(0,(end-Date.now())/1000);drawT();if(left<=0){stopT();setMode(mode==='focus'?'short':'focus');snack(mode==='short'?'Focus done. Take a break.':'Break over.')}},250);if(mode==='focus')gSync(true);drawT()}
+function logSince(){if(since&&mode==='focus')addSess(since,Date.now());since=null}
+function toggleT(){if(end){stopT();return}stopOthers('pomo');end=Date.now()+left*1000;since=Date.now();tick=setInterval(pomoTick,250);if(mode==='focus')gSync(true);drawT()}
+function pomoTick(){left=Math.max(0,(end-Date.now())/1000);drawT();if(left<=0){stopT();setMode(mode==='focus'?'short':'focus');snack(mode==='short'?'Focus done. Take a break.':'Break over.')}}
 function stopT(){const was=!!end;if(tick)clearInterval(tick);tick=null;if(end)left=Math.max(0,(end-Date.now())/1000);end=null;logSince();if(was)gSync(false);drawT();if($('p-ov').classList.contains('on'))rOv()}
 function resetT(){stopT();left=dur(mode);drawT()}
 /* ambience */
@@ -414,10 +424,10 @@ const dueCount=()=>{const t=dk();let n=0;ST.subs.forEach(s=>s.ch.forEach(c=>{if(
 function ren(){const n=ST.name||'Student';$('meN').textContent=n;$('meA').textContent=n[0].toUpperCase();if($('p-ov').classList.contains('on'))rOv();drawT()}
 function rOv(){const n=ST.name,h=new Date().getHours();$('hi').textContent=(h<12?'Good morning':h<17?'Good afternoon':'Good evening')+(n?', '+n:'')+'!';
  const open=ST.tasks.filter(t=>!t.d).length;$('hsub').textContent=open?`You have ${open} task${open>1?'s':''} for today`:'Your list is clear. Enjoy the calm.';
- const now=new Date(),y=now.getFullYear(),m=now.getMonth(),f=(new Date(y,m,1).getDay()+6)%7,dm=new Date(y,m+1,0).getDate();
+ const now=sd(),y=now.getFullYear(),m=now.getMonth(),f=(new Date(y,m,1).getDay()+6)%7,dm=new Date(y,m+1,0).getDate();
  let c='<div class="cg">'+'MTWTFSS'.split('').map(x=>`<span class="h">${x}</span>`).join('')+'<span></span>'.repeat(f);
  for(let d=1;d<=dm;d++)c+=`<span class="${d===now.getDate()?'t':''} ${secOn(dk(new Date(y,m,d)))?'s':''}">${d}</span>`;$('cal').innerHTML=c+'</div>';
- const days=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(['SMTWTFS'[d.getDay()],secOn(dk(d))/3600])}
+ const days=[];for(let i=6;i>=0;i--){const d=sd();d.setDate(d.getDate()-i);days.push(['SMTWTFS'[d.getDay()],secOn(dk(d))/3600])}
  const gh=ST.goal/60,mx=Math.max(gh,...days.map(d=>d[1]),.5);
  $('bars').innerHTML=days.map(d=>`<div><span class="tr"><i style="height:${Math.max(6,d[1]/mx*100)}%"></i></span>${d[0]}</div>`).join('')+`<span class="gl" style="bottom:calc(${gh/mx*100}% * .82 + 22px)">${gh%1?gh.toFixed(1):gh}h</span>`;
  const p=Math.min(1,secOn(dk())/(ST.goal*60)),R=52,C=2*Math.PI*R;
@@ -433,7 +443,7 @@ const tt=id=>{const t=ST.tasks.find(t=>t.id===id);t.d=!t.d;save();rOv()},dt=id=>
 const IV=[1,3,7,14,30];
 function addSub(){const v=$('sin').value.trim();if(!v)return;ST.subs.push({id:Date.now(),n:v,ch:[]});$('sin').value='';save();rSyl()}
 function addCh(id){const v=prompt('Chapter name');if(!v)return;ST.subs.find(s=>s.id===id).ch.push({id:Date.now(),n:v,r:[],due:dk()});save();rSyl()}
-function rev(sid,cid){const q=prompt('How did it go? good / ok / bad','good');if(!q)return;const c=ST.subs.find(s=>s.id===sid).ch.find(c=>c.id===cid),x=/^b/i.test(q)?'bad':/^o/i.test(q)?'ok':'good';c.r.push(x);const d=new Date();d.setDate(d.getDate()+(x==='bad'?1:IV[Math.min(c.r.length,4)]));c.due=dk(d);save();rSyl()}
+function rev(sid,cid){const q=prompt('How did it go? good / ok / bad','good');if(!q)return;const c=ST.subs.find(s=>s.id===sid).ch.find(c=>c.id===cid),x=/^b/i.test(q)?'bad':/^o/i.test(q)?'ok':'good';c.r.push(x);const d=sd();d.setDate(d.getDate()+(x==='bad'?1:IV[Math.min(c.r.length,4)]));c.due=dk(d);save();rSyl()}
 const delS=id=>{if(confirm('Delete subject?')){ST.subs=ST.subs.filter(s=>s.id!==id);save();rSyl()}},delC=(s,c)=>{const S=ST.subs.find(x=>x.id===s);S.ch=S.ch.filter(x=>x.id!==c);save();rSyl()};
 function rSyl(){$('subs').innerHTML=ST.subs.length?ST.subs.map(s=>`<div class="sub"><div class="sh">${ic('book')}${esc(s.n)}<em>${s.ch.filter(c=>c.r.length).length}/${s.ch.length} revised</em><button class="btn" style="padding:6px 14px" onclick="addCh(${s.id})">${ic('plus',14)}Chapter</button><button class="x" onclick="delS(${s.id})">${ic('x',16)}</button></div>`+s.ch.map(c=>{const t=dk(),b=!c.r.length?['Not started','']:c.due<t?['Overdue','od']:c.due===t?['Due today','du']:['Due '+c.due.slice(5),''];
  return `<div class="ch"><span>${esc(c.n)}</span><div class="dots">${IV.map((_,i)=>c.r[i]?`<div class="dt g${c.r[i]==='good'?1:c.r[i]==='ok'?2:3}">${ic('ck',12)}</div>`:`<div class="dt ${i===c.r.length?'nx':''}" ${i===c.r.length?`onclick="rev(${s.id},${c.id})"`:''}>${i+1}</div>`).join('')}</div><span class="tag ${b[1]}" style="flex:0">${b[0]}</span><button class="x" onclick="delC(${s.id},${c.id})">${ic('x',16)}</button></div>`}).join('')+'</div>').join(''):'<div class="card empty">Add a subject, then break it into chapters. Revisions repeat on day 1, 3, 7, 14 and 30.</div>'}
@@ -448,7 +458,7 @@ function addEntry(){const t=$('dtx').value.trim();if(!t)return;ST.diary.unshift(
 function rDia(){const q=($('dsq').value||'').toLowerCase(),l=ST.diary.filter(e=>(e.t+e.x).toLowerCase().includes(q));$('dlist').innerHTML=l.length?l.map(e=>`<div class="entry"><div class="row"><b>${esc(e.t)}</b><span class="tag" style="flex:0">${e.m}</span><button class="x" style="flex:0" onclick="ST.diary=ST.diary.filter(z=>z.id!==${e.id});save();rDia()">${ic('x',16)}</button></div><small>${new Date(e.d).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})}</small><p>${esc(e.x)}</p></div>`).join(''):'<div class="empty">No entries yet</div>'}
 /* habits */
 function addHab(){const v=$('hin').value.trim();if(!v)return;ST.habs.push({id:Date.now(),n:v,c:{}});$('hin').value='';save();rHab()}
-function rHab(){const k=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);k.push([dk(d),'SMTWTFS'[d.getDay()]])}
+function rHab(){const k=[];for(let i=6;i>=0;i--){const d=sd();d.setDate(d.getDate()-i);k.push([dk(d),'SMTWTFS'[d.getDay()]])}
  $('habs').innerHTML=ST.habs.length?ST.habs.map(h=>`<div class="hb"><b>${esc(h.n)}</b>${k.map(x=>`<div style="text-align:center"><div class="mut" style="font-size:10px">${x[1]}</div><div class="hd ${h.c[x[0]]?'d':''}" onclick="hv(${h.id},'${x[0]}')">${ic('ck')}</div></div>`).join('')}<button class="x" onclick="ST.habs=ST.habs.filter(z=>z.id!==${h.id});save();rHab()">${ic('x',16)}</button></div>`).join(''):'<div class="empty">No habits yet</div>'}
 const hv=(id,d)=>{const h=ST.habs.find(h=>h.id===id);h.c[d]=!h.c[d];save();rHab()};
 /* music */
@@ -466,7 +476,7 @@ const sdayStart=()=>{const d=new Date();if(d.getHours()<5)d.setDate(d.getDate()-
 const mSecs=m=>!m||m.studyDay!==sday()?0:(m.dailySeconds||0)+(m.isStudying&&m.sessionStartedAtMs?Math.max(0,(Date.now()-m.sessionStartedAtMs)/1000):0);
 const openM=h=>{$('mdlc').innerHTML=h;$('mdl').style.display='flex'},closeM=()=>{$('mdl').style.display='none'};
 function gInit(){$('gname').value=ST.name||'';ST.gicon=ST.gicon||'leaf';$('gMyIcon').innerHTML=gAv(ST.gicon,44);if(gOnce)return;gOnce=true;
- try{if(!firebase.apps.length)firebase.initializeApp(FB);fdb=firebase.firestore();firebase.auth().onAuthStateChanged(u=>{if(u){fuid=u.uid;gReady()}else firebase.auth().signInAnonymously().catch(noFb)})}catch(e){noFb()}}
+ try{if(!firebase.apps.length)firebase.initializeApp(FB);fdb=firebase.firestore();firebase.auth().onAuthStateChanged(u=>{if(u){fuid=u.uid;gReady()}else if(localStorage.getItem('svguest')==='1')firebase.auth().signInAnonymously().catch(noFb)})}catch(e){noFb()}}
 const noFb=()=>{$('gNo').style.display='block';$('gLobby').style.display='none'};
 function gReady(){myRooms();refreshPub();const q=new URLSearchParams(location.search).get('room');if(q)enter(q);else if(ST.room)enter(ST.room)}
 function refreshPub(){if(!fdb)return;if(pubUn)pubUn();const el=$('pubRooms'),draw=s=>{const r=s.docs.map(d=>({id:d.id,...d.data()}));r.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));el.innerHTML=r.length?r.map(x=>`<div class="room" onclick="enter('${x.id}')">${gAv(x.icon,36)}<div style="flex:1;min-width:0">${esc(x.name)}<div class="mut">by ${esc(x.adminName||'Someone')}</div></div></div>`).join(''):'<div class="empty">No public rooms yet. Create the first one!</div>'};
@@ -481,14 +491,14 @@ function openCreate(){if(!fdb){snack('Group study is still connecting');return}i
 function crDraw(){$('crI').innerHTML=GI.map(g=>`<button class="${cr.icon===g?'sel':''}" onclick="cr.icon='${g}';crDraw()">${gAv(g,38)}</button>`).join('');$('crV').innerHTML=`<button class="${cr.pub?'on':''}" onclick="cr.pub=true;crDraw()">Public</button><button class="${cr.pub?'':'on'}" onclick="cr.pub=false;crDraw()">Private (link only)</button>`}
 async function mkRoom(){const n=$('crn').value.trim();if(!n){snack('Enter a room name');return}
  try{const r=await fdb.collection('groupRooms').add({name:n,icon:cr.icon,isPublic:cr.pub,adminId:fuid,adminName:ST.name,createdAt:ts()});
- await r.collection('members').doc(fuid).set({name:ST.name,icon:ST.gicon,role:'admin',isStudying:!!runStart(),sessionStartedAt:runStart()?ts():null,sessionStartedAtMs:runStart()||null,studyDay:sday(),dailySeconds:Math.floor(secOn(sday())),joinedAt:ts()});closeM();enter(r.id);snack('Room created')}catch(e){snack('Could not create room')}}
+ await r.collection('members').doc(fuid).set({name:ST.name,icon:ST.gicon,role:'admin',isStudying:!!runStart(),sessionStartedAt:runStart()?ts():null,sessionStartedAtMs:runStart()||null,studyDay:sday(),dailySeconds:Math.floor(logOn(sday())),joinedAt:ts()});closeM();enter(r.id);snack('Room created')}catch(e){snack('Could not create room')}}
 async function enter(id){if(!fdb||!need())return;unsubs.forEach(u=>u());unsubs=[];mem={};hist=[];const ref=fdb.collection('groupRooms').doc(id);let d;
  try{d=await ref.get()}catch(e){snack('Could not open room');return}
  if(!d.exists){snack('Room not found');ST.room=null;save();return}
  rdata={id,...d.data()};ST.room=id;ST.rooms=ST.rooms.filter(r=>r.id!==id);ST.rooms.unshift({id,name:rdata.name,icon:rdata.icon});ST.rooms=ST.rooms.slice(0,20);save();myRooms();
  $('gLobby').style.display='none';$('gRoom').style.display='block';hdr();
  const me=ref.collection('members').doc(fuid),md=await me.get();
- if(!md.exists)await me.set({name:ST.name,icon:ST.gicon,role:'member',isStudying:!!runStart(),sessionStartedAt:runStart()?ts():null,sessionStartedAtMs:runStart()||null,studyDay:sday(),dailySeconds:Math.floor(secOn(sday())),joinedAt:ts()});else await me.update({name:ST.name,icon:ST.gicon,isStudying:!!runStart(),sessionStartedAtMs:runStart()||null,sessionStartedAt:null});
+ if(!md.exists)await me.set({name:ST.name,icon:ST.gicon,role:'member',isStudying:!!runStart(),sessionStartedAt:runStart()?ts():null,sessionStartedAtMs:runStart()||null,studyDay:sday(),dailySeconds:Math.floor(logOn(sday())),joinedAt:ts()});else await me.update({name:ST.name,icon:ST.gicon,isStudying:!!runStart(),sessionStartedAtMs:runStart()||null,sessionStartedAt:null});
  unsubs.push(ref.onSnapshot(s=>{if(s.exists){rdata={id,...s.data()};hdr()}else{snack('Room was deleted');backLobby()}}));
  unsubs.push(ref.collection('members').orderBy('joinedAt','asc').onSnapshot(s=>{mem={};s.docs.forEach(x=>mem[x.id]=x.data());cycle();gDraw();badge();hdr()}));
  unsubs.push(ref.collection('dailyHistory').orderBy('savedAt','desc').limit(30).onSnapshot(s=>{hist=s.docs.map(x=>x.data());drawHist()},()=>{hist=[];drawHist()}));
@@ -551,9 +561,10 @@ let tool='pomo',swAcc=0,swStart=null,swI=null,swFrom=null,laps=[],cdLeft=600,cdT
 function setTool(t){tool=t;['pomo','fc','sw','cd'].forEach(k=>{$('tl-'+k).classList.toggle('hide',k!==t);$('t-'+k).classList.toggle('on',k===t)});pipUpd()}
 const swMs=()=>swAcc+(swStart?Date.now()-swStart:0);
 function swDraw(){$('swT').textContent=fmt(swMs()/1000);$('swGo').textContent=swStart?'Pause':(swAcc?'Resume':'Start');pipUpd()}
-function swLog(){if(swFrom){const s=Math.floor((Date.now()-swFrom)/1000);if(s>5){ST.sessions.push({d:dk(),s,sub:ST.sub});save()}swFrom=null;drawT();if($('p-ov').classList.contains('on'))rOv()}}
+function swLog(){if(swFrom){addSess(swFrom,Date.now());swFrom=null;drawT();if($('p-ov').classList.contains('on'))rOv()}}
 function swToggle(){if(swStart){swAcc+=Date.now()-swStart;swStart=null;clearInterval(swI);swLog();gSync(false)}else{stopOthers('sw');swStart=Date.now();swFrom=Date.now();swI=setInterval(swDraw,250);gSync(true)}swDraw()}
-function swLap(){const t=swMs();if(!t)return;laps.unshift(t);const L=laps.length;$('laps').innerHTML=laps.map((v,i)=>`<div class="lp"><span>Lap ${L-i}</span><span>${fmt((v-(laps[i+1]||0))/1000)}</span><span>${fmt(v/1000)}</span></div>`).join('')}
+function swLap(){const t=swMs();if(!t)return;laps.unshift(t);swLapsDraw()}
+function swLapsDraw(){const L=laps.length;$('laps').innerHTML=laps.map((v,i)=>`<div class="lp"><span>Lap ${L-i}</span><span>${fmt((v-(laps[i+1]||0))/1000)}</span><span>${fmt(v/1000)}</span></div>`).join('')}
 function swReset(){if(swStart){clearInterval(swI);swStart=null;swLog();gSync(false)}swAcc=0;laps=[];$('laps').innerHTML='';swDraw()}
 function beep(){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();AC.resume();[0,.4,.8].forEach(t=>{const o=AC.createOscillator(),g=AC.createGain(),n=AC.currentTime+t;o.frequency.value=880;g.gain.setValueAtTime(.25,n);g.gain.exponentialRampToValueAtTime(.001,n+.3);o.connect(g);g.connect(AC.destination);o.start(n);o.stop(n+.3)})}catch(e){}}
 function cdSet(s){if(cdAct)return;$('cdh').value=Math.floor(s/3600);$('cdm').value=Math.floor(s%3600/60);$('cds').value=s%60}
@@ -562,16 +573,17 @@ function cdDraw(){$('cdT').textContent=fmt(cdLeft);$('cdT').style.display=cdAct?
 let fcAcc=0,fcStart=null,fcI=null,fcFrom=null,cdFrom=null;
 const fcMs=()=>fcAcc+(fcStart?Date.now()-fcStart:0);
 function fcDraw(){$('fcT').textContent=fmt(fcMs()/1000);$('fcGo').textContent=fcStart?'Pause':(fcAcc?'Resume':'Start');pipUpd()}
-function fcLog(){if(fcFrom){const s=Math.floor((Date.now()-fcFrom)/1000);if(s>5){ST.sessions.push({d:dk(),s,sub:ST.sub});save()}fcFrom=null;drawT();if($('p-ov').classList.contains('on'))rOv()}}
+function fcLog(){if(fcFrom){addSess(fcFrom,Date.now());fcFrom=null;drawT();if($('p-ov').classList.contains('on'))rOv()}}
 function fcToggle(){if(fcStart){fcAcc+=Date.now()-fcStart;fcStart=null;clearInterval(fcI);fcLog();gSync(false)}else{stopOthers('fc');fcStart=Date.now();fcFrom=Date.now();fcI=setInterval(fcDraw,250);gSync(true)}fcDraw()}
 function fcReset(){if(fcStart){clearInterval(fcI);fcStart=null;fcLog();gSync(false)}fcAcc=0;fcDraw()}
-function cdLog(){if(cdFrom){const s=Math.floor((Date.now()-cdFrom)/1000);if(s>5){ST.sessions.push({d:dk(),s,sub:ST.sub});save()}cdFrom=null;drawT();if($('p-ov').classList.contains('on'))rOv()}}
+function cdLog(){if(cdFrom){addSess(cdFrom,Date.now());cdFrom=null;drawT();if($('p-ov').classList.contains('on'))rOv()}}
 function stopOthers(k){if(k!=='pomo'&&end)stopT();if(k!=='fc'&&fcStart)fcToggle();if(k!=='sw'&&swStart)swToggle();if(k!=='cd'&&cdEnd!==null)cdToggle()}
 function cdToggle(){if(cdEnd!==null){cdLeft=Math.max(0,(cdEnd-Date.now())/1000);cdEnd=null;clearInterval(cdI);cdLog();gSync(false);cdDraw();return}
  if(!cdAct){const s=(+$('cdh').value||0)*3600+(+$('cdm').value||0)*60+(+$('cds').value||0);if(s<=0){snack('Set a time first');return}cdLeft=cdTot=s;cdAct=true}
  stopOthers('cd');cdEnd=Date.now()+cdLeft*1000;cdFrom=Date.now();gSync(true);
- cdI=setInterval(()=>{cdLeft=Math.max(0,(cdEnd-Date.now())/1000);cdDraw();if(cdLeft<=0){clearInterval(cdI);cdEnd=null;cdLog();gSync(false);cdReset();beep();snack('Countdown finished');if('Notification' in window&&Notification.permission==='granted')new Notification('Studyverse',{body:'Countdown finished'})}},250);cdDraw();
+ cdI=setInterval(cdTick,250);cdDraw();
  if('Notification' in window&&Notification.permission==='default')Notification.requestPermission()}
+function cdTick(){cdLeft=Math.max(0,(cdEnd-Date.now())/1000);cdDraw();if(cdLeft<=0){clearInterval(cdI);cdEnd=null;cdLog();gSync(false);cdReset();beep();snack('Countdown finished');if('Notification' in window&&Notification.permission==='granted')new Notification('Studyverse',{body:'Countdown finished'})}}
 function cdReset(){if(cdEnd!==null){clearInterval(cdI);cdEnd=null;cdLog();gSync(false)}clearInterval(cdI);cdEnd=null;cdAct=false;cdDraw()}
 /* ===== Smart notebook ===== */
 const NBC=['#ff9a5c','#5fd08a','#8b7be8','#f2b13c','#2aa3e0','#e1306c'];
@@ -637,7 +649,96 @@ function revShuf(){for(let i=NR.l.length-1;i>0;i--){const j=Math.floor(Math.rand
 const closeRev=()=>$('nbr').classList.remove('on');
 addEventListener('keydown',e=>{if(e.key==='Escape'){if($('nbl').classList.contains('on'))closeImg();else if($('nbe').classList.contains('on'))closeNE();else closeRev();return}
  if($('nbr').classList.contains('on')&&!$('nbl').classList.contains('on')){if(e.key==='ArrowRight')revNav(1);else if(e.key==='ArrowLeft')revNav(-1);else if(e.key===' '){e.preventDefault();NR.s=!NR.s;drawRev()}}});
-subOpts();ren();go('ov');gInit();
+
+/* ===== Keep running timers across exit / refresh (state is stored as timestamps) ===== */
+let leaving=false;
+function saveRun(){if(leaving)return;try{
+ const R={day:dk(),tool,pomo:{mode,left:end?Math.max(0,(end-Date.now())/1000):left,end,since},fc:{acc:fcAcc,start:fcStart,from:fcFrom},sw:{acc:swAcc,start:swStart,from:swFrom,laps},cd:{left:cdEnd!==null?Math.max(0,(cdEnd-Date.now())/1000):cdLeft,tot:cdTot,end:cdEnd,from:cdFrom,act:cdAct}};
+ const idle=!end&&!fcStart&&!swStart&&cdEnd===null&&!fcAcc&&!swAcc&&!cdAct&&mode==='focus'&&left===dur('focus');
+ if(idle)localStorage.removeItem('svrun');else localStorage.setItem('svrun',JSON.stringify(R))}catch(e){}}
+['toggleT','stopT','setMode','resetT','adjMin','setTool','fcToggle','fcReset','swToggle','swReset','swLap','cdToggle','cdReset'].forEach(n=>{const f=window[n];window[n]=function(){const r=f.apply(this,arguments);saveRun();return r}});
+addEventListener('pagehide',saveRun);document.addEventListener('visibilitychange',()=>{if(document.hidden)saveRun()});
+function restoreRun(){let R=null;try{R=JSON.parse(localStorage.getItem('svrun')||'null')}catch(e){}if(!R)return;
+ const now=Date.now(),CAP=12*36e5,same=R.day===dk();let ran=false,fin=false;
+ try{
+  const P=R.pomo;
+  if(P){if(P.end){ran=true;if(P.end>now){mode=P.mode;end=P.end;since=P.since;left=(end-now)/1000;tick=setInterval(pomoTick,250)}
+    else{if(P.mode==='focus')addSess(P.since,P.end);mode=P.mode==='focus'?'short':'focus';left=dur(mode);fin=true}}
+   else if(same){mode=P.mode;left=P.left}}
+  const F=R.fc;
+  if(F&&(F.start||(same&&F.acc))){fcAcc=F.acc||0;if(F.start){ran=true;if(now-F.from>CAP){addSess(F.from,F.from+CAP);fcAcc+=F.from+CAP-F.start;fin=true}else{fcStart=F.start;fcFrom=F.from;fcI=setInterval(fcDraw,250)}}}
+  const W=R.sw;
+  if(W&&(W.start||(same&&W.acc))){swAcc=W.acc||0;laps=W.laps||[];if(laps.length)swLapsDraw();if(W.start){ran=true;if(now-W.from>CAP){addSess(W.from,W.from+CAP);swAcc+=W.from+CAP-W.start;fin=true}else{swStart=W.start;swFrom=W.from;swI=setInterval(swDraw,250)}}}
+  const C=R.cd;
+  if(C&&(C.end||(same&&C.act))){cdTot=C.tot||cdTot;if(C.end){ran=true;if(C.end>now){cdAct=true;cdLeft=(C.end-now)/1000;cdEnd=C.end;cdFrom=C.from;cdI=setInterval(cdTick,250)}else{addSess(C.from,C.end);cdAct=false;cdLeft=0;fin=true}}else{cdAct=!!C.act;cdLeft=C.left}}
+  if(['pomo','fc','sw','cd'].includes(R.tool))setTool(R.tool);
+ }catch(e){}
+ drawT();fcDraw();swDraw();cdDraw();saveRun();
+ if(fin)snack('A timer finished while you were away. Your time is saved.');else if(ran)snack('Welcome back. Your timer kept running.')}
+setInterval(()=>{const a=document.activeElement&&document.activeElement.tagName;if(runStart()&&$('p-ov').classList.contains('on')&&!/SELECT|INPUT|TEXTAREA/.test(a||''))rOv()},30000);
+
+/* ===== Account + cloud sync (Google account = same data on every device) ===== */
+let authU=null,sdb=null,syncUn=null,syncT=null,pushU=0;
+const svS=()=>{try{return JSON.parse(localStorage.getItem('svsync')||'{}')}catch(e){return{}}},svSet=o=>{try{localStorage.setItem('svsync',JSON.stringify({...svS(),...o}))}catch(e){}};
+const cloudOn=()=>!!(authU&&!authU.isAnonymous&&sdb);
+const cleanST=()=>{const o={};Object.keys(ST).forEach(k=>{if(k!=='room')o[k]=ST[k]});return o};
+const sKey=x=>x.t?'t'+x.t:x.d+'|'+x.s+'|'+x.sub;
+function mergeArr(a,b,key){const m=new Map();[...(b||[]),...(a||[])].forEach(x=>{const k=key(x),p=m.get(k);m.set(k,p&&(p.u||0)>(x.u||0)?p:x)});return[...m.values()]}
+function mergeST(L,R){const o={};new Set([...Object.keys(L),...Object.keys(R)]).forEach(k=>{const a=L[k],b=R[k];
+ if(Array.isArray(a)||Array.isArray(b))o[k]=mergeArr(a,b,k==='sessions'?sKey:x=>x.id);
+ else o[k]=(b!==undefined&&b!==null&&b!=='')?b:a});return o}
+function applyST(R){const keep=ST.room;Object.keys(ST).forEach(k=>delete ST[k]);
+ Object.assign(ST,{tasks:[],sessions:[],subs:[],diary:[],habs:[],goal:120,name:'',sub:'General',fmin:25,rooms:[]},R);ST.room=keep;
+ try{localStorage.setItem('sv2',JSON.stringify(ST))}catch(e){}
+ if(!end&&mode==='focus'&&left>dur('focus'))left=dur('focus');
+ ren();const cur=(document.querySelector('.pg.on')||{}).id;if(cur&&cur!=='p-grp')renderPage(cur.slice(2));snack('Synced from your account')}
+const syncSt=m=>{const e=$('syncSt');if(e)e.textContent=m||'Synced to your account on all devices'};
+function schedPush(){if(!cloudOn())return;svSet({dirty:true});clearTimeout(syncT);syncT=setTimeout(pushNow,2500)}
+async function pushNow(){if(!cloudOn())return;clearTimeout(syncT);syncT=null;
+ const d=JSON.stringify(cleanST());if(d.length>950000){snack('Data is too large to sync');return}
+ const u=Date.now();pushU=u;syncSt('Syncing...');
+ try{await sdb.collection('users').doc(authU.uid).set({d,u,v:1});svSet({uid:authU.uid,u,dirty:false});syncSt('')}catch(e){svSet({dirty:true});syncSt('Could not sync ('+(e.code||'offline')+'). Will retry.')}}
+function attachCloud(){if(syncUn){syncUn();syncUn=null}if(!cloudOn())return;
+ syncUn=sdb.collection('users').doc(authU.uid).onSnapshot(snap=>{
+  if(snap.metadata.hasPendingWrites)return;
+  const s=svS(),same=s.uid===authU.uid;
+  if(!snap.exists){pushNow();return}
+  const r=snap.data();if(r.u===pushU)return;
+  let R;try{R=JSON.parse(r.d)}catch(e){return}
+  if(!same){applyST(mergeST(cleanST(),R));svSet({uid:authU.uid,u:r.u});pushNow();return}
+  if(s.dirty){if(r.u>(s.u||0)){applyST(mergeST(cleanST(),R));svSet({u:r.u})}pushNow();return}
+  if(r.u>(s.u||0)){applyST(R);svSet({u:r.u})}
+  syncSt('')},e=>syncSt('Sync error ('+(e.code||'unknown')+'). Check Firestore rules.'))}
+function syncNow(){if(cloudOn())pushNow().then(()=>snack('Synced'))}
+function acctDraw(){const el=$('acct');if(!el)return;const u=authU;
+ if(u&&!u.isAnonymous)el.innerHTML=`<h3>Account</h3><div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">${u.photoURL?`<img src="${esc(u.photoURL)}" referrerpolicy="no-referrer" alt="" style="width:46px;height:46px;border-radius:50%">`:''}<div style="flex:1;min-width:160px"><b>${esc(u.displayName||'Google account')}</b><div class="mut">${esc(u.email||'')}</div><div class="mut" id="syncSt">Synced to your account on all devices</div></div><button class="btn" onclick="syncNow()">Sync now</button><button class="btn" onclick="signOutApp()">Sign out</button></div>`;
+ else el.innerHTML=`<h3>Account</h3><div class="mut" style="margin-bottom:12px">You are using Studyverse as a guest. Your data stays only on this device.</div><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn p" onclick="location.href='login.html?upgrade=1'">Sign in with Google to sync</button><button class="btn" onclick="signOutApp()">Sign out</button></div>`}
+async function signOutApp(){const guest=!cloudOn();
+ if(!confirm(guest?'You are a guest, so signing out removes your data from this device. Export a backup first if you need it. Continue?':'Sign out? Your data stays safe in your account and comes back when you sign in again.'))return;
+ stopOthers('none');
+ if(cloudOn())await Promise.race([pushNow(),new Promise(r=>setTimeout(r,4000))]);
+ leaving=true;if(syncUn)syncUn();
+ ['sv2','svrun','svsync','svguest'].forEach(k=>localStorage.removeItem(k));
+ try{await firebase.auth().signOut()}catch(e){}
+ location.replace('login.html')}
+async function clearAll(){if(!confirm(cloudOn()?'Delete ALL data? This also deletes the copy saved in your account.':'Delete ALL data?'))return;
+ leaving=true;if(syncUn)syncUn();
+ try{if(cloudOn())await sdb.collection('users').doc(authU.uid).delete()}catch(e){}
+ ['sv2','svrun','svsync'].forEach(k=>localStorage.removeItem(k));
+ try{_db&&_db.close();indexedDB.deleteDatabase('svfiles')}catch(e){}location.reload()}
+function authBoot(){const hide=()=>{const b=$('boot');if(b){b.style.opacity=0;setTimeout(()=>b.remove(),300)}};
+ if(typeof firebase==='undefined'){hide();return}
+ try{
+  if(!firebase.apps.length)firebase.initializeApp(FB);sdb=firebase.firestore();
+  firebase.auth().onAuthStateChanged(u=>{authU=u;const guest=localStorage.getItem('svguest')==='1';
+   if(!u){if(guest){hide();acctDraw()}else location.replace('login.html');return}
+   if(u.isAnonymous&&!guest){location.replace('login.html');return}
+   if(!u.isAnonymous)localStorage.removeItem('svguest');
+   hide();acctDraw();attachCloud()})
+ }catch(e){hide()}}
+
+restoreRun();
+subOpts();ren();go('ov');gInit();authBoot();
 /* open a page from app shortcut / link, e.g. index.html#focus */
 {const h=location.hash.slice(1);if(PG.some(p=>p[0]===h)||h==='set')go(h)}
 /* ===== PWA: service worker + install popup ===== */

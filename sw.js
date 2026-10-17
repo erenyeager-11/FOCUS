@@ -1,6 +1,6 @@
 /* Studyverse - Service Worker */
-const CACHE_VERSION = 'studyverse-v2';
-const CORE_ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './icon-512-maskable.png', './apple-touch-icon.png', './favicon.png'];
+const CACHE_VERSION = 'studyverse-v3';
+const CORE_ASSETS = ['./', './index.html', './manifest.json', './login.html', './login.css', './login.js', './icon-192.png', './icon-512.png', './icon-512-maskable.png', './apple-touch-icon.png', './favicon.png'];
 /* third-party static files worth keeping for offline (fonts + Firebase SDK) */
 const CDN_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com', 'www.gstatic.com'];
 
@@ -36,7 +36,7 @@ async function networkFirstHTML(request) {
   const cache = await caches.open(CACHE_VERSION);
   try {
     const res = await fetch(request);
-    if (res && res.ok) { cache.put(request, res.clone()); cache.put('./index.html', res.clone()); }
+    if (res && res.ok) { cache.put(request, res.clone()); if (!/login\.html$/.test(new URL(request.url).pathname)) cache.put('./index.html', res.clone()); }
     return res;
   } catch (e) {
     return (await cache.match(request)) || (await cache.match('./index.html')) || Response.error();

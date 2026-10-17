@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Studyverse | Sign in</title>
+  <meta name="theme-color" content="#050505">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="login.css">
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+</head>
+<body>
+  <main class="room" id="room">
+    <div class="room-light" id="roomLight"></div>
+    <div class="fireflies" id="fireflies"></div>
+    <div class="prompt">Pull the string<i></i></div>
+
+    <section class="lamp-side">
+      <div class="lamp-container" id="lampContainer">
+        <div class="lamp-glow"></div>
+        <div class="lamp-head" id="lampHead"></div>
+        <div class="light-beam"></div>
+        <div class="lamp-stem"></div>
+        <div class="lamp-base"></div>
+        <div class="desk-surface"></div>
+        <svg class="string-svg" aria-hidden="true"><path id="stringPath" d="M 0 0 L 0 80"></path></svg>
+        <div class="string-handle" id="stringHandle" aria-label="Pull lamp string"></div>
+      </div>
+    </section>
+
+    <section class="login-side">
+      <div class="glass login-card" id="loginCard">
+        <div class="glass-line"></div>
+        <div class="sv-brand">Studyverse</div>
+        <div class="login-heading">
+          <h2>Welcome back</h2>
+          <p>Sign in to keep your study history on every device</p>
+        </div>
+
+        <button class="sv-btn sv-google" id="btnGoogle" type="button"><span class="sv-g">G</span> Continue with Google</button>
+
+        <div class="divider"><span></span><b>OR</b><span></span></div>
+
+        <button class="sv-btn sv-guest" id="btnGuest" type="button">Continue as guest</button>
+
+        <div class="sv-err" id="err" role="alert"></div>
+        <div class="sv-note">Guest data stays only on this device. Sign in with Google any time and it moves to your account.</div>
+      </div>
+    </section>
+  </main>
+  <script src="login.js"></script>
+</body>
+</html>

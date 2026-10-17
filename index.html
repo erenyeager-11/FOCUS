@@ -119,6 +119,11 @@ main{min-width:0}
 .gb2{display:inline-flex;align-items:center;gap:8px;background:var(--gs);color:#2c9a5a;font-weight:700;font-size:12px;padding:8px 16px;border-radius:99px;cursor:pointer;margin-bottom:2px}
 
 .focus{position:relative}.focus:fullscreen{min-height:100vh;border-radius:0}.focus:-webkit-full-screen{min-height:100vh;border-radius:0}
+.tl{display:flex;flex-direction:column;align-items:center;gap:14px;width:100%}.tl.hide{display:none}
+.row2{display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center}.pill.ghost{border-color:#c9a77f;color:#8a5a30}.big.sm{font-size:68px}
+.cdin{display:flex;align-items:center;gap:8px;color:#8a5a30;font-weight:700}.cdin input{width:92px;text-align:center;font-size:36px;font-weight:300;color:#e0872e;background:rgba(255,255,255,.75);border:0;border-radius:22px;padding:10px 4px}
+.laps{width:min(380px,100%);max-height:180px;overflow:auto}.lp{display:flex;justify-content:space-between;padding:7px 12px;border-bottom:1px solid rgba(138,90,48,.2);font-variant-numeric:tabular-nums;font-size:13px;color:#8a5a30}
+.cdp{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}.cdp button{padding:6px 14px;border-radius:99px;background:rgba(255,255,255,.75);font-weight:700;font-size:12px;color:#8a5a30}
 @media(max-width:900px){.ov,.g2,.gm,.hero{grid-template-columns:1fr}.cal{margin:0 18px 18px;justify-self:start}.hero p{margin-bottom:20px}}
 @media(max-width:760px){body{padding:8px}#shell{grid-template-columns:1fr;padding:12px;border-radius:28px;padding-bottom:92px}.side{position:fixed;left:10px;right:10px;bottom:calc(8px + env(safe-area-inset-bottom,0px));top:auto;height:auto;z-index:20}.logo{display:none}
 nav{flex-direction:row;padding:6px;border-radius:26px;overflow-x:auto}nav button,nav button.on{flex:0 0 46px;height:46px;border-radius:18px;margin:0}nav .sp{display:none}.big{font-size:60px}.me div{display:none}.top{padding:12px 14px}}
@@ -194,11 +199,16 @@ nav{flex-direction:row;padding:6px;border-radius:26px;overflow-x:auto}nav button
 
 <section class="pg" id="p-focus"><div class="focus">
  <div style="position:absolute;top:16px;right:16px;display:flex;gap:8px"><button class="rb2" id="fsb" title="Full screen" onclick="toggleFs()"><svg class="i"><use href="#full"/></svg></button><button class="rb2" title="Picture in picture" onclick="togglePip()"><svg class="i"><use href="#pip"/></svg></button></div>
- <div class="modes" id="modes"></div>
+ <div class="modes" id="tools"><button id="t-pomo" class="on" onclick="setTool('pomo')">Pomodoro</button><button id="t-sw" onclick="setTool('sw')">Stopwatch</button><button id="t-cd" onclick="setTool('cd')">Countdown</button></div>
  <span class="chip"><svg class="i" style="width:16px"><use href="#book"/></svg><select id="fsub" onchange="ST.sub=this.value;save()"></select></span>
+ <div class="tl" id="tl-pomo"><div class="modes" id="modes"></div>
  <small id="part" style="color:#8a5a30"></small><div id="hgf"></div>
  <div class="big" data-tm>25:00</div>
- <div style="display:flex;gap:12px;align-items:center"><button class="pill" data-go onclick="toggleT()">Start</button><button class="pill" style="border-color:#c9a77f;color:#8a5a30" onclick="resetT()">Reset</button></div>
+ <div class="row2"><button class="pill" data-go onclick="toggleT()">Start</button><button class="pill ghost" onclick="resetT()">Reset</button></div></div>
+ <div class="tl hide" id="tl-sw"><div class="big sm" id="swT">00:00:00</div><div class="row2"><button class="pill" id="swGo" onclick="swToggle()">Start</button><button class="pill ghost" onclick="swLap()">Lap</button><button class="pill ghost" onclick="swReset()">Reset</button></div><div class="laps" id="laps"></div></div>
+ <div class="tl hide" id="tl-cd"><div class="cdin" id="cdIn"><input id="cdh" type="number" min="0" max="23" value="0"><span>h</span><input id="cdm" type="number" min="0" max="59" value="10"><span>m</span><input id="cds" type="number" min="0" max="59" value="0"><span>s</span></div><div class="big sm" id="cdT" style="display:none">00:10:00</div>
+  <div class="cdp" id="cdP"><button onclick="cdSet(300)">5 min</button><button onclick="cdSet(600)">10 min</button><button onclick="cdSet(1800)">30 min</button><button onclick="cdSet(3600)">1 hour</button></div>
+  <div class="row2"><button class="pill" id="cdGo" onclick="cdToggle()">Start</button><button class="pill ghost" onclick="cdReset()">Reset</button></div></div>
  <button class="sbtn" onclick="document.getElementById('snds').classList.toggle('on')"><svg class="i" style="width:16px"><use href="#mus"/></svg>Sounds</button>
  <div class="snds" id="snds"></div></div></section>
 
@@ -274,7 +284,7 @@ function drawT(){const m=String(Math.floor(left/60)).padStart(2,'0')+':'+String(
  $('fm').classList.toggle('on',!!end);$('part').textContent='Part '+(ST.sessions.filter(s=>s.d===dk()).length+1);
  $('meS').textContent=Math.round(secOn(dk())/60)+' min today';pipUpd()}
 function logSince(){if(since&&mode==='focus'){const s=Math.floor((Date.now()-since)/1000);if(s>5){ST.sessions.push({d:dk(),s,sub:ST.sub});save()}}since=null}
-function toggleT(){if(end){stopT();return}end=Date.now()+left*1000;since=Date.now();tick=setInterval(()=>{left=Math.max(0,(end-Date.now())/1000);drawT();if(left<=0){stopT();setMode(mode==='focus'?'short':'focus');snack(mode==='short'?'Focus done. Take a break.':'Break over.')}},250);if(mode==='focus')gSync(true);drawT()}
+function toggleT(){if(end){stopT();return}if(swStart)swToggle();end=Date.now()+left*1000;since=Date.now();tick=setInterval(()=>{left=Math.max(0,(end-Date.now())/1000);drawT();if(left<=0){stopT();setMode(mode==='focus'?'short':'focus');snack(mode==='short'?'Focus done. Take a break.':'Break over.')}},250);if(mode==='focus')gSync(true);drawT()}
 function stopT(){const was=!!end;if(tick)clearInterval(tick);tick=null;if(end)left=Math.max(0,(end-Date.now())/1000);end=null;logSince();if(was)gSync(false);drawT();if($('p-ov').classList.contains('on'))rOv()}
 function resetT(){stopT();left=dur(mode);drawT()}
 /* ambience */
@@ -402,9 +412,10 @@ function leave(){if(!confirm('Leave this room?'))return;const id=ST.room,me=mem[
 const fsEl=()=>document.fullscreenElement||document.webkitFullscreenElement;
 function toggleFs(){const el=document.querySelector('.focus');if(fsEl())(document.exitFullscreen||document.webkitExitFullscreen).call(document);else{const f=el.requestFullscreen||el.webkitRequestFullscreen;if(f)f.call(el);else snack('Full screen is not supported here')}}
 let pipW=null,pipV=null,pipI=null;
-const tmTxt=()=>document.querySelector('[data-tm]').textContent;
-function pipUpd(){if(!pipW)return;const d=pipW.document,t=d.getElementById('pt');if(t){t.textContent=tmTxt();d.getElementById('pb').textContent=end?'Pause':'Start';d.getElementById('ps').textContent=mode==='focus'?ST.sub:MODES[mode]}}
-function pipDraw(c){const x=c.getContext('2d'),g=x.createLinearGradient(0,0,0,c.height);g.addColorStop(0,'#ffe9bd');g.addColorStop(1,'#ffc58a');x.fillStyle=g;x.fillRect(0,0,c.width,c.height);x.textAlign='center';x.fillStyle='#8a5a30';x.font='600 20px sans-serif';x.fillText(mode==='focus'?ST.sub:MODES[mode],c.width/2,44);x.fillStyle='#e0872e';x.font='300 78px sans-serif';x.fillText(tmTxt(),c.width/2,128);x.fillStyle='#8a5a30';x.font='700 16px sans-serif';x.fillText(end?'Focusing':'Paused',c.width/2,162)}
+const runN=()=>({pomo:!!end,sw:!!swStart,cd:cdEnd!==null}[tool]),lbl=()=>tool==='sw'?'Stopwatch':tool==='cd'?'Countdown':(mode==='focus'?ST.sub:MODES[mode]);
+const tmTxt=()=>tool==='sw'?fmt(swMs()/1000):tool==='cd'?fmt(cdLeft):document.querySelector('[data-tm]').textContent;
+function pipUpd(){if(!pipW)return;const d=pipW.document,t=d.getElementById('pt');if(t){t.textContent=tmTxt();d.getElementById('pb').textContent=runN()?'Pause':'Start';d.getElementById('ps').textContent=lbl()}}
+function pipDraw(c){const x=c.getContext('2d'),g=x.createLinearGradient(0,0,0,c.height);g.addColorStop(0,'#ffe9bd');g.addColorStop(1,'#ffc58a');x.fillStyle=g;x.fillRect(0,0,c.width,c.height);x.textAlign='center';x.fillStyle='#8a5a30';x.font='600 20px sans-serif';x.fillText(lbl(),c.width/2,44);x.fillStyle='#e0872e';x.font='300 78px sans-serif';x.fillText(tmTxt(),c.width/2,128);x.fillStyle='#8a5a30';x.font='700 16px sans-serif';x.fillText(runN()?'Running':'Paused',c.width/2,162)}
 async function togglePip(){
  if(pipW){pipW.close();return}
  if(document.pictureInPictureElement){document.exitPictureInPicture();return}
@@ -412,12 +423,29 @@ async function togglePip(){
   if(window.documentPictureInPicture){
    pipW=await documentPictureInPicture.requestWindow({width:300,height:230});const d=pipW.document;
    d.head.innerHTML='<meta charset="utf-8"><style>body{margin:0;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;font-family:Nunito,"Segoe UI",system-ui,sans-serif;background:linear-gradient(180deg,#ffe9bd,#ffc58a);color:#3a2a22}#ps{font-weight:700;font-size:13px;color:#8a5a30}#pt{font-size:64px;font-weight:300;color:#e0872e;font-variant-numeric:tabular-nums;line-height:1}button{padding:9px 28px;border-radius:99px;border:1.5px solid #3a2a22;background:rgba(255,255,255,.5);font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;color:#3a2a22}</style>';
-   d.body.innerHTML='<div id="ps"></div><div id="pt"></div><button id="pb"></button>';d.getElementById('pb').onclick=toggleT;
+   d.body.innerHTML='<div id="ps"></div><div id="pt"></div><button id="pb"></button>';d.getElementById('pb').onclick=()=>({pomo:toggleT,sw:swToggle,cd:cdToggle}[tool])();
    pipW.addEventListener('pagehide',()=>{pipW=null});pipUpd();
   }else if(document.pictureInPictureEnabled){
    const c=document.createElement('canvas');c.width=320;c.height=180;pipDraw(c);pipV=document.createElement('video');pipV.muted=true;pipV.srcObject=c.captureStream(2);await pipV.play();
    pipI=setInterval(()=>pipDraw(c),500);pipV.addEventListener('leavepictureinpicture',()=>{clearInterval(pipI);pipV.srcObject=null;pipV=null});await pipV.requestPictureInPicture();
   }else snack('Picture in picture is not supported in this browser')
  }catch(e){snack('Could not open picture in picture')}}
+/* stopwatch + countdown */
+let tool='pomo',swAcc=0,swStart=null,swI=null,swFrom=null,laps=[],cdLeft=600,cdTot=600,cdEnd=null,cdI=null,cdAct=false;
+function setTool(t){tool=t;['pomo','sw','cd'].forEach(k=>{$('tl-'+k).classList.toggle('hide',k!==t);$('t-'+k).classList.toggle('on',k===t)});pipUpd()}
+const swMs=()=>swAcc+(swStart?Date.now()-swStart:0);
+function swDraw(){$('swT').textContent=fmt(swMs()/1000);$('swGo').textContent=swStart?'Pause':(swAcc?'Resume':'Start');pipUpd()}
+function swLog(){if(swFrom){const s=Math.floor((Date.now()-swFrom)/1000);if(s>5){ST.sessions.push({d:dk(),s,sub:ST.sub});save()}swFrom=null;drawT();if($('p-ov').classList.contains('on'))rOv()}}
+function swToggle(){if(swStart){swAcc+=Date.now()-swStart;swStart=null;clearInterval(swI);swLog();gSync(false)}else{if(end)stopT();swStart=Date.now();swFrom=Date.now();swI=setInterval(swDraw,250);gSync(true)}swDraw()}
+function swLap(){const t=swMs();if(!t)return;laps.unshift(t);const L=laps.length;$('laps').innerHTML=laps.map((v,i)=>`<div class="lp"><span>Lap ${L-i}</span><span>${fmt((v-(laps[i+1]||0))/1000)}</span><span>${fmt(v/1000)}</span></div>`).join('')}
+function swReset(){if(swStart){clearInterval(swI);swStart=null;swLog();gSync(false)}swAcc=0;laps=[];$('laps').innerHTML='';swDraw()}
+function beep(){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();AC.resume();[0,.4,.8].forEach(t=>{const o=AC.createOscillator(),g=AC.createGain(),n=AC.currentTime+t;o.frequency.value=880;g.gain.setValueAtTime(.25,n);g.gain.exponentialRampToValueAtTime(.001,n+.3);o.connect(g);g.connect(AC.destination);o.start(n);o.stop(n+.3)})}catch(e){}}
+function cdSet(s){if(cdAct)return;$('cdh').value=Math.floor(s/3600);$('cdm').value=Math.floor(s%3600/60);$('cds').value=s%60}
+function cdDraw(){$('cdT').textContent=fmt(cdLeft);$('cdT').style.display=cdAct?'block':'none';$('cdIn').style.display=cdAct?'none':'flex';$('cdP').style.display=cdAct?'none':'flex';$('cdGo').textContent=cdEnd!==null?'Pause':(cdAct?'Resume':'Start');pipUpd()}
+function cdToggle(){if(cdEnd!==null){cdLeft=Math.max(0,(cdEnd-Date.now())/1000);cdEnd=null;clearInterval(cdI);cdDraw();return}
+ if(!cdAct){const s=(+$('cdh').value||0)*3600+(+$('cdm').value||0)*60+(+$('cds').value||0);if(s<=0){snack('Set a time first');return}cdLeft=cdTot=s;cdAct=true}
+ cdEnd=Date.now()+cdLeft*1000;cdI=setInterval(()=>{cdLeft=Math.max(0,(cdEnd-Date.now())/1000);cdDraw();if(cdLeft<=0){clearInterval(cdI);cdEnd=null;cdReset();beep();snack('Countdown finished');if('Notification' in window&&Notification.permission==='granted')new Notification('Studyverse',{body:'Countdown finished'})}},250);cdDraw();
+ if('Notification' in window&&Notification.permission==='default')Notification.requestPermission()}
+function cdReset(){clearInterval(cdI);cdEnd=null;cdAct=false;cdDraw()}
 subOpts();ren();go('ov');
 </script></body></html>

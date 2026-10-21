@@ -215,6 +215,8 @@ img,svg,iframe{max-width:100%}
 @media(max-width:380px){.big{font-size:50px}.big.sm{font-size:40px}nav button,nav button.on{flex-basis:42px}}
 @media(hover:none){.btn:hover{transform:none}.room:hover{outline:0}.spot button:hover{outline:0}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.gtm{position:fixed;right:14px;bottom:92px;z-index:40;display:none;align-items:center;gap:10px;background:var(--o);color:#fff;border-radius:99px;padding:8px 8px 8px 16px;box-shadow:0 8px 24px rgba(160,90,40,.35);cursor:pointer;font-weight:800;max-width:70vw}.gtm i{width:8px;height:8px;border-radius:50%;background:#fff;animation:gtp 1.2s infinite}.gtm small{font-size:11px;opacity:.9;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.gtm b{font-variant-numeric:tabular-nums;font-size:15px}.gtm button{background:rgba(255,255,255,.25);color:#fff;border-radius:99px;padding:6px 12px;font-weight:800;font-size:12px}@keyframes gtp{50%{opacity:.25}}
+.cimg{max-width:100%;max-height:260px;border-radius:12px;display:block;margin-top:4px;cursor:pointer}
 </style></head><body>
 <div id="boot" style="position:fixed;inset:0;z-index:999;background:#ffd7a3;display:grid;place-items:center;font:800 22px Nunito,system-ui,sans-serif;color:#2b2320;transition:opacity .3s">Studyverse...</div><script>setTimeout(function(){var b=document.getElementById("boot");if(b)b.remove()},8000)</script>
 <svg width="0" height="0" style="position:absolute"><defs>
@@ -295,13 +297,12 @@ img,svg,iframe{max-width:100%}
  <small id="part" style="color:#8a5a30"></small><div id="hgf"></div>
  <div class="big" data-tm>25:00</div>
  <div class="row2"><button class="pill" data-go onclick="toggleT()">Start</button><button class="pill ghost" onclick="resetT()">Reset</button></div></div>
- <div class="tl hide" id="tl-fc"><small style="color:#8a5a30">Focus timer</small><div class="big" id="fcT">00:00:00</div><div class="row2"><button class="pill" id="fcGo" onclick="fcToggle()">Start</button><button class="pill ghost" onclick="fcReset()">Reset</button></div></div>
+ <div class="tl hide" id="tl-fc"><small style="color:#8a5a30">Focus timer: jitna padhoge utna time count hoga</small><div class="big" id="fcT">00:00:00</div><div class="row2"><button class="pill" id="fcGo" onclick="fcToggle()">Start</button><button class="pill ghost" onclick="fcReset()">Reset</button></div></div>
  <div class="tl hide" id="tl-sw"><div class="big sm" id="swT">00:00:00</div><div class="row2"><button class="pill" id="swGo" onclick="swToggle()">Start</button><button class="pill ghost" onclick="swLap()">Lap</button><button class="pill ghost" onclick="swReset()">Reset</button></div><div class="laps" id="laps"></div></div>
  <div class="tl hide" id="tl-cd"><div class="cdin" id="cdIn"><input id="cdh" type="number" min="0" max="23" value="0"><span>h</span><input id="cdm" type="number" min="0" max="59" value="10"><span>m</span><input id="cds" type="number" min="0" max="59" value="0"><span>s</span></div><div class="big sm" id="cdT" style="display:none">00:10:00</div>
   <div class="cdp" id="cdP"><button onclick="cdSet(300)">5 min</button><button onclick="cdSet(600)">10 min</button><button onclick="cdSet(1800)">30 min</button><button onclick="cdSet(3600)">1 hour</button></div>
   <div class="row2"><button class="pill" id="cdGo" onclick="cdToggle()">Start</button><button class="pill ghost" onclick="cdReset()">Reset</button></div></div>
- <button class="sbtn" onclick="document.getElementById('snds').classList.toggle('on')"><svg class="i" style="width:16px"><use href="#mus"/></svg>Sounds</button>
- <div class="snds" id="snds"></div></div></section>
+ </div></section>
 
 <section class="pg" id="p-nb">
  <div class="row" style="margin-bottom:12px"><input id="nbq" placeholder="Search notes, formulas, tags, files" oninput="rNb()"><button class="btn p" onclick="editNote()">New note</button></div>
@@ -324,14 +325,15 @@ img,svg,iframe{max-width:100%}
  <div id="gLobby">
   <div class="card" style="margin-bottom:18px"><h3>Your study identity</h3><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><div id="gMyIcon"></div><input id="gname" placeholder="Your display name" style="flex:1;min-width:160px"><button class="btn" onclick="pickIcon()">Change icon</button><button class="btn p" onclick="saveName()">Save</button></div></div>
   <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px"><button class="btn p" onclick="openCreate()">Create room</button><button class="btn" onclick="refreshPub()">Refresh public rooms</button></div>
+  <div class="card" style="margin-bottom:18px"><h3>Join with a code</h3><div class="row"><input id="jcode" placeholder="Room code, e.g. K7P2QX" maxlength="8" style="text-transform:uppercase" onkeydown="if(event.key==='Enter')joinCode()"><button class="btn p" onclick="joinCode()">Join</button></div></div>
   <div class="g g2"><div class="card"><h3>Your rooms</h3><div id="myRooms"></div></div><div class="card"><h3>Discover public rooms</h3><div id="pubRooms"><div class="empty">Loading</div></div></div></div>
  </div>
  <div id="gRoom" style="display:none">
-  <div class="card" style="margin-bottom:18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap"><span id="gRI"></span><div style="flex:1;min-width:160px"><div style="font-size:18px;font-weight:800" id="rtitle"></div><div class="mut" id="rmeta"></div></div><button class="btn" onclick="copyInvite()">Copy invite link</button><button class="btn" onclick="backLobby()">Lobby</button><button class="btn" onclick="leave()">Leave room</button></div>
-  <div class="g g2" style="margin-bottom:18px"><div class="card pom"><h3>Your focus today <span class="tag">LIVE</span></h3><div class="tm" id="gMyT" style="font-size:40px;text-align:left">00:00:00</div><small> >w<. </small></div>
+  <div class="card" style="margin-bottom:18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap"><span id="gRI"></span><div style="flex:1;min-width:160px"><div style="font-size:18px;font-weight:800" id="rtitle"></div><div class="mut" id="rmeta"></div></div><button class="btn" onclick="copyCode()">Code: <b id="rcode">------</b></button><button class="btn" onclick="copyInvite()">Copy invite link</button><button class="btn p" id="rmanage" style="display:none" onclick="roomSet()">Manage room</button><button class="btn" onclick="backLobby()">Lobby</button><button class="btn" onclick="leave()">Leave room</button></div>
+  <div class="g g2" style="margin-bottom:18px"><div class="card pom"><h3>Your focus today <span class="tag">LIVE</span></h3><div class="tm" id="gMyT" style="font-size:40px;text-align:left">00:00:00</div><small>Pomodoro, Focus, Stopwatch aur Countdown ka total time. Room ke liye 5:00 AM pe reset hota hai.</small></div>
   <div class="card"><h3>Studying together</h3><div class="tag" id="gCnt" style="display:inline-block">0 members studying right now</div><p class="mut" style="margin-top:12px">Start your Focus timer and your live status and time show up for everyone in this room.</p></div></div>
   <div class="g g2" style="margin-bottom:18px"><div class="card"><h3>Room focus board <span class="mut">TODAY</span></h3><div class="mem" id="mem"></div></div>
-  <div class="card"><h3>Room chat</h3><div class="chat" id="chat"></div><div class="row"><input id="cin" placeholder="Message the room" onkeydown="if(event.key==='Enter')sendMsg()"><button class="btn p" onclick="sendMsg()"><svg class="i"><use href="#send"/></svg></button></div></div></div>
+  <div class="card"><h3>Room chat</h3><div class="chat" id="chat"></div><div class="row"><input id="cin" placeholder="Message the room" onkeydown="if(event.key==='Enter')sendMsg()"><button class="btn" title="Send a photo" onclick="$('cimg').click()">Photo</button><input type="file" id="cimg" accept="image/*" hidden onchange="sendImg(this.files[0]);this.value=''"><button class="btn p" onclick="sendMsg()"><svg class="i"><use href="#send"/></svg></button></div></div></div>
   <div class="g g2"><div class="card"><h3>Daily rankings <span class="mut">RESETS 5:00 AM</span></h3><div id="rank"></div></div><div class="card"><h3>Room history</h3><div id="hist"></div></div></div>
  </div></section>
 
@@ -362,6 +364,7 @@ img,svg,iframe{max-width:100%}
 <div class="ov2" id="nbl" style="z-index:80" onclick="closeImg()"><img id="nbli" alt=""></div>
 <div class="ipop" id="ipop" onclick="if(event.target===this)hideInstall(true)"><div class="ipc"><img src="icon-192.png" alt="Studyverse"><h2>DOWNLOAD WEB APP</h2><p id="ipBody"></p><button class="btn p" id="ipGo" onclick="doInstall()">Download App</button><button class="btn later" onclick="hideInstall(true)">Not now</button></div></div>
 
+<div class="gtm" id="gtm" onclick="go('focus')"><i></i><small id="gtmL"></small><b id="gtmT"></b><button onclick="event.stopPropagation();pauseRun()">Pause</button></div>
 <div id="snk" style="position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(30px);background:var(--card);padding:10px 20px;border-radius:99px;box-shadow:0 8px 24px rgba(160,90,40,.25);opacity:0;transition:.3s;z-index:50;font-weight:700"></div>
 
 <script>
@@ -414,7 +417,6 @@ function stopT(){const was=!!end;if(tick)clearInterval(tick);tick=null;if(end)le
 function resetT(){stopT();left=dur(mode);drawT()}
 /* ambience */
 let AC=null;const SN={rain:['Rain','pink',1800],brown:['Deep hum','brown',380],white:['Soft static','white',7000],cafe:['Cafe','pink',650]},lv={};
-$('snds').innerHTML=Object.keys(SN).map(k=>`<button id="s-${k}" onclick="snd('${k}')">${SN[k][0]}</button>`).join('');
 function snd(k){AC=AC||new(window.AudioContext||window.webkitAudioContext)();AC.resume();if(lv[k]){lv[k].stop();delete lv[k];$('s-'+k).classList.remove('on');return}
  const n=2*AC.sampleRate,b=AC.createBuffer(1,n,AC.sampleRate),d=b.getChannelData(0);let l=0,b0=0,b1=0,b2=0;
  for(let i=0;i<n;i++){const w=Math.random()*2-1;if(SN[k][1]==='white')d[i]=w*.5;else if(SN[k][1]==='brown'){l=(l+.02*w)/1.02;d[i]=l*3.5}else{b0=.99*b0+w*.06;b1=.96*b1+w*.3;b2=.57*b2+w*1.05;d[i]=(b0+b1+b2+w*.2)*.12}}
@@ -478,7 +480,7 @@ const openM=h=>{$('mdlc').innerHTML=h;$('mdl').style.display='flex'},closeM=()=>
 function gInit(){$('gname').value=ST.name||'';ST.gicon=ST.gicon||'leaf';$('gMyIcon').innerHTML=gAv(ST.gicon,44);if(gOnce)return;gOnce=true;
  try{if(!firebase.apps.length)firebase.initializeApp(FB);fdb=firebase.firestore();firebase.auth().onAuthStateChanged(u=>{if(u){fuid=u.uid;gReady()}else if(localStorage.getItem('svguest')==='1')firebase.auth().signInAnonymously().catch(noFb)})}catch(e){noFb()}}
 const noFb=()=>{$('gNo').style.display='block';$('gLobby').style.display='none'};
-function gReady(){myRooms();refreshPub();const q=new URLSearchParams(location.search).get('room');if(q)enter(q);else if(ST.room)enter(ST.room)}
+function gReady(){myRooms();refreshPub();const q=new URLSearchParams(location.search).get('room')||localStorage.getItem('svroom');if(q){localStorage.removeItem('svroom');try{history.replaceState(null,'',location.pathname)}catch(e){}go('grp');enter(q)}else if(ST.room)enter(ST.room)}
 function refreshPub(){if(!fdb)return;if(pubUn)pubUn();const el=$('pubRooms'),draw=s=>{const r=s.docs.map(d=>({id:d.id,...d.data()}));r.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));el.innerHTML=r.length?r.map(x=>`<div class="room" onclick="enter('${x.id}')">${gAv(x.icon,36)}<div style="flex:1;min-width:0">${esc(x.name)}<div class="mut">by ${esc(x.adminName||'Someone')}</div></div></div>`).join(''):'<div class="empty">No public rooms yet. Create the first one!</div>'};
  pubUn=fdb.collection('groupRooms').where('isPublic','==',true).orderBy('createdAt','desc').limit(30).onSnapshot(draw,()=>{pubUn=fdb.collection('groupRooms').where('isPublic','==',true).limit(30).onSnapshot(draw,()=>{el.innerHTML='<div class="empty">Could not load rooms</div>'})})}
 const myRooms=()=>{$('myRooms').innerHTML=ST.rooms.length?ST.rooms.map(r=>`<div class="room" onclick="enter('${r.id}')">${gAv(r.icon,36)}<span style="flex:1">${esc(r.name)}</span></div>`).join(''):'<div class="empty">You have not joined any rooms yet.</div>'};
@@ -490,11 +492,11 @@ function openCreate(){if(!fdb){snack('Group study is still connecting');return}i
  openM(`<h3>Create a study room</h3><input id="crn" placeholder="Room name, e.g. Midnight Grinders"><div class="mut" style="margin:14px 0 6px">Icon</div><div class="ig" id="crI"></div><div class="mut" style="margin:14px 0 6px">Visibility</div><div class="chips" id="crV"></div><div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px"><button class="btn" onclick="closeM()">Cancel</button><button class="btn p" onclick="mkRoom()">Create</button></div>`);crDraw()}
 function crDraw(){$('crI').innerHTML=GI.map(g=>`<button class="${cr.icon===g?'sel':''}" onclick="cr.icon='${g}';crDraw()">${gAv(g,38)}</button>`).join('');$('crV').innerHTML=`<button class="${cr.pub?'on':''}" onclick="cr.pub=true;crDraw()">Public</button><button class="${cr.pub?'':'on'}" onclick="cr.pub=false;crDraw()">Private (link only)</button>`}
 async function mkRoom(){const n=$('crn').value.trim();if(!n){snack('Enter a room name');return}
- try{const r=await fdb.collection('groupRooms').add({name:n,icon:cr.icon,isPublic:cr.pub,adminId:fuid,adminName:ST.name,createdAt:ts()});
- await r.collection('members').doc(fuid).set({name:ST.name,icon:ST.gicon,role:'admin',isStudying:!!runStart(),sessionStartedAt:runStart()?ts():null,sessionStartedAtMs:runStart()||null,studyDay:sday(),dailySeconds:Math.floor(logOn(sday())),joinedAt:ts()});closeM();enter(r.id);snack('Room created')}catch(e){snack('Could not create room')}}
+ try{const code=await newCode();const r=await fdb.collection('groupRooms').add({name:n,icon:cr.icon,isPublic:cr.pub,adminId:fuid,adminName:ST.name,code,createdAt:ts()});
+ await r.collection('members').doc(fuid).set({name:ST.name,icon:ST.gicon,role:'admin',isStudying:!!runStart(),sessionStartedAt:runStart()?ts():null,sessionStartedAtMs:runStart()||null,studyDay:sday(),dailySeconds:Math.floor(logOn(sday())),joinedAt:ts()});closeM();enter(r.id);snack('Room created. Code: '+code)}catch(e){snack('Could not create room')}}
 async function enter(id){if(!fdb||!need())return;unsubs.forEach(u=>u());unsubs=[];mem={};hist=[];const ref=fdb.collection('groupRooms').doc(id);let d;
  try{d=await ref.get()}catch(e){snack('Could not open room');return}
- if(!d.exists){snack('Room not found');ST.room=null;save();return}
+ if(!d.exists){snack('Room not found');ST.room=null;ST.rooms=ST.rooms.filter(r=>r.id!==id);save();myRooms();return}
  rdata={id,...d.data()};ST.room=id;ST.rooms=ST.rooms.filter(r=>r.id!==id);ST.rooms.unshift({id,name:rdata.name,icon:rdata.icon});ST.rooms=ST.rooms.slice(0,20);save();myRooms();
  $('gLobby').style.display='none';$('gRoom').style.display='block';hdr();
  const me=ref.collection('members').doc(fuid),md=await me.get();
@@ -502,9 +504,9 @@ async function enter(id){if(!fdb||!need())return;unsubs.forEach(u=>u());unsubs=[
  unsubs.push(ref.onSnapshot(s=>{if(s.exists){rdata={id,...s.data()};hdr()}else{snack('Room was deleted');backLobby()}}));
  unsubs.push(ref.collection('members').orderBy('joinedAt','asc').onSnapshot(s=>{mem={};s.docs.forEach(x=>mem[x.id]=x.data());cycle();gDraw();badge();hdr()}));
  unsubs.push(ref.collection('dailyHistory').orderBy('savedAt','desc').limit(30).onSnapshot(s=>{hist=s.docs.map(x=>x.data());drawHist()},()=>{hist=[];drawHist()}));
- unsubs.push(ref.collection('messages').orderBy('createdAt','asc').limit(200).onSnapshot(s=>drawChat(s.docs.map(x=>({id:x.id,...x.data()})).slice(-100))));
+ unsubs.push(ref.collection('messages').orderBy('createdAt','desc').limit(50).onSnapshot(s=>drawChat(s.docs.map(x=>({id:x.id,...x.data()})).reverse())));
  clearInterval(clock);clock=setInterval(()=>{cycle();gDraw()},1000)}
-function hdr(){if(!rdata)return;$('gRI').innerHTML=gAv(rdata.icon,46);$('rtitle').textContent=rdata.name||'Room';const r=(mem[fuid]||{}).role;
+function hdr(){if(!rdata)return;{const rr=(mem[fuid]||{}).role;$('rcode').textContent=rdata.code||'------';$('rmanage').style.display=rr==='admin'?'':'none';if(!rdata.code&&rr==='admin'&&!hdr.g){hdr.g=1;newCode().then(c=>fdb.collection('groupRooms').doc(rdata.id).update({code:c})).catch(()=>{})}}$('gRI').innerHTML=gAv(rdata.icon,46);$('rtitle').textContent=rdata.name||'Room';const r=(mem[fuid]||{}).role;
  $('rmeta').textContent=(rdata.isPublic?'Public':'Private')+' · Admin: '+(rdata.adminName||'-')+(r&&r!=='member'?' · You: '+(r==='admin'?'Admin':'Manager'):'')}
 function cycle(){const me=mem[fuid],t=sday();if(!me||!me.studyDay||me.studyDay===t||!ST.room||!fdb)return;const cut=sdayStart(),old=me.studyDay;
  const oldS=(me.dailySeconds||0)+(me.isStudying&&me.sessionStartedAtMs?Math.max(0,(cut-me.sessionStartedAtMs)/1000):0),carry=me.isStudying?Math.max(0,(Date.now()-cut)/1000):0;
@@ -514,12 +516,12 @@ function cycle(){const me=mem[fuid],t=sday();if(!me||!me.studyDay||me.studyDay==
 function gDraw(){const me=mem[fuid]||{},iA=me.role==='admin',iM=iA||me.role==='manager',L=Object.entries(mem).map(([id,m])=>({id,...m,t:mSecs(m),on:!!m.isStudying&&m.studyDay===sday()}));
  $('gMyT').textContent=fmt(mSecs(me));$('gCnt').textContent=L.filter(x=>x.on).length+' members studying right now';
  $('mem').innerHTML=L.map(m=>{const self=m.id===fuid,rl=m.role==='admin'?`<span class="rl">${ic('crown',13)}</span> `:m.role==='manager'?`<span class="rl">${ic('shield',13)}</span> `:'';let a='';
-  if(!self&&m.role!=='admin'){if(iA)a=`<button onclick="setRole('${m.id}','${m.role==='member'?'manager':'member'}')">${m.role==='member'?'Make manager':'Demote'}</button><button onclick="kick('${m.id}')">Kick</button>`;else if(iM&&m.role==='member')a=`<button onclick="kick('${m.id}')">Kick</button>`}
+  if(!self&&m.role!=='admin'){if(iA)a=`<button onclick="setRole('${m.id}','${m.role==='member'?'manager':'member'}')">${m.role==='member'?'Make manager':'Demote'}</button><button onclick="giveOwner('${m.id}')">Make owner</button><button onclick="kick('${m.id}')">Kick</button>`;else if(iM&&m.role==='member')a=`<button onclick="kick('${m.id}')">Kick</button>`}
   return `<div class="mt ${m.on?'live':''}"><div class="scene ${m.on?'st':'idle'}">${gAv(m.icon,44)}<span class="bk">${ic(m.on?'book':'moon',14)}</span><span class="desk"></span></div><b>${rl}${esc(m.name||'Anonymous')}${self?' (you)':''}</b><code>${fmt(m.t)}</code><div class="mut">${m.on?'Studying now':'Idle'}</div>${a?`<div class="acts">${a}</div>`:''}</div>`}).join('');
  $('rank').innerHTML=[...L].sort((a,b)=>b.t-a.t).map((m,i)=>`<div class="rk ${m.id===fuid?'self':''}"><span class="rkn">${i===0?ic('crown',16):i+1}</span>${gAv(m.icon,34)}<span><b>${esc(m.name||'Anonymous')}${m.id===fuid?' (you)':''}</b><div class="mut">${m.on?'Studying right now':'Focus logged today'}</div></span><code style="font:700 12px ui-monospace,monospace;color:var(--o)">${fmt(m.t)}</code></div>`).join('')}
 function drawHist(){$('hist').innerHTML=hist.length?hist.map(h=>`<div class="rk">${gAv(h.memberIcon,32)}<span><b>${esc(h.memberName||'Member')}</b><div class="mut">${esc(h.day||'')}</div></span><code style="font:700 12px ui-monospace,monospace;color:var(--o)">${fmt(h.duration)}</code></div>`).join(''):'<div class="empty">Completed days appear here after the 5:00 AM reset.</div>'}
 function drawChat(ms){const me=mem[fuid]||{},can=me.role==='admin'||me.role==='manager',c=$('chat');
- c.innerHTML=ms.length?ms.map(m=>{const mine=m.senderId===fuid;return `<div class="msg ${mine?'me':''}"><div class="nm">${gAv(m.senderIcon,18)}<b>${esc(m.senderName||'Anon')}</b>${mine||can?`<button class="dl" onclick="delMsg('${m.id}')">${ic('x',12)}</button>`:''}</div>${esc(m.text||'')}</div>`}).join(''):'<div class="empty">No messages yet. Say hi!</div>';c.scrollTop=c.scrollHeight}
+ c.innerHTML=ms.length?ms.map(m=>{const mine=m.senderId===fuid;return `<div class="msg ${mine?'me':''}"><div class="nm">${gAv(m.senderIcon,18)}<b>${esc(m.senderName||'Anon')}</b>${mine||can?`<button class="dl" onclick="delMsg('${m.id}')">${ic('x',12)}</button>`:''}</div>${esc(m.text||'')}${okImg(m.img)?`<img class="cimg" src="${m.img}" alt="photo" onload="this.closest('.chat').scrollTop=1e9" onclick="zoomImg(this.src)">`:''}</div>`}).join(''):'<div class="empty">No messages yet. Say hi!</div>';c.scrollTop=c.scrollHeight}
 function sendMsg(){const v=$('cin').value.trim();if(!v||!ST.room)return;fdb.collection('groupRooms').doc(ST.room).collection('messages').add({text:v,senderId:fuid,senderName:ST.name,senderIcon:ST.gicon,createdAt:ts()}).then(()=>{$('cin').value=''}).catch(()=>snack('Message failed to send'))}
 const delMsg=id=>fdb.collection('groupRooms').doc(ST.room).collection('messages').doc(id).delete().catch(()=>{});
 const setRole=(id,r)=>mref(id).update({role:r}).then(()=>snack(r==='manager'?'Promoted to manager':'Demoted to member')).catch(()=>snack('Could not update role'));
@@ -531,8 +533,11 @@ async function gSync(on){if(!fdb||!fuid||!ST.room||!mem[fuid])return;cycle();con
 function badge(){const el=$('gbadge');if(!el)return;if(!ST.room||!rdata){el.innerHTML='';return}const n=Object.values(mem).filter(m=>m.isStudying&&m.studyDay===sday()).length;el.innerHTML=`<span class="gb2" onclick="go('grp')">${ic('users',16)} In "${esc(rdata.name)}" · ${n} studying now</span>`}
 function copyInvite(){const u=location.origin+location.pathname+'?room='+ST.room;(navigator.clipboard?navigator.clipboard.writeText(u).then(()=>snack('Invite link copied')):Promise.reject()).catch(()=>prompt('Copy invite link',u))}
 function backLobby(){unsubs.forEach(u=>u());unsubs=[];clearInterval(clock);ST.room=null;rdata=null;mem={};save();$('gRoom').style.display='none';$('gLobby').style.display='block';badge()}
-function leave(){if(!confirm('Leave this room?'))return;const id=ST.room,me=mem[fuid];if(me&&me.role==='admin')snack('You were the admin. Promote a manager next time to keep the room going.');
- fdb.collection('groupRooms').doc(id).collection('members').doc(fuid).delete().catch(()=>{});ST.rooms=ST.rooms.filter(r=>r.id!==id);backLobby();myRooms()}
+function leave(){const me=mem[fuid];if(me&&me.role==='admin'){const o=Object.entries(mem).filter(([id])=>id!==fuid);
+ if(!o.length){if(confirm('You are the only member, so leaving deletes this room. Continue?'))deleteRoom(true);return}
+ openM(`<h3>Choose a new owner</h3><div class="mut" style="margin-bottom:10px">You are the owner. Pick who takes over before you leave.</div>`+o.map(([id,m])=>`<div class="room" onclick="giveOwner('${id}',true)">${gAv(m.icon,36)}<span style="flex:1">${esc(m.name||'Member')}</span></div>`).join('')+`<div style="text-align:right;margin-top:14px"><button class="btn" onclick="closeM()">Cancel</button></div>`);return}
+ if(!confirm('Leave this room?'))return;doLeave()}
+function doLeave(){const id=ST.room;fdb.collection('groupRooms').doc(id).collection('members').doc(fuid).delete().catch(()=>{});ST.rooms=ST.rooms.filter(r=>r.id!==id);backLobby();myRooms()}
 
 /* full screen + picture in picture */
 const fsEl=()=>document.fullscreenElement||document.webkitFullscreenElement;
@@ -677,8 +682,45 @@ function restoreRun(){let R=null;try{R=JSON.parse(localStorage.getItem('svrun')|
  if(fin)snack('A timer finished while you were away. Your time is saved.');else if(ran)snack('Welcome back. Your timer kept running.')}
 setInterval(()=>{const a=document.activeElement&&document.activeElement.tagName;if(runStart()&&$('p-ov').classList.contains('on')&&!/SELECT|INPUT|TEXTAREA/.test(a||''))rOv()},30000);
 
+
+/* ===== Group extras: codes, owner rights, photos, global timer pill ===== */
+const CA='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+async function newCode(){for(let i=0;i<6;i++){let c='';for(let j=0;j<6;j++)c+=CA[Math.floor(Math.random()*CA.length)];const q=await fdb.collection('groupRooms').where('code','==',c).limit(1).get();if(q.empty)return c}return Date.now().toString(36).slice(-6).toUpperCase()}
+async function joinCode(){if(!fdb){snack('Group study is still connecting');return}const c=($('jcode').value||'').trim().toUpperCase();if(!c){snack('Enter a room code');return}
+ try{const q=await fdb.collection('groupRooms').where('code','==',c).limit(1).get();if(q.empty){snack('No room with this code');return}$('jcode').value='';enter(q.docs[0].id)}catch(e){snack('Could not look up the code')}}
+function copyCode(){if(!rdata||!rdata.code)return;(navigator.clipboard?navigator.clipboard.writeText(rdata.code).then(()=>snack('Code copied: '+rdata.code)):Promise.reject()).catch(()=>prompt('Room code',rdata.code))}
+let rs={pub:true};
+function rsDraw(){$('rsV').innerHTML=`<button class="${rs.pub?'on':''}" onclick="rs.pub=true;rsDraw()">Public</button><button class="${rs.pub?'':'on'}" onclick="rs.pub=false;rsDraw()">Private (code or link only)</button>`}
+function roomSet(){if(!rdata||(mem[fuid]||{}).role!=='admin')return;rs={pub:!!rdata.isPublic};
+ openM(`<h3>Manage room</h3><input id="rsn" value="${esc(rdata.name||'')}" maxlength="40"><div class="mut" style="margin:14px 0 6px">Visibility</div><div class="chips" id="rsV"></div><div class="mut" style="margin:14px 0 6px">Room code: <b>${esc(rdata.code||'')}</b></div><div style="display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap;margin-top:14px"><button class="btn" style="color:#d4503e" onclick="deleteRoom()">Delete room</button><span style="display:flex;gap:10px"><button class="btn" onclick="closeM()">Cancel</button><button class="btn p" onclick="saveRoomSet()">Save</button></span></div>`);rsDraw()}
+function saveRoomSet(){const n=$('rsn').value.trim();if(!n){snack('Enter a room name');return}
+ fdb.collection('groupRooms').doc(ST.room).update({name:n,isPublic:rs.pub}).then(()=>{const r=ST.rooms.find(x=>x.id===ST.room);if(r){r.name=n;save();myRooms()}closeM();snack('Room updated')}).catch(()=>snack('Could not update room'))}
+async function deleteRoom(skip){if(!rdata||(mem[fuid]||{}).role!=='admin')return;
+ if(!skip&&!confirm('Delete this room for everyone? Chat, history and members will be removed. This cannot be undone.'))return;
+ const id=ST.room,ref=fdb.collection('groupRooms').doc(id);closeM();snack('Deleting room...');
+ try{for(const c of ['messages','dailyHistory','members']){let s;do{s=await ref.collection(c).limit(300).get();if(s.empty)break;const b=fdb.batch();s.docs.forEach(d=>b.delete(d.ref));await b.commit()}while(s.size>=300)}
+  await ref.delete();ST.rooms=ST.rooms.filter(r=>r.id!==id);save();myRooms();snack('Room deleted')}catch(e){snack('Could not delete room ('+(e.code||'error')+')')}}
+async function giveOwner(id,leaveAfter){const t=mem[id];if(!t||(mem[fuid]||{}).role!=='admin')return;
+ if(!leaveAfter&&!confirm('Make '+(t.name||'this member')+' the owner? You will become a manager.'))return;
+ try{const b=fdb.batch(),ref=fdb.collection('groupRooms').doc(ST.room);b.update(ref,{adminId:id,adminName:t.name||'Member'});b.update(ref.collection('members').doc(id),{role:'admin'});b.update(ref.collection('members').doc(fuid),{role:'manager'});await b.commit();
+  snack('Ownership transferred');if(leaveAfter){closeM();doLeave()}}catch(e){snack('Could not transfer ownership ('+(e.code||'error')+')')}}
+const okImg=u=>typeof u==='string'&&/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(u);
+function zoomImg(src){if(okImg(src)){$('nbli').src=src;$('nbl').classList.add('on')}}
+async function sendImg(f){if(!f||!ST.room||!fdb)return;if(!/^image\//.test(f.type)){snack('Choose an image');return}snack('Sending photo...');
+ try{const bm=await createImageBitmap(f);let side=900,q=.65,url='';
+  for(let i=0;i<6;i++){const k=Math.min(1,side/Math.max(bm.width,bm.height)),c=document.createElement('canvas');c.width=Math.round(bm.width*k);c.height=Math.round(bm.height*k);c.getContext('2d').drawImage(bm,0,0,c.width,c.height);url=c.toDataURL('image/jpeg',q);if(url.length<380000)break;side=Math.round(side*.75);q=Math.max(.4,q-.08)}
+  if(url.length>=380000){snack('Photo is too big');return}
+  await fdb.collection('groupRooms').doc(ST.room).collection('messages').add({text:'',img:url,senderId:fuid,senderName:ST.name,senderIcon:ST.gicon,createdAt:ts()});snack('Photo sent')}catch(e){snack('Could not send photo')}}
+function pauseRun(){if(end)stopT();else if(fcStart)fcToggle();else if(swStart)swToggle();else if(cdEnd!==null)cdToggle()}
+function updGtm(){const el=$('gtm');if(!el)return;let t='',l='';
+ if(end){const m=Math.max(0,left);t=String(Math.floor(m/60)).padStart(2,'0')+':'+String(Math.floor(m%60)).padStart(2,'0');l=mode==='focus'?ST.sub:MODES[mode]}
+ else if(fcStart){t=fmt(fcMs()/1000);l='Focus timer'}else if(swStart){t=fmt(swMs()/1000);l='Stopwatch'}else if(cdEnd!==null){t=fmt(cdLeft);l='Countdown'}
+ if(!t||document.querySelector('#p-focus.on')){el.style.display='none';return}
+ el.style.display='flex';$('gtmT').textContent=t;$('gtmL').textContent=l}
+setInterval(updGtm,500);
+
 /* ===== Account + cloud sync (Google account = same data on every device) ===== */
-let authU=null,sdb=null,syncUn=null,syncT=null,pushU=0;
+let authU=null,sdb=null,syncUn=null,syncT=null,pushU=0,cloudReady=false;
 const svS=()=>{try{return JSON.parse(localStorage.getItem('svsync')||'{}')}catch(e){return{}}},svSet=o=>{try{localStorage.setItem('svsync',JSON.stringify({...svS(),...o}))}catch(e){}};
 const cloudOn=()=>!!(authU&&!authU.isAnonymous&&sdb);
 const cleanST=()=>{const o={};Object.keys(ST).forEach(k=>{if(k!=='room')o[k]=ST[k]});return o};
@@ -693,14 +735,15 @@ function applyST(R){const keep=ST.room;Object.keys(ST).forEach(k=>delete ST[k]);
  if(!end&&mode==='focus'&&left>dur('focus'))left=dur('focus');
  ren();const cur=(document.querySelector('.pg.on')||{}).id;if(cur&&cur!=='p-grp')renderPage(cur.slice(2));snack('Synced from your account')}
 const syncSt=m=>{const e=$('syncSt');if(e)e.textContent=m||'Synced to your account on all devices'};
-function schedPush(){if(!cloudOn())return;svSet({dirty:true});clearTimeout(syncT);syncT=setTimeout(pushNow,2500)}
-async function pushNow(){if(!cloudOn())return;clearTimeout(syncT);syncT=null;
+function schedPush(){if(!cloudOn())return;svSet({dirty:true});if(!cloudReady)return;clearTimeout(syncT);syncT=setTimeout(pushNow,2500)}
+async function pushNow(){if(!cloudOn()||!cloudReady)return;clearTimeout(syncT);syncT=null;
  const d=JSON.stringify(cleanST());if(d.length>950000){snack('Data is too large to sync');return}
  const u=Date.now();pushU=u;syncSt('Syncing...');
  try{await sdb.collection('users').doc(authU.uid).set({d,u,v:1});svSet({uid:authU.uid,u,dirty:false});syncSt('')}catch(e){svSet({dirty:true});syncSt('Could not sync ('+(e.code||'offline')+'). Will retry.')}}
-function attachCloud(){if(syncUn){syncUn();syncUn=null}if(!cloudOn())return;
+function attachCloud(){if(syncUn){syncUn();syncUn=null}cloudReady=false;if(!cloudOn())return;
  syncUn=sdb.collection('users').doc(authU.uid).onSnapshot(snap=>{
   if(snap.metadata.hasPendingWrites)return;
+  cloudReady=true;
   const s=svS(),same=s.uid===authU.uid;
   if(!snap.exists){pushNow();return}
   const r=snap.data();if(r.u===pushU)return;
@@ -726,15 +769,16 @@ async function clearAll(){if(!confirm(cloudOn()?'Delete ALL data? This also dele
  try{if(cloudOn())await sdb.collection('users').doc(authU.uid).delete()}catch(e){}
  ['sv2','svrun','svsync'].forEach(k=>localStorage.removeItem(k));
  try{_db&&_db.close();indexedDB.deleteDatabase('svfiles')}catch(e){}location.reload()}
+function toLogin(){const q=new URLSearchParams(location.search).get('room');if(q)localStorage.setItem('svroom',q);location.replace('login.html')}
 function authBoot(){const hide=()=>{const b=$('boot');if(b){b.style.opacity=0;setTimeout(()=>b.remove(),300)}};
  if(typeof firebase==='undefined'){hide();return}
  try{
   if(!firebase.apps.length)firebase.initializeApp(FB);sdb=firebase.firestore();
   firebase.auth().onAuthStateChanged(u=>{authU=u;const guest=localStorage.getItem('svguest')==='1';
-   if(!u){if(guest){hide();acctDraw()}else location.replace('login.html');return}
-   if(u.isAnonymous&&!guest){location.replace('login.html');return}
+   if(!u){if(guest){hide();acctDraw()}else toLogin();return}
+   if(u.isAnonymous&&!guest){toLogin();return}
    if(!u.isAnonymous)localStorage.removeItem('svguest');
-   hide();acctDraw();attachCloud()})
+   hide();acctDraw();attachCloud();if(!ST.name&&u.displayName&&!u.isAnonymous){ST.name=u.displayName.split(' ')[0];save();ren()}})
  }catch(e){hide()}}
 
 restoreRun();

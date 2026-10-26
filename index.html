@@ -802,6 +802,6 @@ async function doInstall(){if(!dip)return;dip.prompt();try{await dip.userChoice}
 addEventListener('beforeinstallprompt',e=>{e.preventDefault();dip=e;setTimeout(showInstall,1500)});
 addEventListener('appinstalled',()=>{dip=null;hideInstall()});
 if(isIOS)setTimeout(showInstall,2500);
-</script><script>window.SV_AI={endpoint:""}; /* paste your Worker URL here, see AI-SETUP.md */</script>
+</script><script>window.SV_AI={endpoint:"https://holy-art-7df5studyverse-ai.hammadpvt-2.workers.dev"}; /* paste your Worker URL here, see AI-SETUP.md */</script>
 <script src="ai-widget.js" defer></script>
 </body></html>

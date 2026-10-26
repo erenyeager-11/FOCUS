@@ -1,12 +1,19 @@
-/* Studyverse AI: floating robot + doubt-solver chat. Self-contained (Shadow DOM), black theme. */
+/* Asth: floating robot + doubt-solver chat. Self-contained (Shadow DOM), black theme. */
 (function () {
   if (window.__svAI) return; window.__svAI = 1;
   const CFG = Object.assign({ endpoint: '', pollinationsKey: '' }, window.SV_AI || {});
-  const SYS = "You are Studyverse AI, a friendly study tutor inside a student's study app. Explain doubts clearly and step by step with short examples. Keep answers concise and well structured. Reply in the same language the student writes in (Hinglish is fine). For maths and science show the working. If you are unsure, say so instead of guessing.";
+  const SYS = "You are Asth, a friendly study tutor inside a student's study app. Your name is Asth. Explain doubts clearly and step by step with short examples. Keep answers concise and well structured. Reply in the same language the student writes in (Hinglish is fine). For maths and science show the working. If you are unsure, say so instead of guessing.";
   const SIZE = 58, M = 10;
   const LS = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
   const LSset = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
 
+  try {
+    if (!document.getElementById('sv-ai-font')) {
+      const l = document.createElement('link'); l.id = 'sv-ai-font'; l.rel = 'stylesheet';
+      l.href = 'https://fonts.googleapis.com/css2?family=Pinyon+Script&family=Great+Vibes&display=swap';
+      document.head.appendChild(l);
+    }
+  } catch (e) {}
   const host = document.createElement('div');
   host.id = 'sv-ai-host';
   host.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:80';
@@ -26,99 +33,127 @@
     <rect x="21" y="51" width="22" height="7" rx="3.5" fill="#0d0d10" stroke="#3a3a42" stroke-width="1.5"/>
   </svg>`;
 
+  const ICON = {
+    full: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>',
+    small: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>',
+    plus: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+    x: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+    send: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>',
+    stop: '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2.5"/></svg>'
+  };
+  const SWASH = '<svg class="swash" viewBox="0 0 120 12" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="sg" x1="0" x2="1"><stop offset="0" stop-color="#ffb454" stop-opacity="0"/><stop offset=".5" stop-color="#ffcf8f"/><stop offset="1" stop-color="#ffb454" stop-opacity="0"/></linearGradient></defs><path d="M2 8 C 25 2, 55 2, 118 7 C 80 5, 40 8, 14 10" fill="none" stroke="url(#sg)" stroke-width="1.6" stroke-linecap="round"/></svg>';
+
   root.innerHTML = `
 <style>
 :host{all:initial}
 *{box-sizing:border-box;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
-#bot{position:fixed;width:${SIZE}px;height:${SIZE}px;border-radius:50%;background:radial-gradient(circle at 30% 25%,#1d1d22,#050506);box-shadow:0 0 0 1px #2c2c33,0 12px 30px rgba(0,0,0,.55),0 0 24px rgba(255,180,84,.28);display:grid;place-items:center;pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;transition:box-shadow .25s,transform .2s}
-#bot:hover{box-shadow:0 0 0 1px #3a3a42,0 12px 30px rgba(0,0,0,.55),0 0 34px rgba(255,180,84,.5)}
-#bot.drag{cursor:grabbing;transform:scale(1.08)}
-#bot svg{width:40px;height:40px;animation:fl 3.2s ease-in-out infinite}
-#bot .tip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);white-space:nowrap;background:#0b0b0d;border:1px solid #2c2c33;color:#e8e8ea;font-size:12px;padding:6px 10px;border-radius:10px;opacity:0;pointer-events:none;transition:.2s}
+.wm{font-family:"Pinyon Script","Great Vibes","Snell Roundhand","Brush Script MT","Segoe Script",cursive;font-weight:400;background:linear-gradient(120deg,#fff3dc 10%,#ffc46b 55%,#ff9d3f);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;line-height:1;letter-spacing:.5px}
+#bot{position:fixed;width:${SIZE}px;height:${SIZE}px;border-radius:50%;background:radial-gradient(circle at 30% 22%,#222228,#050506 70%);box-shadow:0 0 0 1px #34343c,0 14px 34px rgba(0,0,0,.6),0 0 26px rgba(255,180,84,.3);display:grid;place-items:center;pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;transition:box-shadow .25s,transform .2s}
+#bot::before{content:"";position:absolute;inset:-5px;border-radius:50%;border:1px solid rgba(255,180,84,.35);animation:ring 2.8s ease-out infinite}
+#bot:hover{box-shadow:0 0 0 1px #4a4a54,0 14px 34px rgba(0,0,0,.6),0 0 38px rgba(255,180,84,.55)}
+#bot.drag{cursor:grabbing;transform:scale(1.1)}#bot.drag::before{animation:none;opacity:0}
+#bot svg{width:40px;height:40px;animation:fl 3.2s ease-in-out infinite;pointer-events:none}
+#bot .tip{position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%);white-space:nowrap;background:#0b0b0d;border:1px solid #2c2c33;color:#f0f0f2;font-size:14px;padding:5px 12px 3px;border-radius:12px;opacity:0;pointer-events:none;transition:.2s}
+#bot .tip .wm{font-size:22px}
 #bot:hover .tip{opacity:1}#bot.drag .tip{opacity:0}
 .eye{transform-box:fill-box;transform-origin:center;animation:blink 4.5s infinite}
 .ant{animation:pulse 1.8s ease-in-out infinite}
 @keyframes blink{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.08)}}
 @keyframes pulse{50%{opacity:.25}}
 @keyframes fl{50%{transform:translateY(-2px)}}
-#panel{position:fixed;bottom:14px;width:min(410px,calc(100vw - 20px));height:min(640px,calc(100dvh - 28px));background:#08080a;border:1px solid #25252b;border-radius:22px;box-shadow:0 30px 80px rgba(0,0,0,.65),0 0 0 1px rgba(255,255,255,.03) inset;display:flex;flex-direction:column;overflow:hidden;pointer-events:auto;color:#ececee;opacity:0;transform:translateY(16px) scale(.97);visibility:hidden;transition:opacity .2s,transform .2s,visibility .2s}
+@keyframes ring{0%{transform:scale(.92);opacity:.9}100%{transform:scale(1.35);opacity:0}}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+#panel{position:fixed;bottom:14px;width:min(420px,calc(100vw - 20px));height:min(660px,calc(100dvh - 28px));background:radial-gradient(120% 60% at 50% 0%,#17120a 0%,#09090b 55%) ,#08080a;border:1px solid #26262d;border-radius:26px;box-shadow:0 34px 90px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.03) inset;display:flex;flex-direction:column;overflow:hidden;pointer-events:auto;color:#ececee;opacity:0;transform:translateY(18px) scale(.97);visibility:hidden;transition:opacity .22s,transform .22s,visibility .22s,width .25s,height .25s,border-radius .25s}
 #panel.open{opacity:1;transform:none;visibility:visible}
 #panel.r{right:10px}#panel.l{left:10px}
-header{display:flex;align-items:center;gap:10px;padding:14px 14px 12px;border-bottom:1px solid #1d1d22;background:linear-gradient(180deg,#0f0f12,#08080a)}
-header .av{width:38px;height:38px;border-radius:12px;background:#050506;border:1px solid #2c2c33;display:grid;place-items:center;flex:none}
-header .av svg{width:28px;height:28px}
-header .t{flex:1;min-width:0}header b{display:block;font-size:15px;letter-spacing:.2px}
-header small{color:#8b8b94;font-size:12px}header small i{display:inline-block;width:6px;height:6px;border-radius:50%;background:#46d68c;margin-right:5px;box-shadow:0 0 8px #46d68c}
-header button{width:34px;height:34px;border-radius:10px;color:#a0a0aa;display:grid;place-items:center;font-size:17px}
-header button:hover{background:#17171b;color:#fff}
-#msgs{flex:1;overflow-y:auto;padding:16px 14px;display:flex;flex-direction:column;gap:14px;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#2a2a30 transparent}
-.empty{margin:auto;text-align:center;color:#8b8b94;padding:10px 6px}
-.empty svg{width:74px;height:74px;margin-bottom:6px}
-.empty h3{color:#f2f2f4;font-size:18px;margin:4px 0 6px;font-weight:600}
-.empty p{font-size:13px;line-height:1.5;margin:0 0 14px}
-.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
-.chips button{background:#0f0f12;border:1px solid #25252b;color:#cfcfd6;font-size:12.5px;padding:8px 12px;border-radius:99px;transition:.18s}
-.chips button:hover{border-color:#ffb454;color:#ffb454}
-.m{max-width:92%;font-size:14px;line-height:1.55;word-wrap:break-word;overflow-wrap:anywhere}
-.m.u{align-self:flex-end;background:#18181c;border:1px solid #2a2a30;padding:9px 13px;border-radius:16px 16px 4px 16px;white-space:pre-wrap}
-.m.a{align-self:flex-start;border-left:2px solid #ffb454;padding:2px 0 2px 12px;color:#e6e6e9}
-.m.a p{margin:0 0 8px}.m.a h4{margin:10px 0 6px;font-size:14px;color:#fff}
-.m.a ul,.m.a ol{margin:4px 0 8px;padding-left:20px}.m.a li{margin:3px 0}
-.m.a code{background:#17171b;border:1px solid #25252b;padding:1px 6px;border-radius:6px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;color:#ffcf8f}
-.m.a pre{background:#050506;border:1px solid #25252b;border-radius:12px;padding:10px 12px;overflow-x:auto;margin:6px 0 10px}
-.m.a pre code{background:none;border:0;padding:0;color:#d9d9de}
+#panel.full{inset:0;width:100vw;height:100dvh;border-radius:0;border:0}
+header{display:flex;align-items:center;gap:12px;padding:14px 14px 12px;border-bottom:1px solid #1b1b20;background:linear-gradient(180deg,rgba(255,255,255,.035),transparent)}
+header .av{width:44px;height:44px;border-radius:15px;background:radial-gradient(circle at 30% 25%,#202026,#050506);border:1px solid #30303a;display:grid;place-items:center;flex:none;box-shadow:0 0 18px rgba(255,180,84,.18)}
+header .av svg{width:32px;height:32px}
+header .t{flex:1;min-width:0;position:relative}
+header .t .wm{font-size:34px;display:block;padding-top:2px}
+header .t .swash{position:absolute;left:0;top:34px;width:92px;height:8px}
+header small{display:block;color:#8b8b94;font-size:11.5px;margin-top:5px}
+header small i{display:inline-block;width:6px;height:6px;border-radius:50%;background:#46d68c;margin-right:6px;box-shadow:0 0 8px #46d68c}
+header button{width:36px;height:36px;border-radius:12px;color:#9c9ca6;display:grid;place-items:center;transition:.15s}
+header button:hover{background:#18181d;color:#fff}
+#msgs{flex:1;overflow-y:auto;padding:18px 16px;display:flex;flex-direction:column;gap:16px;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#2a2a30 transparent}
+#panel.full #msgs{padding-inline:max(16px,calc((100% - 840px)/2))}
+#panel.full footer{padding-inline:max(14px,calc((100% - 840px)/2))}
+.empty{margin:auto;text-align:center;color:#8b8b94;padding:6px;width:100%;animation:rise .5s}
+.empty .hero{width:92px;height:92px;margin:0 auto 4px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle,rgba(255,180,84,.18),transparent 68%)}
+.empty .hero svg{width:66px;height:66px}
+.empty .wm{font-size:58px;display:block;margin-top:2px}
+.empty .swash{width:130px;height:10px;margin:-2px auto 8px;display:block}
+.empty p{font-size:13.5px;line-height:1.55;margin:0 auto 18px;max-width:300px}
+.chips{display:grid;grid-template-columns:1fr 1fr;gap:9px;max-width:420px;margin:0 auto}
+.chips button{text-align:left;background:linear-gradient(180deg,#121216,#0c0c0f);border:1px solid #24242b;color:#d4d4da;font-size:12.5px;line-height:1.35;padding:11px 12px;border-radius:15px;transition:.18s;display:flex;gap:9px;align-items:flex-start}
+.chips button span{font-size:17px;line-height:1}
+.chips button:hover{border-color:#ffb454;color:#fff;transform:translateY(-2px);box-shadow:0 8px 20px rgba(255,180,84,.08)}
+.m{max-width:92%;font-size:14.2px;line-height:1.6;word-wrap:break-word;overflow-wrap:anywhere;animation:rise .25s}
+.m.u{align-self:flex-end;background:linear-gradient(135deg,#ffc46b,#ff9d3f);color:#1a0f00;padding:10px 14px;border-radius:18px 18px 4px 18px;white-space:pre-wrap;font-weight:500;box-shadow:0 6px 18px rgba(255,157,63,.15)}
+.m.a{align-self:flex-start;background:#0e0e11;border:1px solid #1f1f25;padding:10px 14px 6px;border-radius:18px 18px 18px 4px;color:#e8e8eb}
+.m.a .who{margin:-2px 0 4px}.m.a .who .wm{font-size:22px}
+.m.a p{margin:0 0 9px}.m.a h4{margin:12px 0 6px;font-size:14.5px;color:#fff}
+.m.a ul,.m.a ol{margin:4px 0 9px;padding-left:20px}.m.a li{margin:3px 0}
+.m.a code{background:#17171c;border:1px solid #26262d;padding:1px 6px;border-radius:6px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.6px;color:#ffcf8f}
+.m.a pre{background:#050506;border:1px solid #23232a;border-radius:12px;padding:11px 13px;overflow-x:auto;margin:6px 0 10px}
+.m.a pre code{background:none;border:0;padding:0;color:#dcdce1}
 .m.a b{color:#fff}
-.m.err{align-self:stretch;border:1px solid #4a2222;background:#1a0d0d;color:#ffb3a8;padding:10px 12px;border-radius:14px;font-size:13px}
-.m.err button{margin-top:8px;display:block;background:#2a1414;border:1px solid #5a2a2a;padding:6px 12px;border-radius:99px;color:#ffd0c8;font-size:12px}
-.acts{display:flex;gap:6px;margin-top:2px}
-.acts button{font-size:11.5px;color:#7d7d86;padding:3px 8px;border-radius:8px}.acts button:hover{background:#17171b;color:#fff}
-.dots{display:inline-flex;gap:5px;padding:6px 0 6px 12px;border-left:2px solid #ffb454;align-self:flex-start}
+.m.err{align-self:stretch;max-width:100%;border:1px solid #4a2222;background:#1a0d0d;color:#ffb3a8;padding:11px 13px;border-radius:14px;font-size:13px}
+.m.err button{margin-top:9px;display:block;background:#2a1414;border:1px solid #5a2a2a;padding:6px 13px;border-radius:99px;color:#ffd0c8;font-size:12px}
+.acts{display:flex;gap:6px;margin:2px -6px 0}
+.acts button{font-size:11.5px;color:#74747d;padding:3px 8px;border-radius:8px}.acts button:hover{background:#18181d;color:#fff}
+.dots{display:inline-flex;gap:5px;padding:12px 15px;background:#0e0e11;border:1px solid #1f1f25;border-radius:18px 18px 18px 4px;align-self:flex-start}
 .dots i{width:7px;height:7px;border-radius:50%;background:#ffb454;animation:dd 1.1s infinite}.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
 @keyframes dd{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
-footer{padding:10px 12px 12px;border-top:1px solid #1d1d22;background:#08080a}
-.box{display:flex;align-items:flex-end;gap:8px;background:#0f0f12;border:1px solid #25252b;border-radius:18px;padding:6px 6px 6px 14px;transition:border-color .2s}
-.box:focus-within{border-color:#ffb454}
-textarea{flex:1;background:none;border:0;outline:0;resize:none;color:#f0f0f2;font-size:14px;line-height:1.45;max-height:120px;padding:8px 0;font-family:inherit}
-textarea::placeholder{color:#6d6d76}
-#send{width:38px;height:38px;border-radius:13px;background:#ffb454;color:#1a1000;display:grid;place-items:center;font-size:16px;font-weight:700;flex:none;transition:.15s}
-#send:hover{filter:brightness(1.1)}#send.stop{background:#26262c;color:#fff}
-.foot{text-align:center;color:#55555d;font-size:11px;margin-top:8px}
-@media(max-width:520px){#panel{width:calc(100vw - 16px);height:min(78dvh,640px);bottom:8px}#panel.r{right:8px}#panel.l{left:8px}}
+footer{padding:10px 14px 12px;background:linear-gradient(0deg,#08080a 70%,transparent)}
+.box{display:flex;align-items:flex-end;gap:8px;background:#101013;border:1px solid #26262d;border-radius:22px;padding:6px 6px 6px 16px;transition:border-color .2s,box-shadow .2s}
+.box:focus-within{border-color:#ffb454;box-shadow:0 0 0 4px rgba(255,180,84,.09)}
+textarea{flex:1;background:none;border:0;outline:0;resize:none;color:#f2f2f4;font-size:14.5px;line-height:1.45;max-height:130px;padding:9px 0;font-family:inherit}
+textarea::placeholder{color:#6a6a73}
+#send{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#ffc46b,#ff9d3f);color:#1a0f00;display:grid;place-items:center;flex:none;transition:.15s}
+#send:hover{filter:brightness(1.08);transform:scale(1.05)}#send.stop{background:#26262c;color:#fff}
+.foot{text-align:center;color:#4e4e56;font-size:11px;margin-top:8px}
+@media(max-width:520px){#panel{width:calc(100vw - 16px);height:min(80dvh,680px);bottom:8px}#panel.r{right:8px}#panel.l{left:8px}#panel.full{inset:0;width:100vw;height:100dvh}.chips{grid-template-columns:1fr 1fr}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
-<div id="bot" role="button" tabindex="0" aria-label="Open AI doubt solver">${ROBOT()}<span class="tip">Ask AI a doubt</span></div>
-<section id="panel" class="r" role="dialog" aria-label="Studyverse AI">
+<div id="bot" role="button" tabindex="0" aria-label="Open Asth, your AI doubt solver">${ROBOT()}<span class="tip"><span class="wm">Asth</span></span></div>
+<section id="panel" class="r" role="dialog" aria-label="Asth AI">
   <header>
     <div class="av">${ROBOT()}</div>
-    <div class="t"><b>Studyverse AI</b><small><i></i>Ask any doubt</small></div>
-    <button id="new" title="New chat" aria-label="New chat">&#8635;</button>
-    <button id="x" title="Close" aria-label="Close">&#10005;</button>
+    <div class="t"><span class="wm">Asth</span>${SWASH}<small><i></i>Your study companion</small></div>
+    <button id="fs" title="Full screen" aria-label="Full screen">${ICON.full}</button>
+    <button id="new" title="New chat" aria-label="New chat">${ICON.plus}</button>
+    <button id="x" title="Close" aria-label="Close">${ICON.x}</button>
   </header>
   <div id="msgs"></div>
   <footer>
-    <div class="box"><textarea id="in" rows="1" placeholder="Type your doubt..." maxlength="4000"></textarea><button id="send" aria-label="Send">&#10148;</button></div>
-    <div class="foot">AI can make mistakes. Check important answers.</div>
+    <div class="box"><textarea id="in" rows="1" placeholder="Ask Asth any doubt..." maxlength="4000"></textarea><button id="send" aria-label="Send">${ICON.send}</button></div>
+    <div class="foot">Enter to send &middot; Shift+Enter for a new line &middot; AI can make mistakes</div>
   </footer>
 </section>`;
 
   const $ = s => root.querySelector(s);
   const bot = $('#bot'), panel = $('#panel'), msgs = $('#msgs'), input = $('#in'), sendBtn = $('#send');
 
-  /* ---------- robot position (draggable, snaps to the nearest edge) ---------- */
-  let pos; try { pos = JSON.parse(LS('svaipos')); } catch (e) {}
-  if (!pos || !/^[lr]$/.test(pos.side)) pos = { side: 'r', y: 0.62 };
+  /* ---------- robot position: drag it anywhere, it stays exactly where you drop it ---------- */
+  let pos; try { pos = JSON.parse(LS('svaipos2')); } catch (e) {}
+  if (!pos || typeof pos.x !== 'number' || typeof pos.y !== 'number') pos = { x: 0.92, y: 0.6 };
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-  function place(anim) {
+  let side = 'r';
+  function place() {
     const W = innerWidth, H = innerHeight;
-    bot.style.transition = anim ? 'left .25s,top .25s,box-shadow .25s' : 'none';
-    bot.style.right = bot.style.bottom = 'auto';
-    bot.style.left = (pos.side === 'r' ? W - SIZE - M : M) + 'px';
-    bot.style.top = clamp(pos.y * H, M + 6, H - SIZE - M) + 'px';
-    panel.className = (panel.classList.contains('open') ? 'open ' : '') + pos.side;
+    const x = clamp(pos.x * (W - SIZE), 0, Math.max(0, W - SIZE)), y = clamp(pos.y * (H - SIZE), 0, Math.max(0, H - SIZE));
+    bot.style.transition = 'none'; bot.style.right = bot.style.bottom = 'auto';
+    bot.style.left = x + 'px'; bot.style.top = y + 'px';
+    side = x + SIZE / 2 < W / 2 ? 'l' : 'r';
+    panel.classList.toggle('l', side === 'l'); panel.classList.toggle('r', side === 'r');
   }
-  place(false);
-  addEventListener('resize', () => place(false));
+  place();
+  addEventListener('resize', place);
   let drag = null;
   bot.addEventListener('pointerdown', e => {
     const r = bot.getBoundingClientRect();
@@ -128,19 +163,23 @@ textarea::placeholder{color:#6d6d76}
   bot.addEventListener('pointermove', e => {
     if (!drag) return;
     if (!drag.moved && Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) < 6) return;
-    drag.moved = true; bot.classList.add('drag'); bot.style.transition = 'none';
-    drag.x = clamp(e.clientX - drag.dx, 4, innerWidth - SIZE - 4);
-    drag.y = clamp(e.clientY - drag.dy, 4, innerHeight - SIZE - 4);
+    drag.moved = true; bot.classList.add('drag');
+    drag.x = clamp(e.clientX - drag.dx, 0, innerWidth - SIZE);
+    drag.y = clamp(e.clientY - drag.dy, 0, innerHeight - SIZE);
     bot.style.left = drag.x + 'px'; bot.style.top = drag.y + 'px';
   });
   const endDrag = e => {
     if (!drag) return; const d = drag; drag = null; bot.classList.remove('drag');
     if (!d.moved) { if (e.type === 'pointerup') openPanel(); return; }
-    pos = { side: d.x + SIZE / 2 < innerWidth / 2 ? 'l' : 'r', y: d.y / innerHeight };
-    LSset('svaipos', JSON.stringify(pos)); place(true);
+    pos = { x: d.x / Math.max(1, innerWidth - SIZE), y: d.y / Math.max(1, innerHeight - SIZE) };
+    LSset('svaipos2', JSON.stringify(pos)); place();
   };
   bot.addEventListener('pointerup', endDrag); bot.addEventListener('pointercancel', endDrag);
-  bot.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openPanel(); } });
+  bot.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openPanel(); return; }
+    const st = 0.04, k = { ArrowLeft: [-st, 0], ArrowRight: [st, 0], ArrowUp: [0, -st], ArrowDown: [0, st] }[e.key];
+    if (k) { e.preventDefault(); pos = { x: clamp(pos.x + k[0], 0, 1), y: clamp(pos.y + k[1], 0, 1) }; LSset('svaipos2', JSON.stringify(pos)); place(); }
+  });
 
   /* ---------- chat state ---------- */
   let hist = []; try { hist = JSON.parse(LS('svai') || '[]').filter(m => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string'); } catch (e) {}
@@ -164,15 +203,15 @@ textarea::placeholder{color:#6d6d76}
     close(); return out.join('');
   }
 
-  const CHIPS = ["Explain Newton's laws simply", 'Solve: 2x\u00B2 \u2212 5x + 3 = 0', 'Mitosis vs meiosis', 'Tips to remember formulas'];
+  const CHIPS = [['\uD83C\uDF4E', "Explain Newton's laws simply"], ['\uD83E\uDDEE', 'Solve: 2x\u00B2 \u2212 5x + 3 = 0'], ['\uD83E\uDDEC', 'Mitosis vs meiosis'], ['\uD83D\uDCA1', 'Tips to remember formulas']];
   function empty() {
-    return `<div class="empty">${ROBOT()}<h3>Hi, ask me any doubt</h3><p>Maths, science, coding, English, anything you are stuck on. Ask as many questions as you like.</p><div class="chips">${CHIPS.map(c => `<button data-q="${E(c)}">${E(c)}</button>`).join('')}</div></div>`;
+    return `<div class="empty"><div class="hero">${ROBOT()}</div><span class="wm">Asth</span>${SWASH}<p>Stuck on something? Ask me any doubt in maths, science, coding or English. Ask as many as you like.</p><div class="chips">${CHIPS.map(c => `<button data-q="${E(c[1])}"><span>${c[0]}</span>${E(c[1])}</button>`).join('')}</div></div>`;
   }
   function bottom() { msgs.scrollTop = msgs.scrollHeight; }
   function addMsg(role, text) {
     const d = document.createElement('div'); d.className = 'm ' + (role === 'user' ? 'u' : 'a');
     if (role === 'user') d.textContent = text;
-    else { d.innerHTML = md(text) + '<div class="acts"><button data-copy>Copy</button></div>'; d._t = text; }
+    else { d.innerHTML = '<div class="who"><span class="wm">Asth</span></div>' + md(text) + '<div class="acts"><button data-copy>Copy</button></div>'; d._t = text; }
     msgs.appendChild(d); bottom(); return d;
   }
   function render() {
@@ -222,7 +261,7 @@ textarea::placeholder{color:#6d6d76}
 
   async function send(text) {
     text = (text || '').trim(); if (!text || busy) return;
-    busy = true; sendBtn.classList.add('stop'); sendBtn.innerHTML = '&#9632;'; sendBtn.setAttribute('aria-label', 'Stop');
+    busy = true; sendBtn.classList.add('stop'); sendBtn.innerHTML = ICON.stop; sendBtn.setAttribute('aria-label', 'Stop');
     if (!hist.length) msgs.innerHTML = '';
     hist.push({ role: 'user', content: text }); addMsg('user', text); input.value = ''; autosize();
     const dots = document.createElement('div'); dots.className = 'dots'; dots.innerHTML = '<i></i><i></i><i></i>'; msgs.appendChild(dots); bottom();
@@ -234,9 +273,9 @@ textarea::placeholder{color:#6d6d76}
     } catch (e) {
       dots.remove();
       if (e && e.name === 'AbortError') { hist.pop(); saveHist(); }
-      else { const d = document.createElement('div'); d.className = 'm err'; d.innerHTML = 'The free AI servers are busy right now. Please try again in a few seconds.<button data-retry>Try again</button>'; msgs.appendChild(d); bottom(); saveHist(); }
+      else { const d = document.createElement('div'); d.className = 'm err'; d.innerHTML = 'Asth is a little busy right now. Please try again in a few seconds.<button data-retry>Try again</button>'; msgs.appendChild(d); bottom(); saveHist(); }
     }
-    busy = false; ctrl = null; sendBtn.classList.remove('stop'); sendBtn.innerHTML = '&#10148;'; sendBtn.setAttribute('aria-label', 'Send');
+    busy = false; ctrl = null; sendBtn.classList.remove('stop'); sendBtn.innerHTML = ICON.send; sendBtn.setAttribute('aria-label', 'Send');
   }
 
   function autosize() { input.style.height = 'auto'; input.style.height = Math.min(120, input.scrollHeight) + 'px'; }
@@ -245,9 +284,12 @@ textarea::placeholder{color:#6d6d76}
   sendBtn.addEventListener('click', () => { if (busy && ctrl) ctrl.abort(); else send(input.value); });
   $('#new').addEventListener('click', () => { if (ctrl) ctrl.abort(); hist = []; saveHist(); render(); });
   $('#x').addEventListener('click', closePanel);
-  addEventListener('keydown', e => { if (e.key === 'Escape' && panel.classList.contains('open')) closePanel(); });
+  const fsBtn = $('#fs');
+  function setFull(on) { panel.classList.toggle('full', on); fsBtn.innerHTML = on ? ICON.small : ICON.full; fsBtn.title = on ? 'Exit full screen' : 'Full screen'; setTimeout(bottom, 260); }
+  fsBtn.addEventListener('click', () => setFull(!panel.classList.contains('full')));
+  addEventListener('keydown', e => { if (e.key === 'Escape' && panel.classList.contains('open')) { if (panel.classList.contains('full')) setFull(false); else closePanel(); } });
 
-  function openPanel() { place(false); panel.classList.add('open'); bot.style.visibility = 'hidden'; render(); setTimeout(() => input.focus(), 150); }
+  function openPanel() { place(); panel.classList.add('open'); bot.style.visibility = 'hidden'; render(); setTimeout(() => input.focus(), 150); }
   function closePanel() { panel.classList.remove('open'); bot.style.visibility = ''; }
 
   window.SVAI = { open: openPanel, close: closePanel, ask: send };

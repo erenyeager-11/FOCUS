@@ -103,6 +103,7 @@ header button:hover{background:#18181d;color:#fff}
 .m.a pre code{background:none;border:0;padding:0;color:#dcdce1}
 .m.a b{color:#fff}
 .m.err{align-self:stretch;max-width:100%;border:1px solid #4a2222;background:#1a0d0d;color:#ffb3a8;padding:11px 13px;border-radius:14px;font-size:13px}
+.m.err .why{margin-top:8px;padding:8px 10px;background:#120808;border:1px solid #3a1c1c;border-radius:10px;font:11.5px/1.5 ui-monospace,Menlo,Consolas,monospace;color:#e8a89e;word-break:break-word}
 .m.err button{margin-top:9px;display:block;background:#2a1414;border:1px solid #5a2a2a;padding:6px 13px;border-radius:99px;color:#ffd0c8;font-size:12px}
 .acts{display:flex;gap:6px;margin:2px -6px 0}
 .acts button{font-size:11.5px;color:#74747d;padding:3px 8px;border-radius:8px}.acts button:hover{background:#18181d;color:#fff}
@@ -234,7 +235,17 @@ textarea::placeholder{color:#6a6a73}
     return r;
   }
   const chatParse = j => { const t = j && j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content; if (!t) throw new Error('empty'); return String(t).trim(); };
-  async function viaWorker(messages, sig) { const r = await post(CFG.endpoint, { messages }, sig); const j = await r.json(); if (!j.reply) throw new Error('empty'); return j.reply; }
+  async function viaWorker(messages, sig) {
+    let r;
+    try { r = await fetch(CFG.endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages }), signal: sig }); }
+    catch (e) { if (e && e.name === 'AbortError') throw e; throw new Error('Worker: cannot connect (wrong Worker URL, or ALLOWED_ORIGINS does not match this site: ' + location.origin + ')'); }
+    let j = null; try { j = await r.json(); } catch (e) {}
+    if (!r.ok || !j || !j.reply) {
+      const why = j && j.details && j.details.length ? j.details.join(' | ') : (j && j.error) || ('HTTP ' + r.status);
+      throw new Error('Worker (' + r.status + '): ' + why);
+    }
+    return j.reply;
+  }
   async function viaPollGen(messages, sig) {
     const h = CFG.pollinationsKey ? { Authorization: 'Bearer ' + CFG.pollinationsKey } : {};
     const r = await post('https://gen.pollinations.ai/v1/chat/completions', { model: 'openai', messages: [{ role: 'system', content: SYS }, ...messages] }, sig, h); return chatParse(await r.json());
@@ -249,14 +260,14 @@ textarea::placeholder{color:#6a6a73}
   }
   async function ask(messages, outer) {
     const chain = []; if (CFG.endpoint) chain.push(viaWorker); chain.push(viaPollGen, viaPollLegacy, viaPollGet);
-    let last;
+    let last; const diag = [];
     for (const fn of chain) {
       if (outer && outer.aborted) throw new DOMException('stop', 'AbortError');
       const w = withTimeout(30000, outer);
       try { const t = await fn(messages, w.signal); w.done(); return t; }
-      catch (e) { w.done(); if (outer && outer.aborted) throw e; last = e; }
+      catch (e) { w.done(); if (outer && outer.aborted) throw e; last = e; diag.push((fn === viaWorker ? '' : fn.name.replace('via', '') + ': ') + (e && e.message || e)); }
     }
-    throw last || new Error('failed');
+    const err = last || new Error('failed'); err.diag = diag; throw err;
   }
 
   async function send(text) {
@@ -273,7 +284,7 @@ textarea::placeholder{color:#6a6a73}
     } catch (e) {
       dots.remove();
       if (e && e.name === 'AbortError') { hist.pop(); saveHist(); }
-      else { const d = document.createElement('div'); d.className = 'm err'; d.innerHTML = 'Asth is a little busy right now. Please try again in a few seconds.<button data-retry>Try again</button>'; msgs.appendChild(d); bottom(); saveHist(); }
+      else { const d = document.createElement('div'); d.className = 'm err'; d.innerHTML = 'Asth is a little busy right now. Please try again in a few seconds.' + ((e && e.diag) ? '<div class="why">' + e.diag.map(x => E(String(x))).join('<br>') + '</div>' : '') + '<button data-retry>Try again</button>'; msgs.appendChild(d); bottom(); saveHist(); }
     }
     busy = false; ctrl = null; sendBtn.classList.remove('stop'); sendBtn.innerHTML = ICON.send; sendBtn.setAttribute('aria-label', 'Send');
   }

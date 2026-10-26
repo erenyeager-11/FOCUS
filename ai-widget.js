@@ -259,7 +259,8 @@ textarea::placeholder{color:#6a6a73}
     if (!r.ok) throw new Error('HTTP ' + r.status); const t = (await r.text()).trim(); if (!t) throw new Error('empty'); return t;
   }
   async function ask(messages, outer) {
-    const chain = []; if (CFG.endpoint) chain.push(viaWorker); chain.push(viaPollGen, viaPollLegacy, viaPollGet);
+    const chain = []; if (CFG.endpoint) chain.push(viaWorker); if (CFG.pollinationsKey) chain.push(viaPollGen);
+    if (!chain.length) { const e = new Error('not connected'); e.diag = ['Asth is not connected yet: paste your Worker URL into window.SV_AI in index.html']; throw e; }
     let last; const diag = [];
     for (const fn of chain) {
       if (outer && outer.aborted) throw new DOMException('stop', 'AbortError');

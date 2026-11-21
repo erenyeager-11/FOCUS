@@ -284,7 +284,7 @@ img,svg,iframe{max-width:100%}
    <button class="sq" style="width:42px;height:42px;border-radius:14px" title="Set time" onclick="setTime()"><svg class="i"><use href="#alarm"/></svg></button>
    <select id="tcat"><option>Work</option><option>Study</option><option>Personal</option></select>
    <button class="snd" onclick="addTask()"><svg class="i"><use href="#send"/></svg></button></div>
-  <div class="card pom"><h3>Pomodoro Timer</h3><select id="msub" onchange="ST.sub=this.value;save()"></select>
+  <div class="card pom"><h3>Pomodoro Timer</h3><select id="msub" onchange="pickSub(this)"></select>
    <div class="pc"><div id="hgm"></div><div class="mm"><button onclick="adjMin(-5)"><svg class="i" style="width:14px"><use href="#minus"/></svg></button><div class="tm" data-tm>25:00</div><button onclick="adjMin(5)"><svg class="i" style="width:14px"><use href="#plus"/></svg></button></div>
    <button class="btn w" data-go onclick="toggleT()">Start</button></div></div>
  </div></div></section>
@@ -292,7 +292,7 @@ img,svg,iframe{max-width:100%}
 <section class="pg" id="p-focus"><div class="focus">
  <div style="position:absolute;top:16px;right:16px;display:flex;gap:8px"><button class="rb2" id="fsb" title="Full screen" onclick="toggleFs()"><svg class="i"><use href="#full"/></svg></button><button class="rb2" title="Picture in picture" onclick="togglePip()"><svg class="i"><use href="#pip"/></svg></button></div>
  <div class="modes" id="tools"><button id="t-pomo" class="on" onclick="setTool('pomo')">Pomodoro</button><button id="t-fc" onclick="setTool('fc')">Focus</button><button id="t-sw" onclick="setTool('sw')">Stopwatch</button><button id="t-cd" onclick="setTool('cd')">Countdown</button></div>
- <span class="chip"><svg class="i" style="width:16px"><use href="#book"/></svg><select id="fsub" onchange="ST.sub=this.value;save()"></select></span>
+ <span class="chip"><svg class="i" style="width:16px"><use href="#book"/></svg><select id="fsub" onchange="pickSub(this)"></select></span>
  <div class="tl" id="tl-pomo"><div class="modes" id="modes"></div>
  <small id="part" style="color:#8a5a30"></small><div id="hgf"></div>
  <div class="big" data-tm>25:00</div>
@@ -401,7 +401,14 @@ $('hgm').innerHTML=HG();$('hgf').innerHTML=HG().replace('width="84" height="118"
 const MODES={focus:'Focus',short:'Short break',long:'Long break'};let mode='focus',left=ST.fmin*60,end=null,tick=null,since=null;
 const dur=m=>m==='focus'?ST.fmin*60:m==='short'?300:900;
 $('modes').innerHTML=Object.keys(MODES).map(k=>`<button id="m-${k}" onclick="setMode('${k}')">${MODES[k]}</button>`).join('');
-function subOpts(){const l=['General',...ST.subs.map(s=>s.n)];if(!l.includes(ST.sub))l.push(ST.sub);const h=l.map(s=>`<option ${s===ST.sub?'selected':''}>${esc(s)}</option>`).join('');$('msub').innerHTML=h;$('fsub').innerHTML=h}
+const DEF_SUBS=['Physics','Chemistry','Biology','Maths'];
+function subOpts(){const l=['General',...DEF_SUBS];ST.subs.forEach(s=>{if(!l.some(x=>x.toLowerCase()===s.n.toLowerCase()))l.push(s.n)});if(!l.includes(ST.sub))l.push(ST.sub);const h=l.map(s=>`<option ${s===ST.sub?'selected':''}>${esc(s)}</option>`).join('')+'<option value="__add">+ Add subject...</option>';$('msub').innerHTML=h;$('fsub').innerHTML=h}
+function pickSub(el){if(el.value!=='__add'){ST.sub=el.value;save();subOpts();return}
+ const v=(prompt('New subject name')||'').trim();
+ if(!v){subOpts();return}
+ const all=['General',...DEF_SUBS,...ST.subs.map(x=>x.n)],ex=all.find(x=>x.toLowerCase()===v.toLowerCase());
+ if(ex)ST.sub=ex;else{ST.subs.push({id:Date.now(),n:v,ch:[]});ST.sub=v}
+ save();subOpts();if($('subs'))rSyl()}
 function adjMin(d){if(end||mode!=='focus')return;ST.fmin=Math.min(120,Math.max(5,ST.fmin+d));left=ST.fmin*60;save();drawT()}
 function setMode(k){stopT();mode=k;left=dur(k);drawT()}
 function drawT(){const m=String(Math.floor(left/60)).padStart(2,'0')+':'+String(Math.floor(left%60)).padStart(2,'0'),r=left/dur(mode);

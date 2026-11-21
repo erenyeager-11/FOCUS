@@ -217,7 +217,7 @@ img,svg,iframe{max-width:100%}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 .gtm{position:fixed;right:14px;bottom:92px;z-index:40;display:none;align-items:center;gap:10px;background:var(--o);color:#fff;border-radius:99px;padding:8px 8px 8px 16px;box-shadow:0 8px 24px rgba(160,90,40,.35);cursor:pointer;font-weight:800;max-width:70vw}.gtm i{width:8px;height:8px;border-radius:50%;background:#fff;animation:gtp 1.2s infinite}.gtm small{font-size:11px;opacity:.9;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.gtm b{font-variant-numeric:tabular-nums;font-size:15px}.gtm button{background:rgba(255,255,255,.25);color:#fff;border-radius:99px;padding:6px 12px;font-weight:800;font-size:12px}@keyframes gtp{50%{opacity:.25}}
 .cimg{max-width:100%;max-height:260px;border-radius:12px;display:block;margin-top:4px;cursor:pointer}
-</style></head><body>
+</style><link rel="stylesheet" href="themes.css"><script>try{var _s=localStorage.getItem("svskin");if(_s)document.documentElement.dataset.skin=_s}catch(e){}</script></head><body>
 <div id="boot" style="position:fixed;inset:0;z-index:999;background:#ffd7a3;display:grid;place-items:center;font:800 22px Nunito,system-ui,sans-serif;color:#2b2320;transition:opacity .3s">Studyverse...</div><script>setTimeout(function(){var b=document.getElementById("boot");if(b)b.remove()},8000)</script>
 <svg width="0" height="0" style="position:absolute"><defs>
 <symbol id="home" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></symbol>
@@ -803,5 +803,6 @@ addEventListener('beforeinstallprompt',e=>{e.preventDefault();dip=e;setTimeout(s
 addEventListener('appinstalled',()=>{dip=null;hideInstall()});
 if(isIOS)setTimeout(showInstall,2500);
 </script><script>window.SV_AI={endpoint:"https://holy-art-7df5studyverse-ai.hammadpvt-2.workers.dev"}; /* paste your Worker URL here, see AI-SETUP.md */</script>
+<script src="themes.js" defer></script>
 <script src="ai-widget.js" defer></script>
 </body></html>

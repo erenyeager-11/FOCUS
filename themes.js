@@ -10,7 +10,8 @@ const SK=[
 ['papp','P-App','Dark blue',['#09090b','#18181c','#4c8dff']],
 ['lifepath','LifePath','Warm beige',['#f3ecdd','#fbf7ee','#2b2a26']],
 ['geo','Geo Studio','Soft lavender',['#ececf3','#f2f1f8','#2a2a30']],
-['idraft','iDraft','Glass grayscale',['#e4e4e7','#fff','#17171a']]];
+['idraft','iDraft','Glass grayscale',['#e4e4e7','#fff','#17171a']],
+['kiwi','Kiwi','by Tanishka',['linear-gradient(135deg,#04100b,#14724a)','rgba(10,36,26,.9)','#3df5a0']]];
 const cur=()=>R.dataset.skin||'';
 let RNG=7,DEMO=false;
 
@@ -22,6 +23,7 @@ sp.insertAdjacentHTML('beforebegin','<button id="n-ana" title="Analytics" onclic
 document.querySelectorAll('nav button').forEach(b=>b.insertAdjacentHTML('beforeend','<span class="lb">'+b.title+'</span>'));
 document.querySelector('.logo').insertAdjacentHTML('beforeend','<b class="lbrand">Studyverse</b>');
 document.querySelector('main').insertAdjacentHTML('beforeend','<section class="pg" id="p-ana"><div class="anah"><div class="chips" id="arng"></div><span class="sp2"></span><span class="demo" id="adm" style="display:none">Sample data</span><button class="btn" id="ademo" onclick="svDemo()">Preview with sample data</button></div><div class="statrow" id="astat" style="margin-bottom:16px"></div><div class="ag" id="agrid"></div></section>');
+document.querySelector('.top .me').insertAdjacentHTML('beforebegin','<button class="rb2 kmode" title="Light / dark" onclick="tgTheme()"><span class="km">'+ic('moon')+'</span><span class="ks">'+ic('sun')+'</span></button>');
 const hero=document.querySelector('#p-ov .hero');
 hero.insertAdjacentHTML('afterend','<div class="skin-only statrow" id="ostat"></div>');
 
@@ -98,9 +100,9 @@ window.svDemo=()=>{DEMO=!DEMO;drawAna();ovStats()};
 
 /* theme picker in settings */
 function pickDraw(){const el=q('thcard');if(!el)return;
- const tile=(id,n,d,c)=>`<button class="thc ${cur()===id?'on':''}" onclick="svSkin('${id}')"><div class="thp" style="background:${c[0]}"><i style="background:${c[1]}"></i><div><b style="background:${c[1]}"></b><b style="background:${c[2]}"></b></div></div><strong>${n}</strong><small>${d}</small></button>`;
+ const tile=(id,n,d,c)=>`<button class="thc ${id==='kiwi'?'kw ':''}${cur()===id?'on':''}" onclick="svSkin('${id}')"><div class="thp" style="background:${c[0]}"><i style="background:${c[1]}"></i><div><b style="background:${c[1]}"></b><b style="background:${c[2]}"></b></div></div><strong>${n}</strong><small>${d}</small></button>`;
  el.innerHTML=`<h3>Themes <span class="mut">pick a look, switch anytime</span></h3><div class="thg">${tile('','Classic','Original Studyverse',['#ffd7a3','#fff','#ff9a5c'])}${SK.map(s=>tile(s[0],s[1],s[2],s[3])).join('')}</div>`}
-window.svSkin=id=>{if(id)R.dataset.skin=id;else R.removeAttribute('data-skin');try{localStorage.setItem('svskin',id)}catch(e){}
+window.svSkin=id=>{if(id==='kiwi'&&R.dataset.theme!=='dark')tgTheme();if(id)R.dataset.skin=id;else R.removeAttribute('data-skin');try{localStorage.setItem('svskin',id)}catch(e){}
  const on=document.querySelector('.pg.on');if(on&&on.id==='p-ana'&&!id)go('ov');else if(on&&on.id==='p-ana')drawAna();
  pickDraw();ovStats();const m=document.querySelector('meta[name=theme-color]');snack(id?SK.find(s=>s[0]===id)[1]+' theme applied':'Classic theme restored')};
 document.querySelector('#p-set .g').insertAdjacentHTML('beforeend','<div class="card" id="thcard" style="grid-column:1/-1"></div>');

@@ -11,7 +11,7 @@ const SK=[
 ['lifepath','LifePath','Warm beige',['#f3ecdd','#fbf7ee','#2b2a26']],
 ['geo','Geo Studio','Soft lavender',['#ececf3','#f2f1f8','#2a2a30']],
 ['idraft','iDraft','Glass grayscale',['#e4e4e7','#fff','#17171a']],
-['kiwi','Kiwi','by Tanishka',['linear-gradient(135deg,#04100b,#14724a)','rgba(10,36,26,.9)','#3df5a0']]];
+['kiwi','Kiwi','Forest glass',['linear-gradient(135deg,#04100b,#14724a)','rgba(10,36,26,.9)','#3df5a0']]];
 const cur=()=>R.dataset.skin||'';
 let RNG=7,DEMO=false;
 
@@ -23,7 +23,6 @@ sp.insertAdjacentHTML('beforebegin','<button id="n-ana" title="Analytics" onclic
 document.querySelectorAll('nav button').forEach(b=>b.insertAdjacentHTML('beforeend','<span class="lb">'+b.title+'</span>'));
 document.querySelector('.logo').insertAdjacentHTML('beforeend','<b class="lbrand">Studyverse</b>');
 document.querySelector('main').insertAdjacentHTML('beforeend','<section class="pg" id="p-ana"><div class="anah"><div class="chips" id="arng"></div><span class="sp2"></span><span class="demo" id="adm" style="display:none">Sample data</span><button class="btn" id="ademo" onclick="svDemo()">Preview with sample data</button></div><div class="statrow" id="astat" style="margin-bottom:16px"></div><div class="ag" id="agrid"></div></section>');
-document.querySelector('.top .me').insertAdjacentHTML('beforebegin','<button class="rb2 kmode" title="Light / dark" onclick="tgTheme()"><span class="km">'+ic('moon')+'</span><span class="ks">'+ic('sun')+'</span></button>');
 const hero=document.querySelector('#p-ov .hero');
 hero.insertAdjacentHTML('afterend','<div class="skin-only statrow" id="ostat"></div>');
 

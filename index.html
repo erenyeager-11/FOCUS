@@ -477,7 +477,7 @@ function yt(t,id){const c=$('ypl');c.style.display='block';c.innerHTML=`<iframe 
 function ytLink(){const r=$('ylink').value;let m=r.match(/[?&]list=([\w-]+)/);if(m)return yt('p',m[1]);m=r.match(/(?:v=|youtu\.be\/|live\/|embed\/)([\w-]{11})/);if(m)yt('v',m[1]);else snack('Could not read that link')}
 /* group study (Firebase: groupRooms / members / messages / dailyHistory) */
 const GI=['leaf','star','moon','sun','flame','bolt','heart','cloud','crown','coffee','book','paw','wave','globe','shield','trophy'],GC=['#ff8f6a','#f2b13c','#8b7be8','#4fc98a','#2aa3e0','#e1306c','#ffb978','#5fd08a'];
-const gAv=(id,s)=>{const i=Math.max(0,GI.indexOf(id));return `<span class="gav" style="width:${s}px;height:${s}px;background:${GC[i%8]}">${ic(GI.includes(id)?id:'leaf')}</span>`};
+const gAv=(id,s)=>{if(window.svAv&&/^av\d+$/.test(id||''))return svAv(id,s);const i=Math.max(0,GI.indexOf(id));return `<span class="gav" style="width:${s}px;height:${s}px;background:${GC[i%8]}">${ic(GI.includes(id)?id:'leaf')}</span>`};
 let fdb=null,fuid=null,gOnce=false,unsubs=[],mem={},hist=[],clock=null,rdata=null,pubUn=null,cr={icon:'leaf',pub:true};
 const ts=()=>firebase.firestore.FieldValue.serverTimestamp(),mref=id=>fdb.collection('groupRooms').doc(ST.room).collection('members').doc(id||fuid);
 const sday=()=>{const d=new Date();if(d.getHours()<5)d.setDate(d.getDate()-1);return dk(d)};
@@ -810,6 +810,6 @@ addEventListener('beforeinstallprompt',e=>{e.preventDefault();dip=e;setTimeout(s
 addEventListener('appinstalled',()=>{dip=null;hideInstall()});
 if(isIOS)setTimeout(showInstall,2500);
 </script><script>window.SV_AI={endpoint:"https://holy-art-7df5studyverse-ai.hammadpvt-2.workers.dev"}; /* paste your Worker URL here, see AI-SETUP.md */</script>
-<script src="themes.js" defer></script><script src="kiwi.js" defer></script>
+<script src="themes.js" defer></script><script src="kiwi.js" defer></script><script src="avatars.js" defer></script>
 <script src="ai-widget.js" defer></script>
 </body></html>

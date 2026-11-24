@@ -705,7 +705,7 @@ function saveRoomSet(){const n=$('rsn').value.trim();if(!n){snack('Enter a room 
 async function deleteRoom(skip){if(!rdata||(mem[fuid]||{}).role!=='admin')return;
  if(!skip&&!confirm('Delete this room for everyone? Chat, history and members will be removed. This cannot be undone.'))return;
  const id=ST.room,ref=fdb.collection('groupRooms').doc(id);closeM();snack('Deleting room...');
- try{for(const c of ['messages','dailyHistory','members']){let s;do{s=await ref.collection(c).limit(300).get();if(s.empty)break;const b=fdb.batch();s.docs.forEach(d=>b.delete(d.ref));await b.commit()}while(s.size>=300)}
+ try{for(const c of ['messages','dailyHistory','challenges','chSubs','xpLog','members']){let s;do{s=await ref.collection(c).limit(300).get();if(s.empty)break;const b=fdb.batch();s.docs.forEach(d=>b.delete(d.ref));await b.commit()}while(s.size>=300)}
   await ref.delete();ST.rooms=ST.rooms.filter(r=>r.id!==id);save();myRooms();snack('Room deleted')}catch(e){snack('Could not delete room ('+(e.code||'error')+')')}}
 async function giveOwner(id,leaveAfter){const t=mem[id];if(!t||(mem[fuid]||{}).role!=='admin')return;
  if(!leaveAfter&&!confirm('Make '+(t.name||'this member')+' the owner? You will become a manager.'))return;
@@ -810,6 +810,6 @@ addEventListener('beforeinstallprompt',e=>{e.preventDefault();dip=e;setTimeout(s
 addEventListener('appinstalled',()=>{dip=null;hideInstall()});
 if(isIOS)setTimeout(showInstall,2500);
 </script><script>window.SV_AI={endpoint:"https://holy-art-7df5studyverse-ai.hammadpvt-2.workers.dev"}; /* paste your Worker URL here, see AI-SETUP.md */</script>
-<script src="themes.js" defer></script><script src="kiwi.js" defer></script><script src="avatars.js" defer></script>
+<script src="themes.js" defer></script><script src="kiwi.js" defer></script><script src="avatars.js" defer></script><script src="challenges.js" defer></script><script src="floattimer.js" defer></script>
 <script src="ai-widget.js" defer></script>
 </body></html>

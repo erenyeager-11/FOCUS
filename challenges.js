@@ -36,6 +36,8 @@ const sub=(c,u)=>SUB[c.id+'_'+u];
 const late=c=>c.deadlineMs&&Date.now()>c.deadlineMs;
 function left(c){if(!c.deadlineMs)return 'No deadline';const ms=c.deadlineMs-Date.now(),a=Math.abs(ms),m=Math.floor(a/6e4),h=Math.floor(m/60),d=Math.floor(h/24),t=d?d+'d '+(h%24)+'h':h?h+'h '+(m%60)+'m':m+'m';return ms<0?'Ended '+t+' ago':t+' left'}
 const who=c=>c.assign==='all'?'Everyone':(c.assign||[]).length+' member'+((c.assign||[]).length===1?'':'s');
+const err=(e,w)=>snack(e&&e.code==='permission-denied'?'Firebase rules are blocking Challenges. Publish the Challenges rules once in the Firebase console.':'Could not '+w+' ('+(e&&e.code||'error')+')');
+let warned=0;const lerr=e=>{if(!warned&&e&&e.code==='permission-denied'){warned=1;snack('Challenges need the Firebase rules update to load')}};
 const nm=u=>esc((mem[u]||{}).name||'Member');
 
 /* ---------- rendering ---------- */
@@ -86,20 +88,20 @@ const S={
   ids=[...document.querySelectorAll('#chp input:checked')].map(i=>i.value);
   if(!t){snack('Add a title');return}if(!(xp>=1&&xp<=1000)){snack('XP must be between 1 and 1000');return}if(!all&&!ids.length){snack('Pick at least one member');return}
   const dl=l?new Date(l).getTime():null;if(l&&!(dl>Date.now())){snack('Deadline must be in the future');return}
-  try{await ref().collection('challenges').add({title:t,desc:q('chd').value.trim(),xp,deadlineMs:dl,assign:all?'all':ids,createdBy:fuid,byName:(mem[fuid]||{}).name||ST.name||'Manager',createdAt:ts()});closeM();snack('Challenge created')}catch(e){snack('Could not create challenge ('+(e.code||'error')+')')}},
+  try{await ref().collection('challenges').add({title:t,desc:q('chd').value.trim(),xp,deadlineMs:dl,assign:all?'all':ids,createdBy:fuid,byName:(mem[fuid]||{}).name||ST.name||'Manager',createdAt:ts()});closeM();snack('Challenge created')}catch(e){err(e,'create challenge')}},
  submit(cid){const c=C.find(x=>x.id===cid);if(!c||!mine(c)||late(c))return;const s=sub(c,fuid);if(s&&(s.status==='approved'||s.status==='pending'))return;
   modal(`<h3>Submit for review</h3><div class="chf"><div class="mut">${esc(c.title)} · +${c.xp} XP</div><label><em>Note for the reviewer <span>(optional)</span></em><textarea id="chn" maxlength="300" rows="3" placeholder="What did you finish?"></textarea></label><div class="cfa"><button class="btn" onclick="closeM()">Cancel</button><button class="btn p" onclick="SVCH.send('${sid(cid)}')">Submit</button></div></div>`)},
  async send(cid){const c=C.find(x=>x.id===cid);if(!c||!mine(c)||late(c))return;const m=mem[fuid]||{};
-  try{await ref().collection('chSubs').doc(cid+'_'+fuid).set({cid,uid:fuid,name:m.name||ST.name||'Member',icon:m.icon||'leaf',status:'pending',note:(q('chn').value||'').trim(),reason:'',submittedAt:ts()});closeM();snack('Submitted for review')}catch(e){snack('Could not submit ('+(e.code||'error')+')')}},
+  try{await ref().collection('chSubs').doc(cid+'_'+fuid).set({cid,uid:fuid,name:m.name||ST.name||'Member',icon:m.icon||'leaf',status:'pending',note:(q('chn').value||'').trim(),reason:'',submittedAt:ts()});closeM();snack('Submitted for review')}catch(e){err(e,'submit')}},
  async ok(cid,u){if(!isM())return;const sr=ref().collection('chSubs').doc(cid+'_'+u),xr=ref().collection('xpLog').doc(cid+'_'+u),c=C.find(x=>x.id===cid);if(!c)return;
   try{const r=await fdb.runTransaction(async t=>{const [s,x]=await Promise.all([t.get(sr),t.get(xr)]);if(!s.exists||s.data().status!=='pending')return 'stale';
    const by={reviewedBy:fuid,reviewedAt:ts()};t.update(sr,{status:'approved',...by});
    if(x.exists)return 'dup';t.set(xr,{cid,uid:u,kind:'task',title:c.title,xp:c.xp,at:ts(),by:fuid,byName:(mem[fuid]||{}).name||'Manager'});return 'ok'});
-   snack(r==='ok'?'Approved, +'+c.xp+' XP awarded':r==='dup'?'Already rewarded earlier. Marked approved.':'Already reviewed')}catch(e){snack('Could not approve ('+(e.code||'error')+')')}},
+   snack(r==='ok'?'Approved, +'+c.xp+' XP awarded':r==='dup'?'Already rewarded earlier. Marked approved.':'Already reviewed')}catch(e){err(e,'approve')}},
  async no(cid,u){if(!isM())return;const r=prompt('Reason for rejecting (optional)');if(r===null)return;
-  try{await fdb.runTransaction(async t=>{const sr=ref().collection('chSubs').doc(cid+'_'+u),s=await t.get(sr);if(s.exists&&s.data().status==='pending')t.update(sr,{status:'rejected',reason:r.trim().slice(0,160),reviewedBy:fuid,reviewedAt:ts()})});snack('Rejected')}catch(e){snack('Could not reject ('+(e.code||'error')+')')}},
+  try{await fdb.runTransaction(async t=>{const sr=ref().collection('chSubs').doc(cid+'_'+u),s=await t.get(sr);if(s.exists&&s.data().status==='pending')t.update(sr,{status:'rejected',reason:r.trim().slice(0,160),reviewedBy:fuid,reviewedAt:ts()})});snack('Rejected')}catch(e){err(e,'reject')}},
  async del(cid){if(!isM()||!confirm('Delete this challenge? XP already awarded stays in the rankings.'))return;
-  try{const b=fdb.batch();Object.values(SUB).filter(s=>s.cid===cid).forEach(s=>b.delete(ref().collection('chSubs').doc(cid+'_'+s.uid)));b.delete(ref().collection('challenges').doc(cid));await b.commit();snack('Challenge deleted')}catch(e){snack('Could not delete ('+(e.code||'error')+')')}},
+  try{const b=fdb.batch();Object.values(SUB).filter(s=>s.cid===cid).forEach(s=>b.delete(ref().collection('chSubs').doc(cid+'_'+s.uid)));b.delete(ref().collection('challenges').doc(cid));await b.commit();snack('Challenge deleted')}catch(e){err(e,'delete')}},
  async bonus(u){if(!isM()||!mem[u])return;const a=prompt('XP to give '+(mem[u].name||'member')+' (use a minus sign to deduct, -500 to 500)','10');if(a===null)return;const v=Math.round(+a);
   if(!v||v<-500||v>500){snack('Enter a number from -500 to 500');return}const why=(prompt('Reason (optional)')||'').trim().slice(0,80);
   try{await ref().collection('xpLog').doc('b'+Date.now().toString(36)+'_'+u).set({cid:'',uid:u,kind:'bonus',title:why||(v>0?'Bonus XP':'XP adjustment'),xp:v,at:ts(),by:fuid,byName:(mem[fuid]||{}).name||'Manager'});snack((v>0?'+':'')+v+' XP for '+(mem[u].name||'member'))}catch(e){snack('Could not update XP ('+(e.code||'error')+')')}}
@@ -108,9 +110,9 @@ const S={
 /* ---------- wiring into the existing room ---------- */
 function stop(){un.forEach(u=>u());un=[];clearInterval(tm);tm=null;C=[];SUB={};XP=[]}
 function start(){if(!fdb||!ST.room||!q('chList'))return;stop();const r=ref();
- un.push(r.collection('challenges').orderBy('createdAt','desc').limit(60).onSnapshot(s=>{C=s.docs.map(d=>({id:d.id,...d.data()}));drawC()},()=>{}));
- un.push(r.collection('chSubs').limit(800).onSnapshot(s=>{SUB={};s.docs.forEach(d=>SUB[d.id]=d.data());drawC()},()=>{}));
- un.push(r.collection('xpLog').orderBy('at','desc').limit(1000).onSnapshot(s=>{XP=s.docs.map(d=>({id:d.id,...d.data()}));draw()},()=>{}));
+ un.push(r.collection('challenges').orderBy('createdAt','desc').limit(60).onSnapshot(s=>{C=s.docs.map(d=>({id:d.id,...d.data()}));drawC()},lerr));
+ un.push(r.collection('chSubs').limit(800).onSnapshot(s=>{SUB={};s.docs.forEach(d=>SUB[d.id]=d.data());drawC()},lerr));
+ un.push(r.collection('xpLog').orderBy('at','desc').limit(1000).onSnapshot(s=>{XP=s.docs.map(d=>({id:d.id,...d.data()}));draw()},lerr));
  let day=lk(new Date());tm=setInterval(()=>{const k=lk(new Date());if(k!==day){day=k;bo=0}if(q('gRoom').style.display!=='none')draw()},30000);draw()}
 const g=q('rank').closest('.g');
 g.insertAdjacentHTML('beforebegin',`<div class="g g2" id="chSec" style="margin-bottom:18px"><div class="card"><div class="chtop"><h3>Challenges</h3><button class="btn p sm" id="chNew" style="display:none" onclick="SVCH.newCh()">New challenge</button></div><div class="chips" id="chTabs" style="margin-bottom:10px"></div><div id="chList"></div></div>
